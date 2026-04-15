@@ -1,0 +1,14 @@
+{
+  "pages": [
+    { "path": "pages/math/index", "style": { "navigationStyle": "custom", "navigationBarTitleText": "数学练习" } },
+    { "path": "pages/math/online", "style": { "navigationStyle": "custom", "navigationBarTitleText": "在线练习" } },
+    { "path": "pages/math/print", "style": { "navigationStyle": "custom", "navigationBarTitleText": "打印出题" } },
+    { "path": "pages/math/history", "style": { "navigationStyle": "custom", "navigationBarTitleText": "历史记录" } }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "数学练习",
+    "navigationBarBackgroundColor": "#F8F8F8",
+    "backgroundColor": "#F8F8F8"
+  }
+}
