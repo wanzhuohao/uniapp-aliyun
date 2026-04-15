@@ -64,7 +64,7 @@
               :key="qi"
               :class="['grid-item',
                 record.type === 'online' && q.isCorrect === false && 'grid-item-wrong',
-                q.type === 'hundredChart' && 'grid-item-chart']"
+                (q.type === 'hundredChart' || q.type === 'triangle' || q.type === 'square') && 'grid-item-chart']"
             >
               <!-- 百数表：mini 网格 -->
               <template v-if="q.type === 'hundredChart'">
@@ -78,6 +78,19 @@
                         <view v-else class="mc-empty" />
                       </template>
                     </template>
+                  </view>
+                  <text v-if="record.type === 'online' && q.isCorrect !== false" class="grid-correct"> ✓</text>
+                  <text v-if="record.type === 'online' && q.isCorrect === false" class="grid-answer"> ✗</text>
+                </view>
+              </template>
+              <!-- 图形填数：显示所有数字 -->
+              <template v-else-if="q.type === 'triangle' || q.type === 'square'">
+                <view class="mini-chart-wrap">
+                  <text class="grid-expr">{{ q.type === 'triangle' ? '△' : '□' }}</text>
+                  <view class="shape-nums">
+                    <text v-for="k in Object.keys(parseShape(q.expr).vals)" :key="k"
+                      :class="['shape-num', parseShape(q.expr).shown.includes(k) ? 'mc-center' : 'mc-ans']"
+                    >{{ parseShape(q.expr).vals[k] }}</text>
                   </view>
                   <text v-if="record.type === 'online' && q.isCorrect !== false" class="grid-correct"> ✓</text>
                   <text v-if="record.type === 'online' && q.isCorrect === false" class="grid-answer"> ✗</text>
@@ -178,6 +191,11 @@ function getAccuracy(record) {
 // 百数表 JSON 解析
 function parseChart(exprStr) {
   try { return JSON.parse(exprStr) } catch { return { center: 0, rows: 0, cols: 0, cellMap: {}, centerKey: '', hiddenKeys: [] } }
+}
+
+// 图形填数 JSON 解析
+function parseShape(exprStr) {
+  try { return JSON.parse(exprStr) } catch { return { target: 0, vals: {}, shown: [], hidden: [] } }
 }
 
 // 填运算符：把 ○ 替换为实际答案
@@ -483,6 +501,22 @@ onShow(() => {
 .mc-empty {
   width: 40rpx;
   height: 40rpx;
+}
+
+/* 图形填数历史 */
+.shape-nums {
+  display: flex;
+  gap: 4rpx;
+}
+.shape-num {
+  width: 36rpx;
+  height: 36rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18rpx;
+  font-weight: bold;
 }
 
 .grid-expr {

@@ -219,6 +219,99 @@
             </view>
           </template>
 
+          <!-- 三角形填数 -->
+          <template v-else-if="q.type === 'triangle'">
+            <view class="shape-wrap">
+              <text class="shape-hint">每边之和 = {{ shapeData(q).target }}</text>
+              <view class="tri-layout">
+                <!-- 第1行: A -->
+                <view class="tri-row tri-row-1">
+                  <view :class="['shape-circle', shapeIsShown(q, 'A') && 'shape-given']">
+                    <text v-if="shapeIsShown(q, 'A')">{{ shapeData(q).vals.A }}</text>
+                    <input v-else class="shape-input" type="number" :value="shapeAnswer(q, 'A')" placeholder="?" @input="onShapeInput(i, 'A', $event)" />
+                  </view>
+                </view>
+                <!-- 第2行: AB  AC -->
+                <view class="tri-row tri-row-2">
+                  <view :class="['shape-circle', shapeIsShown(q, 'AB') && 'shape-given']">
+                    <text v-if="shapeIsShown(q, 'AB')">{{ shapeData(q).vals.AB }}</text>
+                    <input v-else class="shape-input" type="number" :value="shapeAnswer(q, 'AB')" placeholder="?" @input="onShapeInput(i, 'AB', $event)" />
+                  </view>
+                  <view :class="['shape-circle', shapeIsShown(q, 'AC') && 'shape-given']">
+                    <text v-if="shapeIsShown(q, 'AC')">{{ shapeData(q).vals.AC }}</text>
+                    <input v-else class="shape-input" type="number" :value="shapeAnswer(q, 'AC')" placeholder="?" @input="onShapeInput(i, 'AC', $event)" />
+                  </view>
+                </view>
+                <!-- 第3行: B  BC  C -->
+                <view class="tri-row tri-row-3">
+                  <view :class="['shape-circle', shapeIsShown(q, 'B') && 'shape-given']">
+                    <text v-if="shapeIsShown(q, 'B')">{{ shapeData(q).vals.B }}</text>
+                    <input v-else class="shape-input" type="number" :value="shapeAnswer(q, 'B')" placeholder="?" @input="onShapeInput(i, 'B', $event)" />
+                  </view>
+                  <view :class="['shape-circle', shapeIsShown(q, 'BC') && 'shape-given']">
+                    <text v-if="shapeIsShown(q, 'BC')">{{ shapeData(q).vals.BC }}</text>
+                    <input v-else class="shape-input" type="number" :value="shapeAnswer(q, 'BC')" placeholder="?" @input="onShapeInput(i, 'BC', $event)" />
+                  </view>
+                  <view :class="['shape-circle', shapeIsShown(q, 'C') && 'shape-given']">
+                    <text v-if="shapeIsShown(q, 'C')">{{ shapeData(q).vals.C }}</text>
+                    <input v-else class="shape-input" type="number" :value="shapeAnswer(q, 'C')" placeholder="?" @input="onShapeInput(i, 'C', $event)" />
+                  </view>
+                </view>
+              </view>
+            </view>
+          </template>
+
+          <!-- 方形填数 -->
+          <template v-else-if="q.type === 'square'">
+            <view class="shape-wrap">
+              <text class="shape-hint">每边之和 = {{ shapeData(q).target }}</text>
+              <view class="sq-layout">
+                <!-- 第1行: A  AB  B -->
+                <view class="sq-row">
+                  <view :class="['shape-circle', shapeIsShown(q, 'A') && 'shape-given']">
+                    <text v-if="shapeIsShown(q, 'A')">{{ shapeData(q).vals.A }}</text>
+                    <input v-else class="shape-input" type="number" :value="shapeAnswer(q, 'A')" placeholder="?" @input="onShapeInput(i, 'A', $event)" />
+                  </view>
+                  <view :class="['shape-circle', shapeIsShown(q, 'AB') && 'shape-given']">
+                    <text v-if="shapeIsShown(q, 'AB')">{{ shapeData(q).vals.AB }}</text>
+                    <input v-else class="shape-input" type="number" :value="shapeAnswer(q, 'AB')" placeholder="?" @input="onShapeInput(i, 'AB', $event)" />
+                  </view>
+                  <view :class="['shape-circle', shapeIsShown(q, 'B') && 'shape-given']">
+                    <text v-if="shapeIsShown(q, 'B')">{{ shapeData(q).vals.B }}</text>
+                    <input v-else class="shape-input" type="number" :value="shapeAnswer(q, 'B')" placeholder="?" @input="onShapeInput(i, 'B', $event)" />
+                  </view>
+                </view>
+                <!-- 第2行: DA  (空)  BC -->
+                <view class="sq-row">
+                  <view :class="['shape-circle', shapeIsShown(q, 'DA') && 'shape-given']">
+                    <text v-if="shapeIsShown(q, 'DA')">{{ shapeData(q).vals.DA }}</text>
+                    <input v-else class="shape-input" type="number" :value="shapeAnswer(q, 'DA')" placeholder="?" @input="onShapeInput(i, 'DA', $event)" />
+                  </view>
+                  <view class="shape-empty" />
+                  <view :class="['shape-circle', shapeIsShown(q, 'BC') && 'shape-given']">
+                    <text v-if="shapeIsShown(q, 'BC')">{{ shapeData(q).vals.BC }}</text>
+                    <input v-else class="shape-input" type="number" :value="shapeAnswer(q, 'BC')" placeholder="?" @input="onShapeInput(i, 'BC', $event)" />
+                  </view>
+                </view>
+                <!-- 第3行: D  CD  C -->
+                <view class="sq-row">
+                  <view :class="['shape-circle', shapeIsShown(q, 'D') && 'shape-given']">
+                    <text v-if="shapeIsShown(q, 'D')">{{ shapeData(q).vals.D }}</text>
+                    <input v-else class="shape-input" type="number" :value="shapeAnswer(q, 'D')" placeholder="?" @input="onShapeInput(i, 'D', $event)" />
+                  </view>
+                  <view :class="['shape-circle', shapeIsShown(q, 'CD') && 'shape-given']">
+                    <text v-if="shapeIsShown(q, 'CD')">{{ shapeData(q).vals.CD }}</text>
+                    <input v-else class="shape-input" type="number" :value="shapeAnswer(q, 'CD')" placeholder="?" @input="onShapeInput(i, 'CD', $event)" />
+                  </view>
+                  <view :class="['shape-circle', shapeIsShown(q, 'C') && 'shape-given']">
+                    <text v-if="shapeIsShown(q, 'C')">{{ shapeData(q).vals.C }}</text>
+                    <input v-else class="shape-input" type="number" :value="shapeAnswer(q, 'C')" placeholder="?" @input="onShapeInput(i, 'C', $event)" />
+                  </view>
+                </view>
+              </view>
+            </view>
+          </template>
+
           <!-- 普通加减/连加减: 算式 = 输入框 -->
           <template v-else>
             <text class="q-expr">{{ q.expr }} =</text>
@@ -275,6 +368,17 @@
               </view>
             </view>
           </template>
+          <!-- 图形填数错题：显示所有数字 -->
+          <template v-else-if="w.type === 'triangle' || w.type === 'square'">
+            <view class="wrong-chart-block">
+              <text class="wrong-expr">{{ w.index + 1 }}. {{ w.type === 'triangle' ? '三角' : '方形' }}填数（每边和={{ shapeDataStatic(w.expr).target }}）</text>
+              <view class="wrong-shape-vals">
+                <text v-for="k in Object.keys(shapeDataStatic(w.expr).vals)" :key="k"
+                  :class="['wrong-shape-num', shapeDataStatic(w.expr).shown.includes(k) ? 'given' : 'answer']"
+                >{{ shapeDataStatic(w.expr).vals[k] }}</text>
+              </view>
+            </view>
+          </template>
           <!-- 其他所有题型：完整算式 + 用户答案 -->
           <template v-else>
             <text class="wrong-expr">{{ w.index + 1 }}. {{ fillAnswer(w) }}</text>
@@ -309,8 +413,8 @@ import { toast } from '../../utils/common/toast.js'
 // ---- 配置选项 ----
 const levelOptions = [
   { value: 1, label: '20以内' },
-  { value: 2, label: '±整十' },
-  { value: 3, label: '±一位数' },
+  { value: 2, label: '100以内(整十)' },
+  { value: 3, label: '100以内' },
 ]
 const typeOptions = [
   { value: 'add',          label: '加法' },
@@ -320,6 +424,7 @@ const typeOptions = [
   { value: 'chain',        label: '连加连减' },
   { value: 'fillOp',       label: '填运算符' },
   { value: 'hundredChart', label: '百数表' },
+  { value: 'shapeFill',   label: '图形填数' },
 ]
 const countPresets = [20, 50, 100]
 
@@ -550,6 +655,28 @@ function onChartInput(qIndex, key, e) {
   q.userAnswer = JSON.stringify(data.hiddenKeys.map(k => q._chartAnswers[k] || ''))
 }
 
+// 图形填数辅助 (三角/方形共用)
+function shapeData(q) {
+  try { return JSON.parse(q.expr) } catch { return { target: 0, vals: {}, shown: [], hidden: [] } }
+}
+
+function shapeIsShown(q, key) {
+  return shapeData(q).shown.includes(key)
+}
+
+function shapeAnswer(q, key) {
+  if (!q._shapeAnswers) return ''
+  return q._shapeAnswers[key] || ''
+}
+
+function onShapeInput(qIndex, key, e) {
+  const q = questions.value[qIndex]
+  if (!q._shapeAnswers) q._shapeAnswers = {}
+  q._shapeAnswers[key] = e.detail.value
+  const data = shapeData(q)
+  q.userAnswer = JSON.stringify(data.hidden.map(k => q._shapeAnswers[k] || ''))
+}
+
 function onInput(index, e) {
   questions.value[index].userAnswer = e.detail.value
 }
@@ -677,6 +804,11 @@ function formatUserAnswer(w) {
   // 双边运算符: "+,-" → "+ 和 -"
   if (w.type === 'fillOp2') return ua.replace(',', ' 和 ')
   return ua
+}
+
+// 结果页: 解析图形填数
+function shapeDataStatic(exprStr) {
+  try { return JSON.parse(exprStr) } catch { return { target: 0, vals: {}, shown: [], hidden: [] } }
 }
 
 // 结果页: 把正确答案填入算式，统一简洁风格
@@ -989,6 +1121,77 @@ onUnmounted(() => {
   border-color: #42A5F5;
 }
 
+/* 图形填数 (三角/方形共用) */
+.shape-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+.shape-hint {
+  font-size: 24rpx;
+  color: #999;
+  margin-bottom: 12rpx;
+}
+.shape-circle {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 50%;
+  border: 3rpx solid #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30rpx;
+  font-weight: bold;
+  background: #FFF8E1;
+}
+.shape-given {
+  background: #E3F2FD;
+  color: #1565C0;
+  border-color: #90CAF9;
+}
+.shape-empty {
+  width: 72rpx;
+  height: 72rpx;
+}
+.shape-input {
+  width: 60rpx;
+  height: 60rpx;
+  text-align: center;
+  font-size: 26rpx;
+  font-weight: bold;
+  border: none;
+  background: transparent;
+}
+
+/* 三角形布局 */
+.tri-layout {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8rpx;
+}
+.tri-row {
+  display: flex;
+  justify-content: center;
+  gap: 16rpx;
+}
+.tri-row-2 {
+  gap: 80rpx;
+}
+
+/* 方形布局 */
+.sq-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+.sq-row {
+  display: flex;
+  justify-content: center;
+  gap: 16rpx;
+}
+
 /* 百数表不规则网格 */
 .hundred-chart {
   display: grid;
@@ -1175,6 +1378,32 @@ onUnmounted(() => {
 .wrong-chart-empty {
   width: 52rpx;
   height: 52rpx;
+}
+
+/* 图形填数错题 */
+.wrong-shape-vals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8rpx;
+  margin-top: 8rpx;
+}
+.wrong-shape-num {
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22rpx;
+  font-weight: bold;
+}
+.wrong-shape-num.given {
+  background: #E3F2FD;
+  color: #1565C0;
+}
+.wrong-shape-num.answer {
+  background: #FFF3E0;
+  color: #E65100;
 }
 
 .all-correct {

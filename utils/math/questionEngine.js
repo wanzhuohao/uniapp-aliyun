@@ -1,7 +1,7 @@
 const LEVEL_CONFIG = {
-  1: { name: '20以内加减', max: 20 },
-  2: { name: '100以内±整十', max: 100, step: 10 },
-  3: { name: '100以内±一位数', max: 100 },
+  1: { name: '20以内', max: 20 },
+  2: { name: '100以内(整十)', max: 100, step: 10 },
+  3: { name: '100以内', max: 100 },
 }
 
 function rand(min, max) {
@@ -232,8 +232,91 @@ function genHundredChart(level) {
   }
 }
 
-const TYPE_GENERATORS = { add: genAdd, sub: genSub, compare: genCompare, fill: genFillBlank, chain: genChain, fillOp: genFillOp, hundredChart: genHundredChart }
-const MIX_TYPES = ['add', 'add', 'sub', 'sub', 'compare', 'fill', 'chain', 'fillOp', 'hundredChart']
+// 三角形填数: 6个位置(3顶点A/B/C + 3中点AB/BC/AC)，每边3数之和=target
+// 布局:     A
+//          / \
+//        AB   AC
+//        /     \
+//       B — BC — C
+function genTriangle(level) {
+  const cfg = LEVEL_CONFIG[level]
+  const maxNum = Math.min(cfg.max, 20) // 数字不超过20
+  for (let attempt = 0; attempt < 30; attempt++) {
+    const A = rand(1, Math.floor(maxNum / 2))
+    const B = rand(1, Math.floor(maxNum / 2))
+    const C = rand(1, Math.floor(maxNum / 2))
+    const target = rand(Math.max(A + B, B + C, A + C) + 1, A + B + C + maxNum)
+    const AB = target - A - B
+    const BC = target - B - C
+    const AC = target - A - C
+    if (AB < 1 || BC < 1 || AC < 1) continue
+    if (AB > maxNum || BC > maxNum || AC > maxNum) continue
+    // 确保6个数不全相同（有趣）
+    const vals = { A, B, C, AB, BC, AC }
+    const allKeys = Object.keys(vals)
+    // 随机显示2~3个，隐藏其余
+    const showCount = rand(2, 3)
+    const shuffled = allKeys.sort(() => Math.random() - 0.5)
+    const shown = shuffled.slice(0, showCount)
+    const hidden = shuffled.slice(showCount)
+    return {
+      expr: JSON.stringify({ target, vals, shown, hidden }),
+      answer: JSON.stringify(hidden.map(k => String(vals[k]))),
+      type: 'triangle',
+    }
+  }
+  // fallback
+  return { expr: JSON.stringify({ target: 10, vals: { A: 1, B: 2, C: 3, AB: 7, BC: 5, AC: 6 }, shown: ['A', 'B'], hidden: ['C', 'AB', 'BC', 'AC'] }), answer: JSON.stringify(['3','7','5','6']), type: 'triangle' }
+}
+
+// 方形填数: 8个位置(4顶点A/B/C/D + 4中点AB/BC/CD/DA)，每边3数之和=target
+// 布局: A — AB — B
+//       |        |
+//       DA      BC
+//       |        |
+//       D — CD — C
+function genSquare(level) {
+  const cfg = LEVEL_CONFIG[level]
+  const maxNum = Math.min(cfg.max, 20)
+  for (let attempt = 0; attempt < 50; attempt++) {
+    const A = rand(1, Math.floor(maxNum / 2))
+    const B = rand(1, Math.floor(maxNum / 2))
+    const C = rand(1, Math.floor(maxNum / 2))
+    const D = rand(1, Math.floor(maxNum / 2))
+    // 每边之和相等 = target
+    // AB = target - A - B, BC = target - B - C, CD = target - C - D, DA = target - D - A
+    const minTarget = Math.max(A + B, B + C, C + D, D + A) + 1
+    if (minTarget > A + B + maxNum) continue
+    const target = rand(minTarget, Math.min(A + B + maxNum, B + C + maxNum, C + D + maxNum, D + A + maxNum))
+    const AB = target - A - B
+    const BC = target - B - C
+    const CD = target - C - D
+    const DA = target - D - A
+    if (AB < 1 || BC < 1 || CD < 1 || DA < 1) continue
+    if (AB > maxNum || BC > maxNum || CD > maxNum || DA > maxNum) continue
+    const vals = { A, B, C, D, AB, BC, CD, DA }
+    const allKeys = Object.keys(vals)
+    const showCount = rand(2, 3)
+    const shuffled = allKeys.sort(() => Math.random() - 0.5)
+    const shown = shuffled.slice(0, showCount)
+    const hidden = shuffled.slice(showCount)
+    return {
+      expr: JSON.stringify({ target, vals, shown, hidden }),
+      answer: JSON.stringify(hidden.map(k => String(vals[k]))),
+      type: 'square',
+    }
+  }
+  // fallback
+  return { expr: JSON.stringify({ target: 10, vals: { A: 1, B: 2, C: 3, D: 4, AB: 7, BC: 5, CD: 3, DA: 5 }, shown: ['A', 'B', 'C'], hidden: ['D', 'AB', 'BC', 'CD', 'DA'] }), answer: JSON.stringify(['4','7','5','3','5']), type: 'square' }
+}
+
+// 图形填数: 随机三角形或方形
+function genShapeFill(level) {
+  return Math.random() > 0.5 ? genTriangle(level) : genSquare(level)
+}
+
+const TYPE_GENERATORS = { add: genAdd, sub: genSub, compare: genCompare, fill: genFillBlank, chain: genChain, fillOp: genFillOp, hundredChart: genHundredChart, shapeFill: genShapeFill }
+const MIX_TYPES = ['add', 'add', 'sub', 'sub', 'compare', 'fill', 'chain', 'fillOp', 'hundredChart', 'shapeFill']
 const PRINT_TYPES = ['add', 'add', 'sub', 'sub', 'chain']
 const PRINT_NO_CHAIN_TYPES = ['add', 'sub']
 
