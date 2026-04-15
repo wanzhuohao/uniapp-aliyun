@@ -154,6 +154,10 @@ function goBack() {
   }
 }
 
+function isMobile() {
+  return /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)
+}
+
 async function handlePrint() {
   saveRecord({
     type: 'print',
@@ -162,27 +166,37 @@ async function handlePrint() {
     questions: questions.value.map(q => ({ expr: q.expr, answer: q.answer })),
   })
   showAnswerSheet.value = false
-  toast.loading('生成打印图片...')
+  toast.loading('生成图片...')
   try {
     const { default: html2canvas } = await import('html2canvas')
     const el = document.getElementById('printArea')
     const canvas = await html2canvas(el, { scale: 2, useCORS: true })
     const dataUrl = canvas.toDataURL('image/png')
     toast.hideLoading()
-    // 新窗口打印图片
-    const win = window.open('', '_blank')
-    win.document.write(`
-      <html><head><title>打印</title>
-      <style>
-        @page { margin: 0; }
-        body { margin: 0; display: flex; justify-content: center; }
-        img { width: 100%; height: auto; }
-      </style>
-      </head><body>
-      <img src="${dataUrl}" onload="window.print();window.close();" />
-      </body></html>
-    `)
-    win.document.close()
+
+    if (isMobile()) {
+      // 手机：下载图片，用户从相册打印
+      const link = document.createElement('a')
+      link.download = `${Date.now()}.png`
+      link.href = dataUrl
+      link.click()
+      toast.success('图片已保存，请从相册打印')
+    } else {
+      // 电脑：新窗口打印
+      const win = window.open('', '_blank')
+      win.document.write(`
+        <html><head><title>打印</title>
+        <style>
+          @page { margin: 0; }
+          body { margin: 0; display: flex; justify-content: center; }
+          img { width: 100%; height: auto; }
+        </style>
+        </head><body>
+        <img src="${dataUrl}" onload="window.print();window.close();" />
+        </body></html>
+      `)
+      win.document.close()
+    }
   } catch (e) {
     toast.hideLoading()
     toast.error('打印失败')
