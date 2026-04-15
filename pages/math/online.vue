@@ -430,7 +430,7 @@ const countPresets = [20, 50, 100]
 
 // ---- 设置状态（多选用 Set） ----
 const selectedLevels = ref(new Set([1]))
-const selectedTypes  = ref(new Set(['add', 'sub']))
+const selectedTypes  = ref(new Set(['add']))
 
 function toggleLevel(val) {
   const s = selectedLevels.value
