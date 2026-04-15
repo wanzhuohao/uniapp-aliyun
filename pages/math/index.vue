@@ -24,6 +24,13 @@
           <text class="module-desc">查看历次练习成绩</text>
         </view>
       </view>
+      <view class="module-card mistakes-card" @click="goTo('/pages/math/mistakes')">
+        <text class="module-icon">📖</text>
+        <view class="module-info">
+          <text class="module-name">错题本</text>
+          <text class="module-desc">间隔复习，重练错题</text>
+        </view>
+      </view>
     </view>
   </view>
 </template>
@@ -82,6 +89,7 @@ function goTo(url) {
 .online-card  { border-left-color: #42A5F5; }
 .print-card   { border-left-color: #29B6F6; }
 .history-card { border-left-color: #0288D1; }
+.mistakes-card { border-left-color: #FF7043; }
 .module-icon {
   font-size: 56rpx;
 }

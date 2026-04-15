@@ -56,30 +56,63 @@
           </view>
         </view>
 
-        <!-- Expanded Detail: 4-column grid like print sheet -->
+        <!-- Expanded Detail -->
         <view v-if="expandedIndex === index" class="card-detail">
           <view class="detail-grid">
             <view
               v-for="(q, qi) in record.questions"
               :key="qi"
-              :class="['grid-item', record.type === 'online' && q.isCorrect === false && 'grid-item-wrong']"
+              :class="['grid-item',
+                record.type === 'online' && q.isCorrect === false && 'grid-item-wrong',
+                q.type === 'hundredChart' && 'grid-item-chart']"
             >
-              <!-- 打印记录：算式部分 + 红色答案 -->
-              <template v-if="record.type !== 'online'">
-                <text class="grid-expr">{{ exprParts(q.expr).before }}</text>
-                <text class="grid-answer">{{ q.answer }}</text>
-                <text class="grid-expr">{{ exprParts(q.expr).after }}</text>
+              <!-- 百数表：mini 网格 -->
+              <template v-if="q.type === 'hundredChart'">
+                <view class="mini-chart-wrap">
+                  <view class="mini-chart" :style="{ gridTemplateColumns: `repeat(${parseChart(q.expr).cols}, 40rpx)` }">
+                    <template v-for="r in parseChart(q.expr).rows" :key="r">
+                      <template v-for="c in parseChart(q.expr).cols" :key="c">
+                        <text v-if="`${r-1},${c-1}` in parseChart(q.expr).cellMap"
+                          :class="['mc-cell', `${r-1},${c-1}` === parseChart(q.expr).centerKey ? 'mc-center' : 'mc-ans']"
+                        >{{ parseChart(q.expr).cellMap[`${r-1},${c-1}`] }}</text>
+                        <view v-else class="mc-empty" />
+                      </template>
+                    </template>
+                  </view>
+                  <text v-if="record.type === 'online' && q.isCorrect !== false" class="grid-correct"> ✓</text>
+                  <text v-if="record.type === 'online' && q.isCorrect === false" class="grid-answer"> ✗</text>
+                </view>
               </template>
-              <!-- 在线记录 -->
+              <!-- 填运算符(单边+双边) -->
+              <template v-else-if="q.type === 'fillOp' || q.type === 'fillOp2'">
+                <template v-if="record.type === 'online' && q.isCorrect !== false">
+                  <text class="grid-expr">{{ formatOpExpr(q) }}</text>
+                  <text class="grid-correct"> ✓</text>
+                </template>
+                <template v-else-if="record.type === 'online'">
+                  <text class="grid-expr">{{ formatOpExpr(q) }}</text>
+                  <text class="grid-answer"> ✗</text>
+                </template>
+                <template v-else>
+                  <text class="grid-expr">{{ formatOpExpr(q) }}</text>
+                </template>
+              </template>
+              <!-- 普通题 -->
               <template v-else>
-                <!-- 答对：算式 + 绿色答案 + ✓ -->
-                <template v-if="q.isCorrect !== false">
+                <!-- 打印记录 -->
+                <template v-if="record.type !== 'online'">
+                  <text class="grid-expr">{{ exprParts(q.expr).before }}</text>
+                  <text class="grid-answer">{{ q.answer }}</text>
+                  <text class="grid-expr">{{ exprParts(q.expr).after }}</text>
+                </template>
+                <!-- 在线答对 -->
+                <template v-else-if="q.isCorrect !== false">
                   <text class="grid-expr">{{ exprParts(q.expr).before }}</text>
                   <text class="grid-correct">{{ q.answer }}</text>
                   <text class="grid-expr">{{ exprParts(q.expr).after }}</text>
                   <text class="grid-correct"> ✓</text>
                 </template>
-                <!-- 答错：算式 + 红色用户答案划掉 + 绿色正确答案 -->
+                <!-- 在线答错 -->
                 <template v-else>
                   <text class="grid-expr">{{ exprParts(q.expr).before }}</text>
                   <text class="grid-wrong-user">{{ q.userAnswer || '?' }}</text>
@@ -140,6 +173,23 @@ function getAccuracy(record) {
   if (record.correct != null) return Math.round((record.correct / total) * 100)
   const correct = record.questions.filter(q => q.isCorrect !== false).length
   return Math.round((correct / total) * 100)
+}
+
+// 百数表 JSON 解析
+function parseChart(exprStr) {
+  try { return JSON.parse(exprStr) } catch { return { center: 0, rows: 0, cols: 0, cellMap: {}, centerKey: '', hiddenKeys: [] } }
+}
+
+// 填运算符：把 ○ 替换为实际答案
+function formatOpExpr(q) {
+  if (q.type === 'fillOp2') {
+    const ops = (q.answer || '').split(',')
+    const parts = q.expr.split('○')
+    if (parts.length === 3 && ops.length === 2) {
+      return `${parts[0].trim()} ${ops[0]} ${parts[1].trim()} ${ops[1]} ${parts[2].trim()}`
+    }
+  }
+  return q.expr.replace('○', q.answer || '?')
 }
 
 // 拆算式为答案前后两部分
@@ -394,6 +444,45 @@ onShow(() => {
 
 .grid-item-wrong {
   background: #fff3f3;
+}
+
+/* 百数表占满整行 */
+.grid-item-chart {
+  grid-column: 1 / -1;
+  white-space: normal;
+  overflow: visible;
+}
+
+.mini-chart-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+.mini-chart {
+  display: grid;
+  gap: 2rpx;
+}
+.mc-cell {
+  width: 40rpx;
+  height: 40rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20rpx;
+  font-weight: bold;
+  border-radius: 4rpx;
+}
+.mc-center {
+  background: #E3F2FD;
+  color: #1565C0;
+}
+.mc-ans {
+  background: #FFF3E0;
+  color: #E65100;
+}
+.mc-empty {
+  width: 40rpx;
+  height: 40rpx;
 }
 
 .grid-expr {

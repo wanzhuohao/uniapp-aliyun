@@ -4,7 +4,9 @@
     { "path": "pages/math/index", "style": { "navigationStyle": "custom", "navigationBarTitleText": "数学练习" } },
     { "path": "pages/math/online", "style": { "navigationStyle": "custom", "navigationBarTitleText": "在线练习" } },
     { "path": "pages/math/print", "style": { "navigationStyle": "custom", "navigationBarTitleText": "打印出题" } },
-    { "path": "pages/math/history", "style": { "navigationStyle": "custom", "navigationBarTitleText": "历史记录" } }
+    { "path": "pages/math/history", "style": { "navigationStyle": "custom", "navigationBarTitleText": "历史记录" } },
+    { "path": "pages/math/mistakes", "style": { "navigationStyle": "custom", "navigationBarTitleText": "错题本" } },
+    { "path": "pages/math/mistakes-practice", "style": { "navigationStyle": "custom", "navigationBarTitleText": "错题重练" } }
   ],
   "globalStyle": {
     "navigationBarTextStyle": "black",

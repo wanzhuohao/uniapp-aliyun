@@ -153,64 +153,69 @@
             </text>
           </template>
 
-          <!-- 填运算符: a [+/-] b = c -->
+          <!-- 填运算符(单边): a [+/-] b = c -->
           <template v-else-if="q.type === 'fillOp'">
-            <text class="q-expr">{{ splitFillOp(q.expr)[0] }}</text>
-            <view class="compare-btns">
-              <view
-                :class="['cmp-btn', q.userAnswer === '+' && 'selected']"
-                @click="selectCompare(i, '+')"
-              >+</view>
-              <view
-                :class="['cmp-btn', q.userAnswer === '-' && 'selected']"
-                @click="selectCompare(i, '-')"
-              >-</view>
+            <view class="fillop2-row">
+              <text class="fillop2-num">{{ splitFillOp(q.expr)[0] }}</text>
+              <view class="fillop2-btns">
+                <view
+                  :class="['fillop2-btn', q.userAnswer === '+' && 'selected']"
+                  @click="selectCompare(i, '+')"
+                >+</view>
+                <view
+                  :class="['fillop2-btn', q.userAnswer === '-' && 'selected']"
+                  @click="selectCompare(i, '-')"
+                >-</view>
+              </view>
+              <text class="fillop2-num">{{ splitFillOp(q.expr)[1] }}</text>
             </view>
-            <text class="q-expr">{{ splitFillOp(q.expr)[1] }}</text>
           </template>
 
-          <!-- 百数表: 十字格填空 -->
+          <!-- 填运算符(双边): a [+/-] b = c [+/-] d -->
+          <template v-else-if="q.type === 'fillOp2'">
+            <view class="fillop2-row">
+              <text class="fillop2-num">{{ splitFillOp2(q.expr)[0] }}</text>
+              <view class="fillop2-btns">
+                <view
+                  :class="['fillop2-btn', getOp2(q, 0) === '+' && 'selected']"
+                  @click="selectOp2(i, 0, '+')"
+                >+</view>
+                <view
+                  :class="['fillop2-btn', getOp2(q, 0) === '-' && 'selected']"
+                  @click="selectOp2(i, 0, '-')"
+                >-</view>
+              </view>
+              <text class="fillop2-num">{{ splitFillOp2(q.expr)[1] }}</text>
+              <view class="fillop2-btns">
+                <view
+                  :class="['fillop2-btn', getOp2(q, 1) === '+' && 'selected']"
+                  @click="selectOp2(i, 1, '+')"
+                >+</view>
+                <view
+                  :class="['fillop2-btn', getOp2(q, 1) === '-' && 'selected']"
+                  @click="selectOp2(i, 1, '-')"
+                >-</view>
+              </view>
+              <text class="fillop2-num">{{ splitFillOp2(q.expr)[2] }}</text>
+            </view>
+          </template>
+
+          <!-- 百数表: 不规则形状填空 -->
           <template v-else-if="q.type === 'hundredChart'">
-            <view class="hundred-chart">
-              <view class="hc-row">
-                <view class="hc-cell" />
-                <view :class="['hc-cell', isHidden(q, 'top') && 'hc-input-cell']">
-                  <text v-if="!isHidden(q, 'top')">{{ chartData(q).values.top }}</text>
-                  <input v-else class="hc-input" type="number"
-                    :value="chartAnswer(q, 'top')"
-                    placeholder="?"
-                    @input="onChartInput(i, 'top', $event)" />
-                </view>
-                <view class="hc-cell" />
-              </view>
-              <view class="hc-row">
-                <view :class="['hc-cell', isHidden(q, 'left') && 'hc-input-cell']">
-                  <text v-if="!isHidden(q, 'left')">{{ chartData(q).values.left }}</text>
-                  <input v-else class="hc-input" type="number"
-                    :value="chartAnswer(q, 'left')"
-                    placeholder="?"
-                    @input="onChartInput(i, 'left', $event)" />
-                </view>
-                <view class="hc-cell hc-center">{{ chartData(q).center }}</view>
-                <view :class="['hc-cell', isHidden(q, 'right') && 'hc-input-cell']">
-                  <text v-if="!isHidden(q, 'right')">{{ chartData(q).values.right }}</text>
-                  <input v-else class="hc-input" type="number"
-                    :value="chartAnswer(q, 'right')"
-                    placeholder="?"
-                    @input="onChartInput(i, 'right', $event)" />
-                </view>
-              </view>
-              <view class="hc-row">
-                <view class="hc-cell" />
-                <view :class="['hc-cell', isHidden(q, 'bottom') && 'hc-input-cell']">
-                  <text v-if="!isHidden(q, 'bottom')">{{ chartData(q).values.bottom }}</text>
-                  <input v-else class="hc-input" type="number"
-                    :value="chartAnswer(q, 'bottom')"
-                    placeholder="?"
-                    @input="onChartInput(i, 'bottom', $event)" />
-                </view>
-                <view class="hc-cell" />
-              </view>
+            <view class="hundred-chart" :style="{ gridTemplateColumns: `repeat(${getChartCols(q)}, 80rpx)` }">
+              <template v-for="r in getChartRows(q)" :key="r">
+                <template v-for="c in getChartCols(q)" :key="c">
+                  <view v-if="hasChartCell(q, r-1, c-1)"
+                    :class="['hc-cell', isChartCenter(q, r-1, c-1) && 'hc-center']">
+                    <text v-if="isChartCenter(q, r-1, c-1)">{{ getChartVal(q, r-1, c-1) }}</text>
+                    <input v-else class="hc-input" type="number"
+                      :value="chartAnswer(q, `${r-1},${c-1}`)"
+                      placeholder="?"
+                      @input="onChartInput(i, `${r-1},${c-1}`, $event)" />
+                  </view>
+                  <view v-else class="hc-empty" />
+                </template>
+              </template>
             </view>
           </template>
 
@@ -254,8 +259,27 @@
       <view v-if="wrongList.length > 0" class="wrong-section">
         <text class="wrong-title">错题回顾（{{ wrongList.length }} 题）</text>
         <view v-for="(w, i) in wrongList" :key="i" class="wrong-item">
-          <text class="wrong-expr">{{ w.index + 1 }}. {{ w.expr }} = {{ w.answer }}</text>
-          <text class="wrong-answer">你答：{{ w.userAnswer !== '' && w.userAnswer !== undefined ? w.userAnswer : '未填' }}</text>
+          <!-- 百数表错题 -->
+          <template v-if="w.type === 'hundredChart'">
+            <view class="wrong-chart-block">
+              <text class="wrong-expr">{{ w.index + 1 }}. 百数表（中间{{ chartDataStatic(w.expr).center }}）</text>
+              <view class="wrong-chart-mini" :style="{ gridTemplateColumns: `repeat(${chartDataStatic(w.expr).cols}, 52rpx)` }">
+                <template v-for="r in chartDataStatic(w.expr).rows" :key="r">
+                  <template v-for="c in chartDataStatic(w.expr).cols" :key="c">
+                    <text v-if="`${r-1},${c-1}` in chartDataStatic(w.expr).cellMap"
+                      :class="['wrong-chart-cell', `${r-1},${c-1}` === chartDataStatic(w.expr).centerKey ? 'given' : 'answer']"
+                    >{{ chartDataStatic(w.expr).cellMap[`${r-1},${c-1}`] }}</text>
+                    <view v-else class="wrong-chart-empty" />
+                  </template>
+                </template>
+              </view>
+            </view>
+          </template>
+          <!-- 其他所有题型：完整算式 + 用户答案 -->
+          <template v-else>
+            <text class="wrong-expr">{{ w.index + 1 }}. {{ fillAnswer(w) }}</text>
+            <text class="wrong-answer">你答：{{ formatUserAnswer(w) }}</text>
+          </template>
         </view>
       </view>
 
@@ -279,7 +303,7 @@
 import { ref, computed, onUnmounted } from 'vue'
 import PageHeader from '../../components/PageHeader.vue'
 import { generateQuestions, LEVEL_CONFIG } from '../../utils/math/questionEngine.js'
-import { saveRecord } from '../../utils/math/mathStorage.js'
+import { saveRecord, recordWrong } from '../../utils/math/mathStorage.js'
 import { toast } from '../../utils/common/toast.js'
 
 // ---- 配置选项 ----
@@ -462,28 +486,68 @@ function splitFillOp(expr) {
   return parts.length === 2 ? parts : [expr, '']
 }
 
-// 百数表辅助
-function chartData(q) {
-  try { return JSON.parse(q.expr) } catch { return { center: 0, hidden: [], values: {} } }
+// 双边填运算符 "5 ○ 3 = 12 ○ 4" 拆成 ["5 ", " 3 = 12 ", " 4"]
+function splitFillOp2(expr) {
+  const parts = expr.split('○').map(s => s.trim())
+  return parts.length === 3 ? parts : [expr, '', '']
 }
 
-function isHidden(q, pos) {
-  const data = chartData(q)
-  return data.hidden && data.hidden.includes(pos)
+// 获取双边填运算符第 idx 个选择（0=左,1=右）
+function getOp2(q, idx) {
+  if (!q._op2Answers) return ''
+  return q._op2Answers[idx] || ''
 }
 
-function chartAnswer(q, pos) {
+// 选择双边填运算符
+function selectOp2(qIndex, opIdx, symbol) {
+  const q = questions.value[qIndex]
+  if (!q._op2Answers) q._op2Answers = ['', '']
+  q._op2Answers[opIdx] = symbol
+  q.userAnswer = q._op2Answers.join(',')
+  // 两个都选了才自动前进
+  if (q._op2Answers[0] && q._op2Answers[1]) {
+    const total = questions.value.length
+    if (qIndex < total - 1) {
+      currentFocus.value = qIndex + 1
+      scrollTarget.value = 'q-' + (qIndex + 1)
+    }
+  }
+}
+
+// 百数表辅助 (不规则形状)
+function parseChartData(q) {
+  try { return JSON.parse(q.expr) } catch { return { center: 0, rows: 0, cols: 0, cellMap: {}, centerKey: '', hiddenKeys: [] } }
+}
+
+function getChartRows(q) { return parseChartData(q).rows || 0 }
+function getChartCols(q) { return parseChartData(q).cols || 0 }
+
+function hasChartCell(q, r, c) {
+  const data = parseChartData(q)
+  return `${r},${c}` in data.cellMap
+}
+
+function isChartCenter(q, r, c) {
+  const data = parseChartData(q)
+  return `${r},${c}` === data.centerKey
+}
+
+function getChartVal(q, r, c) {
+  const data = parseChartData(q)
+  return data.cellMap[`${r},${c}`] || ''
+}
+
+function chartAnswer(q, key) {
   if (!q._chartAnswers) return ''
-  return q._chartAnswers[pos] || ''
+  return q._chartAnswers[key] || ''
 }
 
-function onChartInput(qIndex, pos, e) {
+function onChartInput(qIndex, key, e) {
   const q = questions.value[qIndex]
   if (!q._chartAnswers) q._chartAnswers = {}
-  q._chartAnswers[pos] = e.detail.value
-  // 拼接所有隐藏位置的答案作为 userAnswer
-  const data = chartData(q)
-  q.userAnswer = JSON.stringify(data.hidden.map(p => q._chartAnswers[p] || ''))
+  q._chartAnswers[key] = e.detail.value
+  const data = parseChartData(q)
+  q.userAnswer = JSON.stringify(data.hiddenKeys.map(k => q._chartAnswers[k] || ''))
 }
 
 function onInput(index, e) {
@@ -523,7 +587,7 @@ function doSubmit() {
   stopTimer()
   finalTime.value = elapsed.value
 
-  // 保存记录
+  // 保存历史记录
   try {
     saveRecord({
       type: 'online',
@@ -535,12 +599,20 @@ function doSubmit() {
       questions: questions.value.map(q => ({
         expr: q.expr,
         answer: q.answer,
+        type: q.type,
         userAnswer: q.userAnswer,
-        isCorrect: q.userAnswer === q.answer,
+        isCorrect: String(q.userAnswer) === String(q.answer),
       })),
     })
   } catch (e) {
     console.error('保存记录失败', e)
+  }
+
+  // 错题写入错题本
+  for (const q of questions.value) {
+    if (String(q.userAnswer) !== String(q.answer)) {
+      recordWrong({ expr: q.expr, answer: q.answer, type: q.type || 'add' })
+    }
   }
 
   phase.value = 'result'
@@ -591,6 +663,40 @@ function formatTime(s) {
   const m = Math.floor(s / 60)
   const sec = s % 60
   return `${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`
+}
+
+// 结果页: 解析百数表 JSON
+function chartDataStatic(exprStr) {
+  try { return JSON.parse(exprStr) } catch { return { center: 0, grid: [], shown: [], hidden: [] } }
+}
+
+// 结果页: 格式化用户的错误答案
+function formatUserAnswer(w) {
+  const ua = w.userAnswer
+  if (ua === '' || ua === undefined) return '未填'
+  // 双边运算符: "+,-" → "+ 和 -"
+  if (w.type === 'fillOp2') return ua.replace(',', ' 和 ')
+  return ua
+}
+
+// 结果页: 把正确答案填入算式，统一简洁风格
+function fillAnswer(w) {
+  // 双边运算符: a ○ b = c ○ d → a + b = c - d
+  if (w.type === 'fillOp2') {
+    const ops = (w.answer || '').split(',')
+    const parts = w.expr.split('○')
+    if (parts.length === 3 && ops.length === 2) {
+      return `${parts[0].trim()} ${ops[0]} ${parts[1].trim()} ${ops[1]} ${parts[2].trim()}`
+    }
+  }
+  // 单边运算符: a ○ b = c → a - b = c
+  if (w.type === 'fillOp') return w.expr.replace('○', w.answer)
+  // 填空: __ + 3 = 10 → 7 + 3 = 10
+  if (w.expr.includes('__')) return w.expr.replace('__', w.answer)
+  // 比大小: 8 ○ 11 → 8 ＜ 11
+  if (w.expr.includes('○')) return w.expr.replace('○', w.answer)
+  // 普通加减: 3 + 5 = 8
+  return `${w.expr} = ${w.answer}`
 }
 
 onUnmounted(() => {
@@ -848,15 +954,44 @@ onUnmounted(() => {
 }
 .cmp-btn:active { transform: scale(0.93); }
 
-/* 百数表十字格 */
-.hundred-chart {
+/* 双边填运算符紧凑布局 */
+.fillop2-row {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 0;
+  gap: 4rpx;
 }
-.hc-row {
+.fillop2-num {
+  font-size: 34rpx;
+  font-weight: bold;
+  white-space: nowrap;
+}
+.fillop2-btns {
   display: flex;
+  gap: 6rpx;
+}
+.fillop2-btn {
+  width: 56rpx;
+  height: 52rpx;
+  border: 3rpx solid #E0E0E0;
+  border-radius: 10rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  font-weight: bold;
+  background: #fff;
+  color: #555;
+}
+.fillop2-btn:active { transform: scale(0.93); }
+.fillop2-btn.selected {
+  background: #42A5F5;
+  color: #fff;
+  border-color: #42A5F5;
+}
+
+/* 百数表不规则网格 */
+.hundred-chart {
+  display: grid;
   gap: 0;
 }
 .hc-cell {
@@ -868,18 +1003,15 @@ onUnmounted(() => {
   justify-content: center;
   font-size: 32rpx;
   font-weight: bold;
-  background: #fff;
-}
-.hc-cell:empty {
-  border: none;
-  background: transparent;
+  background: #FFF8E1;
 }
 .hc-center {
   background: #E3F2FD;
   color: #1565C0;
 }
-.hc-input-cell {
-  background: #FFF8E1;
+.hc-empty {
+  width: 80rpx;
+  height: 80rpx;
 }
 .hc-input {
   width: 70rpx;
@@ -1013,6 +1145,38 @@ onUnmounted(() => {
   margin-left: 12rpx;
 }
 
+/* 错题百数表网格 */
+.wrong-chart-block {
+  width: 100%;
+}
+.wrong-chart-mini {
+  display: grid;
+  gap: 2rpx;
+  margin-top: 8rpx;
+}
+.wrong-chart-cell {
+  width: 52rpx;
+  height: 52rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22rpx;
+  font-weight: bold;
+  border-radius: 4rpx;
+}
+.wrong-chart-cell.given {
+  background: #E3F2FD;
+  color: #1565C0;
+}
+.wrong-chart-cell.answer {
+  background: #FFEBEE;
+  color: #E53935;
+}
+.wrong-chart-empty {
+  width: 52rpx;
+  height: 52rpx;
+}
+
 .all-correct {
   margin-top: 24rpx;
   padding: 32rpx 48rpx;
@@ -1108,6 +1272,19 @@ onUnmounted(() => {
   background: #42A5F5;
   color: #fff;
   border-color: #42A5F5;
+}
+:global(html body.dark-mode) .fillop2-btn {
+  background: #1A1A2E;
+  border-color: #444;
+  color: #E0E0E0;
+}
+:global(html body.dark-mode) .fillop2-btn.selected {
+  background: #42A5F5;
+  color: #fff;
+  border-color: #42A5F5;
+}
+:global(html body.dark-mode) .fillop2-num {
+  color: #E0E0E0;
 }
 :global(html body.dark-mode) .q-index {
   color: #666;

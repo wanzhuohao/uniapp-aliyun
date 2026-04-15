@@ -119,9 +119,11 @@ function genChain(level) {
   return { expr: `${a} + ${b} + ${c}`, answer: String(a + b + c) }
 }
 
-// 填运算符: a ○ b = c，填 + 或 -
+// 填运算符: 单边 a ○ b = c，或双边 a ○ b = c ○ d
 function genFillOp(level) {
   const cfg = LEVEL_CONFIG[level]
+  // 约40%概率出双边题
+  if (Math.random() < 0.4) return genFillOpDouble(level)
   const isAdd = Math.random() > 0.5
   let a, b, c
   if (isAdd) {
@@ -136,24 +138,96 @@ function genFillOp(level) {
   return { expr: `${a} ○ ${b} = ${c}`, answer: isAdd ? '+' : '-', type: 'fillOp' }
 }
 
-// 百数表填空: 十字格，中间给数，填上(-10)下(+10)左(-1)右(+1)
+// 双边填运算符: a ○ b = c ○ d，两边都要填
+function genFillOpDouble(level) {
+  const cfg = LEVEL_CONFIG[level]
+  for (let attempt = 0; attempt < 20; attempt++) {
+    // 先确定目标值
+    const target = rand(2, cfg.max - 1)
+    // 左边: a op1 b = target
+    const leftAdd = Math.random() > 0.5
+    let a, b
+    if (leftAdd) {
+      a = rand(1, target - 1)
+      b = target - a
+    } else {
+      a = rand(target + 1, Math.min(cfg.max, target + cfg.max))
+      b = a - target
+      if (b <= 0 || a > cfg.max) continue
+    }
+    // 右边: c op2 d = target
+    const rightAdd = Math.random() > 0.5
+    let c, d
+    if (rightAdd) {
+      c = rand(1, target - 1)
+      d = target - c
+    } else {
+      c = rand(target + 1, Math.min(cfg.max, target + cfg.max))
+      d = c - target
+      if (d <= 0 || c > cfg.max) continue
+    }
+    const op1 = leftAdd ? '+' : '-'
+    const op2 = rightAdd ? '+' : '-'
+    return {
+      expr: `${a} ○ ${b} = ${c} ○ ${d}`,
+      answer: `${op1},${op2}`,
+      type: 'fillOp2',
+    }
+  }
+  // fallback: 简单加法等式
+  const t = rand(3, Math.floor(cfg.max / 2))
+  const a = rand(1, t - 1), b = t - a
+  const c = rand(1, t - 1), d = t - c
+  return { expr: `${a} ○ ${b} = ${c} ○ ${d}`, answer: '+,+', type: 'fillOp2' }
+}
+
+// 百数表填空: 不规则形状(十字/L/T形等)，只给1个数，其余全填
+// 从中间向外随机生长5~8个格子，值按百数表规律: 左右±1, 上下±10
 function genHundredChart(level) {
   const cfg = LEVEL_CONFIG[level]
-  // 中间数范围：确保上下左右都在 1~100 内
-  const center = rand(Math.max(11, 2), Math.min(cfg.max, 90))
-  const top = center - 10
-  const bottom = center + 10
-  const left = center - 1
-  const right = center + 1
-  // 随机隐藏 1~3 个位置让用户填
-  const positions = ['top', 'bottom', 'left', 'right']
-  const hideCount = rand(2, 4)
-  const shuffled = positions.sort(() => Math.random() - 0.5)
-  const hidden = shuffled.slice(0, hideCount)
-  const values = { top, bottom, left, right, center }
+  // 百数表固定用1~100范围，不受难度级别限制
+  const center = rand(22, 79)
+  const cellCount = rand(5, 8)
+  const cells = [{ r: 0, c: 0 }]
+  const cellSet = new Set(['0,0'])
+  const dirs = [{ r: -1, c: 0 }, { r: 1, c: 0 }, { r: 0, c: -1 }, { r: 0, c: 1 }]
+
+  let attempts = 0
+  while (cells.length < cellCount && attempts < 100) {
+    attempts++
+    const base = cells[Math.floor(Math.random() * cells.length)]
+    const dir = dirs[Math.floor(Math.random() * dirs.length)]
+    const nr = base.r + dir.r, nc = base.c + dir.c
+    const key = `${nr},${nc}`
+    if (cellSet.has(key)) continue
+    const val = center + nr * 10 + nc
+    if (val < 1 || val > 100) continue
+    cells.push({ r: nr, c: nc })
+    cellSet.add(key)
+  }
+
+  // 计算网格边界
+  const minR = Math.min(...cells.map(c => c.r))
+  const maxR = Math.max(...cells.map(c => c.r))
+  const minC = Math.min(...cells.map(c => c.c))
+  const maxC = Math.max(...cells.map(c => c.c))
+  const rows = maxR - minR + 1
+  const cols = maxC - minC + 1
+
+  // cellMap: "行,列" -> 值
+  const cellMap = {}
+  for (const cell of cells) {
+    const gr = cell.r - minR, gc = cell.c - minC
+    cellMap[`${gr},${gc}`] = center + cell.r * 10 + cell.c
+  }
+
+  const centerKey = `${0 - minR},${0 - minC}`
+  const allKeys = Object.keys(cellMap)
+  const hiddenKeys = allKeys.filter(k => k !== centerKey)
+
   return {
-    expr: JSON.stringify({ center, hidden, values }),
-    answer: JSON.stringify(hidden.map(p => values[p])),
+    expr: JSON.stringify({ center, rows, cols, cellMap, centerKey, hiddenKeys }),
+    answer: JSON.stringify(hiddenKeys.map(k => String(cellMap[k]))),
     type: 'hundredChart',
   }
 }

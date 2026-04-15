@@ -1,7 +1,9 @@
 <script>
+import { migrateData } from './utils/math/mathStorage.js'
+
 export default {
   onLaunch() {
-    console.log('App Launch')
+    migrateData()
   }
 }
 </script>
