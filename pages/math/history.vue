@@ -1,10 +1,7 @@
 <template>
   <view class="container">
     <!-- Header -->
-    <view class="header">
-      <text class="back-btn" @click="uni.navigateBack()">←</text>
-      <text class="header-title">练习记录</text>
-    </view>
+    <PageHeader title="练习记录" />
 
     <!-- Tab Bar -->
     <view class="tab-row">
@@ -91,6 +88,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
+import PageHeader from '../../components/PageHeader.vue'
 import { getHistory } from '../../utils/math/mathStorage.js'
 import { LEVEL_CONFIG } from '../../utils/math/questionEngine.js'
 

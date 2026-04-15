@@ -1,11 +1,8 @@
 <template>
   <view class="print-page">
     <!-- Phase 1: Setup panel -->
+    <PageHeader title="打印出题" />
     <view v-if="!questions.length" class="setup-panel">
-      <view class="header">
-        <text class="back-btn" @click="goBack">←</text>
-        <text class="title">打印出题</text>
-      </view>
 
       <view class="config-card">
         <text class="config-label">选择难度</text>
@@ -98,6 +95,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import PageHeader from '../../components/PageHeader.vue'
 import { generateQuestions, LEVEL_CONFIG } from '../../utils/math/questionEngine.js'
 import { saveRecord } from '../../utils/math/mathStorage.js'
 import { toast } from '../../utils/common/toast.js'

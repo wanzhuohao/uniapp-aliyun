@@ -1,9 +1,6 @@
 <template>
   <view class="index-page">
-    <view class="header">
-      <text class="back-btn" @click="goBack">←</text>
-      <text class="title">数学练习</text>
-    </view>
+    <PageHeader title="数学练习" />
 
     <view class="modules">
       <view class="module-card online-card" @click="goTo('/pages/math/online')">
@@ -32,9 +29,7 @@
 </template>
 
 <script setup>
-function goBack() {
-  uni.navigateBack()
-}
+import PageHeader from '../../components/PageHeader.vue'
 
 function goTo(url) {
   uni.navigateTo({ url })

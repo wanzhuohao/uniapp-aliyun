@@ -2,12 +2,8 @@
   <view class="online-page">
 
     <!-- ===================== PHASE: SETUP ===================== -->
+    <PageHeader v-if="phase === 'setup'" title="在线练习" />
     <view v-if="phase === 'setup'" class="setup-area">
-      <view class="setup-header">
-        <view class="back-btn" @click="goBack">←</view>
-        <text class="setup-title">在线练习</text>
-        <view class="placeholder" />
-      </view>
 
       <scroll-view scroll-y class="setup-scroll">
         <!-- 难度 -->
@@ -220,6 +216,7 @@
 
 <script setup>
 import { ref, computed, onUnmounted } from 'vue'
+import PageHeader from '../../components/PageHeader.vue'
 import { generateQuestions, LEVEL_CONFIG } from '../../utils/math/questionEngine.js'
 import { saveRecord } from '../../utils/math/mathStorage.js'
 import { toast } from '../../utils/common/toast.js'
