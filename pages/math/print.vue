@@ -465,7 +465,8 @@ async function exportAnswerImage() {
 
 /* ── Answer sheet decoration ──────────────────────────────────── */
 .answer-sheet {
-  border: 2px dashed #E53935;
+  padding: 2mm 4mm;
+  border: none;
 }
 </style>
 
