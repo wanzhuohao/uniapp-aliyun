@@ -372,10 +372,16 @@ onShow(() => {
 
 .detail-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 4rpx 8rpx;
-  font-size: 24rpx;
+  font-size: 26rpx;
   line-height: 1.8;
+}
+@media (min-width: 768px) {
+  .detail-grid {
+    grid-template-columns: repeat(4, 1fr);
+    font-size: 24rpx;
+  }
 }
 
 .grid-item {
