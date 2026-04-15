@@ -465,7 +465,7 @@ function restart() {
 
 function goHome() {
   stopTimer()
-  uni.switchTab({ url: '/pages/index/index' })
+  uni.reLaunch({ url: '/pages/math/index' })
 }
 
 // ---- 返回 ----
