@@ -39,7 +39,7 @@ function goTo(url) {
 <style scoped>
 .index-page {
   min-height: 100vh;
-  padding: 48rpx 32rpx;
+  padding: 0;
   background: #F5F7FA;
 }
 .header {
@@ -63,6 +63,7 @@ function goTo(url) {
   display: flex;
   flex-direction: column;
   gap: 32rpx;
+  padding: 32rpx;
 }
 .module-card {
   display: flex;
