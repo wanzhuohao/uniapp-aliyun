@@ -71,7 +71,7 @@
       <!-- Answer sheet (hidden by default, shown only for export) -->
       <div
         id="answerArea"
-        class="a4-sheet answer-sheet no-print"
+        class="answer-sheet no-print"
         :style="{ display: showAnswerSheet ? 'block' : 'none' }"
       >
         <div class="sheet-header">
@@ -201,7 +201,7 @@ async function exportAnswerImage() {
     const el = document.getElementById('answerArea')
     const canvas = await html2canvas(el, { scale: 2, useCORS: true })
     const link = document.createElement('a')
-    link.download = `数学练习答案_${formatDate(new Date())}.png`
+    link.download = `数学练习答案_${Date.now()}.png`
     link.href = canvas.toDataURL('image/png')
     link.click()
     toast.hideLoading()
@@ -465,8 +465,14 @@ async function exportAnswerImage() {
 
 /* ── Answer sheet decoration ──────────────────────────────────── */
 .answer-sheet {
-  padding: 2mm 4mm;
-  border: none;
+  width: auto;
+  min-width: 600px;
+  max-width: 900px;
+  margin: 20rpx auto;
+  padding: 8px 12px;
+  background: #fff;
+  box-sizing: border-box;
+  font-family: 'Arial', 'SimSun', sans-serif;
 }
 </style>
 
