@@ -201,7 +201,7 @@ async function exportAnswerImage() {
     const el = document.getElementById('answerArea')
     const canvas = await html2canvas(el, { scale: 2, useCORS: true })
     const link = document.createElement('a')
-    link.download = `数学练习答案_${Date.now()}.png`
+    link.download = `${Date.now()}.png`
     link.href = canvas.toDataURL('image/png')
     link.click()
     toast.hideLoading()
