@@ -2,6 +2,7 @@
   <view class="container">
     <!-- Header -->
     <view class="header">
+      <text class="back-btn" @click="uni.navigateBack()">←</text>
       <text class="header-title">练习记录</text>
     </view>
 
