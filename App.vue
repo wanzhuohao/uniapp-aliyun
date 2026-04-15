@@ -7,9 +7,14 @@ export default {
 </script>
 
 <style>
+html, body, #app, uni-app, uni-page, uni-page-body, uni-page-head {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+uni-page-head {
+  display: none !important;
+}
 body {
-  margin: 0;
-  padding: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
 }
 
