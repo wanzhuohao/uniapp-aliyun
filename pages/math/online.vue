@@ -13,8 +13,8 @@
             <view
               v-for="item in levelOptions"
               :key="item.value"
-              :class="['setting-tag', selectedLevels.has(item.value) && 'active']"
-              @click="toggleLevel(item.value)"
+              :class="['setting-tag', selectedLevel === item.value && 'active']"
+              @click="selectedLevel = item.value"
             >{{ item.label }}</view>
           </view>
         </view>
@@ -428,16 +428,10 @@ const typeOptions = [
 ]
 const countPresets = [20, 50, 100]
 
-// ---- 设置状态（多选用 Set） ----
-const selectedLevels = ref(new Set([1]))
+// ---- 设置状态 ----
+const selectedLevel = ref(1)
 const selectedTypes  = ref(new Set(['add']))
 
-function toggleLevel(val) {
-  const s = selectedLevels.value
-  if (s.has(val)) { if (s.size > 1) s.delete(val) } // 至少保留一个
-  else s.add(val)
-  selectedLevels.value = new Set(s) // 触发响应式
-}
 function toggleType(val) {
   const s = selectedTypes.value
   if (s.has(val)) { if (s.size > 1) s.delete(val) }
@@ -445,11 +439,6 @@ function toggleType(val) {
   selectedTypes.value = new Set(s)
 }
 
-// 兼容旧接口
-const selectedLevel = computed(() => {
-  const arr = [...selectedLevels.value]
-  return arr.length === 3 ? 'mix' : arr.length === 1 ? arr[0] : arr
-})
 const selectedType = computed(() => {
   const arr = [...selectedTypes.value]
   return arr.length === 5 ? 'mix' : arr.length === 1 ? arr[0] : arr
