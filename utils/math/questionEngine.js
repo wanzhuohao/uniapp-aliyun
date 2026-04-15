@@ -119,8 +119,47 @@ function genChain(level) {
   return { expr: `${a} + ${b} + ${c}`, answer: String(a + b + c) }
 }
 
-const TYPE_GENERATORS = { add: genAdd, sub: genSub, compare: genCompare, fill: genFillBlank, chain: genChain }
-const MIX_TYPES = ['add', 'add', 'sub', 'sub', 'compare', 'fill', 'chain']
+// 填运算符: a ○ b = c，填 + 或 -
+function genFillOp(level) {
+  const cfg = LEVEL_CONFIG[level]
+  const isAdd = Math.random() > 0.5
+  let a, b, c
+  if (isAdd) {
+    a = rand(1, cfg.max - 1)
+    b = rand(1, cfg.max - a)
+    c = a + b
+  } else {
+    a = rand(2, cfg.max)
+    b = rand(1, a - 1)
+    c = a - b
+  }
+  return { expr: `${a} ○ ${b} = ${c}`, answer: isAdd ? '+' : '-', type: 'fillOp' }
+}
+
+// 百数表填空: 十字格，中间给数，填上(-10)下(+10)左(-1)右(+1)
+function genHundredChart(level) {
+  const cfg = LEVEL_CONFIG[level]
+  // 中间数范围：确保上下左右都在 1~100 内
+  const center = rand(Math.max(11, 2), Math.min(cfg.max, 90))
+  const top = center - 10
+  const bottom = center + 10
+  const left = center - 1
+  const right = center + 1
+  // 随机隐藏 1~3 个位置让用户填
+  const positions = ['top', 'bottom', 'left', 'right']
+  const hideCount = rand(2, 4)
+  const shuffled = positions.sort(() => Math.random() - 0.5)
+  const hidden = shuffled.slice(0, hideCount)
+  const values = { top, bottom, left, right, center }
+  return {
+    expr: JSON.stringify({ center, hidden, values }),
+    answer: JSON.stringify(hidden.map(p => values[p])),
+    type: 'hundredChart',
+  }
+}
+
+const TYPE_GENERATORS = { add: genAdd, sub: genSub, compare: genCompare, fill: genFillBlank, chain: genChain, fillOp: genFillOp, hundredChart: genHundredChart }
+const MIX_TYPES = ['add', 'add', 'sub', 'sub', 'compare', 'fill', 'chain', 'fillOp', 'hundredChart']
 const PRINT_TYPES = ['add', 'add', 'sub', 'sub', 'chain']
 const PRINT_NO_CHAIN_TYPES = ['add', 'sub']
 

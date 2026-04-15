@@ -153,6 +153,67 @@
             </text>
           </template>
 
+          <!-- 填运算符: a [+/-] b = c -->
+          <template v-else-if="q.type === 'fillOp'">
+            <text class="q-expr">{{ splitFillOp(q.expr)[0] }}</text>
+            <view class="compare-btns">
+              <view
+                :class="['cmp-btn', q.userAnswer === '+' && 'selected']"
+                @click="selectCompare(i, '+')"
+              >+</view>
+              <view
+                :class="['cmp-btn', q.userAnswer === '-' && 'selected']"
+                @click="selectCompare(i, '-')"
+              >-</view>
+            </view>
+            <text class="q-expr">{{ splitFillOp(q.expr)[1] }}</text>
+          </template>
+
+          <!-- 百数表: 十字格填空 -->
+          <template v-else-if="q.type === 'hundredChart'">
+            <view class="hundred-chart">
+              <view class="hc-row">
+                <view class="hc-cell" />
+                <view :class="['hc-cell', isHidden(q, 'top') && 'hc-input-cell']">
+                  <text v-if="!isHidden(q, 'top')">{{ chartData(q).values.top }}</text>
+                  <input v-else class="hc-input" type="number"
+                    :value="chartAnswer(q, 'top')"
+                    placeholder="?"
+                    @input="onChartInput(i, 'top', $event)" />
+                </view>
+                <view class="hc-cell" />
+              </view>
+              <view class="hc-row">
+                <view :class="['hc-cell', isHidden(q, 'left') && 'hc-input-cell']">
+                  <text v-if="!isHidden(q, 'left')">{{ chartData(q).values.left }}</text>
+                  <input v-else class="hc-input" type="number"
+                    :value="chartAnswer(q, 'left')"
+                    placeholder="?"
+                    @input="onChartInput(i, 'left', $event)" />
+                </view>
+                <view class="hc-cell hc-center">{{ chartData(q).center }}</view>
+                <view :class="['hc-cell', isHidden(q, 'right') && 'hc-input-cell']">
+                  <text v-if="!isHidden(q, 'right')">{{ chartData(q).values.right }}</text>
+                  <input v-else class="hc-input" type="number"
+                    :value="chartAnswer(q, 'right')"
+                    placeholder="?"
+                    @input="onChartInput(i, 'right', $event)" />
+                </view>
+              </view>
+              <view class="hc-row">
+                <view class="hc-cell" />
+                <view :class="['hc-cell', isHidden(q, 'bottom') && 'hc-input-cell']">
+                  <text v-if="!isHidden(q, 'bottom')">{{ chartData(q).values.bottom }}</text>
+                  <input v-else class="hc-input" type="number"
+                    :value="chartAnswer(q, 'bottom')"
+                    placeholder="?"
+                    @input="onChartInput(i, 'bottom', $event)" />
+                </view>
+                <view class="hc-cell" />
+              </view>
+            </view>
+          </template>
+
           <!-- 普通加减/连加减: 算式 = 输入框 -->
           <template v-else>
             <text class="q-expr">{{ q.expr }} =</text>
@@ -228,11 +289,13 @@ const levelOptions = [
   { value: 3, label: '±一位数' },
 ]
 const typeOptions = [
-  { value: 'add',     label: '加法' },
-  { value: 'sub',     label: '减法' },
-  { value: 'compare', label: '比大小' },
-  { value: 'fill',    label: '填空' },
-  { value: 'chain',   label: '连加连减' },
+  { value: 'add',          label: '加法' },
+  { value: 'sub',          label: '减法' },
+  { value: 'compare',      label: '比大小' },
+  { value: 'fill',         label: '填空' },
+  { value: 'chain',        label: '连加连减' },
+  { value: 'fillOp',       label: '填运算符' },
+  { value: 'hundredChart', label: '百数表' },
 ]
 const countPresets = [20, 50, 100]
 
@@ -391,6 +454,36 @@ function splitFill(expr) {
   const idx = expr.indexOf('__')
   if (idx === -1) return [expr]
   return [expr.slice(0, idx), '__', expr.slice(idx + 2)]
+}
+
+// 填运算符 "14 ○ 6 = 8" 拆成 ["14 ", " 6 = 8"]
+function splitFillOp(expr) {
+  const parts = expr.split('○').map(s => s.trim())
+  return parts.length === 2 ? parts : [expr, '']
+}
+
+// 百数表辅助
+function chartData(q) {
+  try { return JSON.parse(q.expr) } catch { return { center: 0, hidden: [], values: {} } }
+}
+
+function isHidden(q, pos) {
+  const data = chartData(q)
+  return data.hidden && data.hidden.includes(pos)
+}
+
+function chartAnswer(q, pos) {
+  if (!q._chartAnswers) return ''
+  return q._chartAnswers[pos] || ''
+}
+
+function onChartInput(qIndex, pos, e) {
+  const q = questions.value[qIndex]
+  if (!q._chartAnswers) q._chartAnswers = {}
+  q._chartAnswers[pos] = e.detail.value
+  // 拼接所有隐藏位置的答案作为 userAnswer
+  const data = chartData(q)
+  q.userAnswer = JSON.stringify(data.hidden.map(p => q._chartAnswers[p] || ''))
 }
 
 function onInput(index, e) {
@@ -754,6 +847,50 @@ onUnmounted(() => {
   color: #555;
 }
 .cmp-btn:active { transform: scale(0.93); }
+
+/* 百数表十字格 */
+.hundred-chart {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+.hc-row {
+  display: flex;
+  gap: 0;
+}
+.hc-cell {
+  width: 80rpx;
+  height: 80rpx;
+  border: 2rpx solid #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  font-weight: bold;
+  background: #fff;
+}
+.hc-cell:empty {
+  border: none;
+  background: transparent;
+}
+.hc-center {
+  background: #E3F2FD;
+  color: #1565C0;
+}
+.hc-input-cell {
+  background: #FFF8E1;
+}
+.hc-input {
+  width: 70rpx;
+  height: 70rpx;
+  text-align: center;
+  font-size: 28rpx;
+  font-weight: bold;
+  border: none;
+  background: transparent;
+}
+
 .cmp-btn.selected {
   background: #42A5F5;
   color: #fff;
