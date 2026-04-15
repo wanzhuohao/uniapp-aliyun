@@ -113,7 +113,6 @@ const levelOptions = [
   { value: 1,     label: '20以内' },
   { value: 2,     label: '100以内(整十)' },
   { value: 3,     label: '100以内' },
-  { value: 'mix', label: '混合' },
 ]
 
 const levelLabel = computed(() => {
