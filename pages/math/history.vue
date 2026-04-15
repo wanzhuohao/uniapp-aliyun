@@ -64,17 +64,19 @@
             <view
               v-for="(q, qi) in record.questions"
               :key="qi"
-              :class="['grid-item', record.type === 'online' && isWrong(record, qi) && 'grid-item-wrong']"
+              :class="['grid-item', record.type === 'online' && q.isCorrect === false && 'grid-item-wrong']"
             >
-              <text class="grid-expr">{{ q.expr }} = </text>
-              <!-- 打印记录：答案红色 -->
-              <text v-if="record.type !== 'online'" class="grid-answer">{{ q.answer }}</text>
-              <!-- 在线记录：答对绿色，答错红色+用户答案 -->
+              <!-- 打印记录：算式 = 红色答案 -->
+              <template v-if="record.type !== 'online'">
+                <text class="grid-expr">{{ formatExpr(q.expr, q.answer) }}</text>
+              </template>
+              <!-- 在线记录 -->
               <template v-else>
-                <text v-if="!isWrong(record, qi)" class="grid-correct">{{ q.answer }} ✓</text>
+                <!-- 答对：把答案填入正确位置，绿色 -->
+                <text v-if="q.isCorrect !== false" class="grid-correct">{{ formatExpr(q.expr, q.answer) }} ✓</text>
+                <!-- 答错：显示用户答案（红色划掉）+ 正确答案（绿色） -->
                 <template v-else>
-                  <text class="grid-wrong-user">{{ getUserAnswer(record, qi) || '?' }}</text>
-                  <text class="grid-answer">{{ q.answer }}</text>
+                  <text class="grid-expr">{{ formatExprWrong(q.expr, q.userAnswer, q.answer) }}</text>
                 </template>
               </template>
             </view>
@@ -122,33 +124,35 @@ function getLevelName(level) {
 }
 
 function getAccuracy(record) {
-  if (!record.answers || !record.questions) return 0
+  if (!record.questions) return 0
   const total = record.questions.length
   if (total === 0) return 0
-  const correct = record.questions.filter((q, i) => {
-    const ua = record.answers[i]
-    return ua != null && String(ua).trim() === String(q.answer).trim()
-  }).length
+  // 兼容两种格式：q.isCorrect 或 record.correct
+  if (record.correct != null) return Math.round((record.correct / total) * 100)
+  const correct = record.questions.filter(q => q.isCorrect !== false).length
   return Math.round((correct / total) * 100)
 }
 
-function getUserAnswer(record, index) {
-  if (!record.answers) return ''
-  return record.answers[index] != null ? String(record.answers[index]) : ''
+// 把答案填入算式的正确位置
+// 填空题: "__ + 3 = 10" + answer "7" → "7 + 3 = 10"
+// 比大小: "8 ○ 11" + answer "＜" → "8 ＜ 11"
+// 普通题: "3 + 5" + answer "8" → "3 + 5 = 8"
+function formatExpr(expr, answer) {
+  if (expr.includes('__')) return expr.replace('__', answer)
+  if (expr.includes('○')) return expr.replace('○', answer)
+  return `${expr} = ${answer}`
 }
 
-function isCorrect(record, index) {
-  if (!record.questions || !record.answers) return false
-  const q = record.questions[index]
-  const ua = record.answers[index]
-  return ua != null && String(ua).trim() === String(q.answer).trim()
-}
-
-function isWrong(record, index) {
-  if (!record.questions || !record.answers) return false
-  const ua = record.answers[index]
-  if (ua == null || String(ua).trim() === '') return false
-  return !isCorrect(record, index)
+// 答错时的显示：用户答案划掉 + 正确答案
+function formatExprWrong(expr, userAnswer, answer) {
+  const ua = userAnswer || '?'
+  if (expr.includes('__')) {
+    return expr.replace('__', ua) + ' ✗ → ' + expr.replace('__', answer)
+  }
+  if (expr.includes('○')) {
+    return expr.replace('○', ua) + ' ✗ → ' + answer
+  }
+  return `${expr} = ${ua} ✗ → ${answer}`
 }
 
 function formatTime(seconds) {
