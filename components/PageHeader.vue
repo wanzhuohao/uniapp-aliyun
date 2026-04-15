@@ -21,7 +21,7 @@ function onBack() {
 .page-header {
   display: flex;
   align-items: center;
-  padding: 16rpx 24rpx;
+  padding: 20rpx 28rpx;
   background: #42A5F5;
   color: #fff;
   position: sticky;
@@ -29,20 +29,20 @@ function onBack() {
   z-index: 10;
 }
 .ph-back {
-  font-size: 32rpx;
+  font-size: 36rpx;
   font-weight: bold;
-  width: 44rpx;
-  height: 44rpx;
+  width: 50rpx;
+  height: 50rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 12rpx;
+  margin-right: 14rpx;
   border-radius: 50%;
   background: rgba(255,255,255,0.2);
 }
 .ph-back:active { transform: scale(0.9); }
 .ph-title {
-  font-size: 30rpx;
+  font-size: 32rpx;
   font-weight: bold;
   flex: 1;
 }
