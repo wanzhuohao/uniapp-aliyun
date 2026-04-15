@@ -1,5 +1,6 @@
 {
   "pages": [
+    { "path": "pages/index/index", "style": { "navigationStyle": "custom", "navigationBarTitleText": "云工具箱" } },
     { "path": "pages/math/index", "style": { "navigationStyle": "custom", "navigationBarTitleText": "数学练习" } },
     { "path": "pages/math/online", "style": { "navigationStyle": "custom", "navigationBarTitleText": "在线练习" } },
     { "path": "pages/math/print", "style": { "navigationStyle": "custom", "navigationBarTitleText": "打印出题" } },

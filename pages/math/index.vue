@@ -1,7 +1,8 @@
 <template>
   <view class="index-page">
     <view class="header">
-      <text class="title">云工具箱</text>
+      <text class="back-btn" @click="goBack">←</text>
+      <text class="title">数学练习</text>
     </view>
 
     <view class="modules">
