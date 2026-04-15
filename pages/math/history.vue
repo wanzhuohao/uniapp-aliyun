@@ -64,17 +64,27 @@
               :key="qi"
               :class="['grid-item', record.type === 'online' && q.isCorrect === false && 'grid-item-wrong']"
             >
-              <!-- 打印记录：算式 = 红色答案 -->
+              <!-- 打印记录：算式部分 + 红色答案 -->
               <template v-if="record.type !== 'online'">
-                <text class="grid-expr">{{ formatExpr(q.expr, q.answer) }}</text>
+                <text class="grid-expr">{{ exprParts(q.expr).before }}</text>
+                <text class="grid-answer">{{ q.answer }}</text>
+                <text class="grid-expr">{{ exprParts(q.expr).after }}</text>
               </template>
               <!-- 在线记录 -->
               <template v-else>
-                <!-- 答对：把答案填入正确位置，绿色 -->
-                <text v-if="q.isCorrect !== false" class="grid-correct">{{ formatExpr(q.expr, q.answer) }} ✓</text>
-                <!-- 答错：显示用户答案（红色划掉）+ 正确答案（绿色） -->
+                <!-- 答对：算式 + 绿色答案 + ✓ -->
+                <template v-if="q.isCorrect !== false">
+                  <text class="grid-expr">{{ exprParts(q.expr).before }}</text>
+                  <text class="grid-correct">{{ q.answer }}</text>
+                  <text class="grid-expr">{{ exprParts(q.expr).after }}</text>
+                  <text class="grid-correct"> ✓</text>
+                </template>
+                <!-- 答错：算式 + 红色用户答案划掉 + 绿色正确答案 -->
                 <template v-else>
-                  <text class="grid-expr">{{ formatExprWrong(q.expr, q.userAnswer, q.answer) }}</text>
+                  <text class="grid-expr">{{ exprParts(q.expr).before }}</text>
+                  <text class="grid-wrong-user">{{ q.userAnswer || '?' }}</text>
+                  <text class="grid-answer"> → {{ q.answer }}</text>
+                  <text class="grid-expr">{{ exprParts(q.expr).after }}</text>
                 </template>
               </template>
             </view>
@@ -130,6 +140,22 @@ function getAccuracy(record) {
   if (record.correct != null) return Math.round((record.correct / total) * 100)
   const correct = record.questions.filter(q => q.isCorrect !== false).length
   return Math.round((correct / total) * 100)
+}
+
+// 拆算式为答案前后两部分
+// 填空 "__ + 3 = 10" → { before: "", after: " + 3 = 10" }
+// 比大小 "8 ○ 11" → { before: "8 ", after: " 11" }
+// 普通 "3 + 5" → { before: "3 + 5 = ", after: "" }
+function exprParts(expr) {
+  if (expr.includes('__')) {
+    const i = expr.indexOf('__')
+    return { before: expr.slice(0, i), after: expr.slice(i + 2) }
+  }
+  if (expr.includes('○')) {
+    const i = expr.indexOf('○')
+    return { before: expr.slice(0, i), after: expr.slice(i + 1) }
+  }
+  return { before: expr + ' = ', after: '' }
 }
 
 // 把答案填入算式的正确位置
