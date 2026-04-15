@@ -368,14 +368,46 @@
               </view>
             </view>
           </template>
-          <!-- 图形填数错题：显示所有数字 -->
-          <template v-else-if="w.type === 'triangle' || w.type === 'square'">
+          <!-- 三角形错题：保持三角布局 -->
+          <template v-else-if="w.type === 'triangle'">
             <view class="wrong-chart-block">
-              <text class="wrong-expr">{{ w.index + 1 }}. {{ w.type === 'triangle' ? '三角' : '方形' }}填数（每边和={{ shapeDataStatic(w.expr).target }}）</text>
-              <view class="wrong-shape-vals">
-                <text v-for="k in Object.keys(shapeDataStatic(w.expr).vals)" :key="k"
-                  :class="['wrong-shape-num', shapeDataStatic(w.expr).shown.includes(k) ? 'given' : 'answer']"
-                >{{ shapeDataStatic(w.expr).vals[k] }}</text>
+              <text class="wrong-expr">{{ w.index + 1 }}. 三角填数（每边和={{ shapeDataStatic(w.expr).target }}）</text>
+              <view class="wrong-tri">
+                <view class="wt-row wt-row-1">
+                  <text :class="['wt-c', shapeDataStatic(w.expr).shown.includes('A') ? 'given' : 'answer']">{{ shapeDataStatic(w.expr).vals.A }}</text>
+                </view>
+                <view class="wt-row wt-row-2">
+                  <text :class="['wt-c', shapeDataStatic(w.expr).shown.includes('AB') ? 'given' : 'answer']">{{ shapeDataStatic(w.expr).vals.AB }}</text>
+                  <text :class="['wt-c', shapeDataStatic(w.expr).shown.includes('AC') ? 'given' : 'answer']">{{ shapeDataStatic(w.expr).vals.AC }}</text>
+                </view>
+                <view class="wt-row wt-row-3">
+                  <text :class="['wt-c', shapeDataStatic(w.expr).shown.includes('B') ? 'given' : 'answer']">{{ shapeDataStatic(w.expr).vals.B }}</text>
+                  <text :class="['wt-c', shapeDataStatic(w.expr).shown.includes('BC') ? 'given' : 'answer']">{{ shapeDataStatic(w.expr).vals.BC }}</text>
+                  <text :class="['wt-c', shapeDataStatic(w.expr).shown.includes('C') ? 'given' : 'answer']">{{ shapeDataStatic(w.expr).vals.C }}</text>
+                </view>
+              </view>
+            </view>
+          </template>
+          <!-- 方形错题：保持方形布局 -->
+          <template v-else-if="w.type === 'square'">
+            <view class="wrong-chart-block">
+              <text class="wrong-expr">{{ w.index + 1 }}. 方形填数（每边和={{ shapeDataStatic(w.expr).target }}）</text>
+              <view class="wrong-sq">
+                <view class="ws-row">
+                  <text :class="['wt-c', shapeDataStatic(w.expr).shown.includes('A') ? 'given' : 'answer']">{{ shapeDataStatic(w.expr).vals.A }}</text>
+                  <text :class="['wt-c', shapeDataStatic(w.expr).shown.includes('AB') ? 'given' : 'answer']">{{ shapeDataStatic(w.expr).vals.AB }}</text>
+                  <text :class="['wt-c', shapeDataStatic(w.expr).shown.includes('B') ? 'given' : 'answer']">{{ shapeDataStatic(w.expr).vals.B }}</text>
+                </view>
+                <view class="ws-row">
+                  <text :class="['wt-c', shapeDataStatic(w.expr).shown.includes('DA') ? 'given' : 'answer']">{{ shapeDataStatic(w.expr).vals.DA }}</text>
+                  <view class="wt-empty" />
+                  <text :class="['wt-c', shapeDataStatic(w.expr).shown.includes('BC') ? 'given' : 'answer']">{{ shapeDataStatic(w.expr).vals.BC }}</text>
+                </view>
+                <view class="ws-row">
+                  <text :class="['wt-c', shapeDataStatic(w.expr).shown.includes('D') ? 'given' : 'answer']">{{ shapeDataStatic(w.expr).vals.D }}</text>
+                  <text :class="['wt-c', shapeDataStatic(w.expr).shown.includes('CD') ? 'given' : 'answer']">{{ shapeDataStatic(w.expr).vals.CD }}</text>
+                  <text :class="['wt-c', shapeDataStatic(w.expr).shown.includes('C') ? 'given' : 'answer']">{{ shapeDataStatic(w.expr).vals.C }}</text>
+                </view>
               </view>
             </view>
           </template>
@@ -1369,31 +1401,45 @@ onUnmounted(() => {
   height: 52rpx;
 }
 
-/* 图形填数错题 */
-.wrong-shape-vals {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8rpx;
-  margin-top: 8rpx;
-}
-.wrong-shape-num {
-  width: 48rpx;
-  height: 48rpx;
+/* 图形填数错题 mini 布局 */
+.wt-c {
+  width: 44rpx;
+  height: 44rpx;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 22rpx;
+  font-size: 20rpx;
   font-weight: bold;
 }
-.wrong-shape-num.given {
+.wt-c.given {
   background: #E3F2FD;
   color: #1565C0;
 }
-.wrong-shape-num.answer {
+.wt-c.answer {
   background: #FFF3E0;
   color: #E65100;
 }
+.wt-empty {
+  width: 44rpx;
+  height: 44rpx;
+}
+.wrong-tri {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4rpx;
+  margin-top: 8rpx;
+}
+.wt-row { display: flex; justify-content: center; gap: 8rpx; }
+.wt-row-2 { gap: 36rpx; }
+.wrong-sq {
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+  margin-top: 8rpx;
+}
+.ws-row { display: flex; justify-content: center; gap: 8rpx; }
 
 .all-correct {
   margin-top: 24rpx;

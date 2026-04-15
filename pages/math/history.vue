@@ -83,14 +83,46 @@
                   <text v-if="record.type === 'online' && q.isCorrect === false" class="grid-answer"> ✗</text>
                 </view>
               </template>
-              <!-- 图形填数：显示所有数字 -->
-              <template v-else-if="q.type === 'triangle' || q.type === 'square'">
-                <view class="mini-chart-wrap">
-                  <text class="grid-expr">{{ q.type === 'triangle' ? '△' : '□' }}</text>
-                  <view class="shape-nums">
-                    <text v-for="k in Object.keys(parseShape(q.expr).vals)" :key="k"
-                      :class="['shape-num', parseShape(q.expr).shown.includes(k) ? 'mc-center' : 'mc-ans']"
-                    >{{ parseShape(q.expr).vals[k] }}</text>
+              <!-- 三角形填数 -->
+              <template v-else-if="q.type === 'triangle'">
+                <view class="mini-shape-wrap">
+                  <view class="mini-tri">
+                    <view class="mt-row mt-row-1">
+                      <text :class="['mt-c', parseShape(q.expr).shown.includes('A') ? 'mc-center' : 'mc-ans']">{{ parseShape(q.expr).vals.A }}</text>
+                    </view>
+                    <view class="mt-row mt-row-2">
+                      <text :class="['mt-c', parseShape(q.expr).shown.includes('AB') ? 'mc-center' : 'mc-ans']">{{ parseShape(q.expr).vals.AB }}</text>
+                      <text :class="['mt-c', parseShape(q.expr).shown.includes('AC') ? 'mc-center' : 'mc-ans']">{{ parseShape(q.expr).vals.AC }}</text>
+                    </view>
+                    <view class="mt-row">
+                      <text :class="['mt-c', parseShape(q.expr).shown.includes('B') ? 'mc-center' : 'mc-ans']">{{ parseShape(q.expr).vals.B }}</text>
+                      <text :class="['mt-c', parseShape(q.expr).shown.includes('BC') ? 'mc-center' : 'mc-ans']">{{ parseShape(q.expr).vals.BC }}</text>
+                      <text :class="['mt-c', parseShape(q.expr).shown.includes('C') ? 'mc-center' : 'mc-ans']">{{ parseShape(q.expr).vals.C }}</text>
+                    </view>
+                  </view>
+                  <text v-if="record.type === 'online' && q.isCorrect !== false" class="grid-correct"> ✓</text>
+                  <text v-if="record.type === 'online' && q.isCorrect === false" class="grid-answer"> ✗</text>
+                </view>
+              </template>
+              <!-- 方形填数 -->
+              <template v-else-if="q.type === 'square'">
+                <view class="mini-shape-wrap">
+                  <view class="mini-sq">
+                    <view class="ms-row">
+                      <text :class="['mt-c', parseShape(q.expr).shown.includes('A') ? 'mc-center' : 'mc-ans']">{{ parseShape(q.expr).vals.A }}</text>
+                      <text :class="['mt-c', parseShape(q.expr).shown.includes('AB') ? 'mc-center' : 'mc-ans']">{{ parseShape(q.expr).vals.AB }}</text>
+                      <text :class="['mt-c', parseShape(q.expr).shown.includes('B') ? 'mc-center' : 'mc-ans']">{{ parseShape(q.expr).vals.B }}</text>
+                    </view>
+                    <view class="ms-row">
+                      <text :class="['mt-c', parseShape(q.expr).shown.includes('DA') ? 'mc-center' : 'mc-ans']">{{ parseShape(q.expr).vals.DA }}</text>
+                      <view class="mt-empty" />
+                      <text :class="['mt-c', parseShape(q.expr).shown.includes('BC') ? 'mc-center' : 'mc-ans']">{{ parseShape(q.expr).vals.BC }}</text>
+                    </view>
+                    <view class="ms-row">
+                      <text :class="['mt-c', parseShape(q.expr).shown.includes('D') ? 'mc-center' : 'mc-ans']">{{ parseShape(q.expr).vals.D }}</text>
+                      <text :class="['mt-c', parseShape(q.expr).shown.includes('CD') ? 'mc-center' : 'mc-ans']">{{ parseShape(q.expr).vals.CD }}</text>
+                      <text :class="['mt-c', parseShape(q.expr).shown.includes('C') ? 'mc-center' : 'mc-ans']">{{ parseShape(q.expr).vals.C }}</text>
+                    </view>
                   </view>
                   <text v-if="record.type === 'online' && q.isCorrect !== false" class="grid-correct"> ✓</text>
                   <text v-if="record.type === 'online' && q.isCorrect === false" class="grid-answer"> ✗</text>
@@ -482,12 +514,13 @@ onShow(() => {
   height: 40rpx;
 }
 
-/* 图形填数历史 */
-.shape-nums {
+/* 图形填数历史 mini 布局 */
+.mini-shape-wrap {
   display: flex;
-  gap: 4rpx;
+  align-items: center;
+  gap: 8rpx;
 }
-.shape-num {
+.mt-c {
   width: 36rpx;
   height: 36rpx;
   border-radius: 50%;
@@ -497,6 +530,12 @@ onShow(() => {
   font-size: 18rpx;
   font-weight: bold;
 }
+.mt-empty { width: 36rpx; height: 36rpx; }
+.mini-tri { display: flex; flex-direction: column; align-items: center; gap: 2rpx; }
+.mt-row { display: flex; justify-content: center; gap: 4rpx; }
+.mt-row-2 { gap: 24rpx; }
+.mini-sq { display: flex; flex-direction: column; gap: 2rpx; }
+.ms-row { display: flex; justify-content: center; gap: 4rpx; }
 
 .grid-expr {
   color: #333;
