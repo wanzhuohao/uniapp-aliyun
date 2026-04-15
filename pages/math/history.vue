@@ -44,7 +44,7 @@
               <!-- Online: accuracy + time -->
               <view v-if="record.type === 'online'" class="meta-row">
                 <text class="accuracy-text">{{ getAccuracy(record) }}%</text>
-                <text class="time-text">{{ formatTime(record.duration) }}</text>
+                <text class="time-text">{{ formatTime(record.elapsed) }}</text>
               </view>
               <!-- Print: label -->
               <view v-else class="meta-row">
@@ -226,27 +226,6 @@ function exprParts(expr) {
   return { before: expr + ' = ', after: '' }
 }
 
-// 把答案填入算式的正确位置
-// 填空题: "__ + 3 = 10" + answer "7" → "7 + 3 = 10"
-// 比大小: "8 ○ 11" + answer "＜" → "8 ＜ 11"
-// 普通题: "3 + 5" + answer "8" → "3 + 5 = 8"
-function formatExpr(expr, answer) {
-  if (expr.includes('__')) return expr.replace('__', answer)
-  if (expr.includes('○')) return expr.replace('○', answer)
-  return `${expr} = ${answer}`
-}
-
-// 答错时的显示：用户答案划掉 + 正确答案
-function formatExprWrong(expr, userAnswer, answer) {
-  const ua = userAnswer || '?'
-  if (expr.includes('__')) {
-    return expr.replace('__', ua) + ' ✗ → ' + expr.replace('__', answer)
-  }
-  if (expr.includes('○')) {
-    return expr.replace('○', ua) + ' ✗ → ' + answer
-  }
-  return `${expr} = ${ua} ✗ → ${answer}`
-}
 
 function formatTime(seconds) {
   if (!seconds && seconds !== 0) return '--:--'

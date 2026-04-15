@@ -98,6 +98,18 @@ function formatExprShort(item) {
       return `百数表(${data.center})`
     } catch { return '百数表' }
   }
+  if (item.type === 'triangle') {
+    try {
+      const data = JSON.parse(item.expr)
+      return `三角填数(和=${data.target})`
+    } catch { return '三角填数' }
+  }
+  if (item.type === 'square') {
+    try {
+      const data = JSON.parse(item.expr)
+      return `方形填数(和=${data.target})`
+    } catch { return '方形填数' }
+  }
   if (item.type === 'fillOp' || item.type === 'fillOp2') {
     return item.expr.replace(/○/g, '?')
   }

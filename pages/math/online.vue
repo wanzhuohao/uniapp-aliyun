@@ -441,7 +441,7 @@ function toggleType(val) {
 
 const selectedType = computed(() => {
   const arr = [...selectedTypes.value]
-  return arr.length === 5 ? 'mix' : arr.length === 1 ? arr[0] : arr
+  return arr.length === typeOptions.length ? 'mix' : arr.length === 1 ? arr[0] : arr
 })
 const selectedCount = ref(100)
 const customCountActive = ref(false)
@@ -1166,7 +1166,7 @@ onUnmounted(() => {
   gap: 16rpx;
 }
 .tri-row-2 {
-  gap: 80rpx;
+  gap: 60rpx;
 }
 
 /* 方形布局 */

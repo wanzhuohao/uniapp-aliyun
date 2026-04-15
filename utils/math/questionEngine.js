@@ -48,7 +48,8 @@ function genCompare(level) {
   function genSide() {
     if (Math.random() > 0.4) {
       // 纯数字
-      return { text: String(rand(1, cfg.max)), value: rand(1, cfg.max) }
+      const n = rand(1, cfg.max)
+      return { text: String(n), value: n }
     }
     // 简单算式
     const isAdd = Math.random() > 0.5
@@ -253,12 +254,19 @@ function genTriangle(level) {
     if (AB > maxNum || BC > maxNum || AC > maxNum) continue
     // 确保6个数不全相同（有趣）
     const vals = { A, B, C, AB, BC, AC }
-    const allKeys = Object.keys(vals)
-    // 随机显示2~3个，隐藏其余
-    const showCount = rand(2, 3)
-    const shuffled = allKeys.sort(() => Math.random() - 0.5)
-    const shown = shuffled.slice(0, showCount)
-    const hidden = shuffled.slice(showCount)
+    // 必须给3个数才能保证唯一解；且不能3个都在同一条边上
+    const validShown = [
+      ['A', 'B', 'C'],       // 全顶点
+      ['AB', 'BC', 'AC'],    // 全中点
+      ['A', 'BC', 'AB'],     // 混合
+      ['A', 'BC', 'AC'],
+      ['B', 'AB', 'AC'],
+      ['B', 'AC', 'BC'],
+      ['C', 'AB', 'BC'],
+      ['C', 'AB', 'AC'],
+    ]
+    const shown = validShown[Math.floor(Math.random() * validShown.length)]
+    const hidden = Object.keys(vals).filter(k => !shown.includes(k))
     return {
       expr: JSON.stringify({ target, vals, shown, hidden }),
       answer: JSON.stringify(hidden.map(k => String(vals[k]))),
@@ -295,11 +303,16 @@ function genSquare(level) {
     if (AB < 1 || BC < 1 || CD < 1 || DA < 1) continue
     if (AB > maxNum || BC > maxNum || CD > maxNum || DA > maxNum) continue
     const vals = { A, B, C, D, AB, BC, CD, DA }
-    const allKeys = Object.keys(vals)
-    const showCount = rand(2, 3)
-    const shuffled = allKeys.sort(() => Math.random() - 0.5)
-    const shown = shuffled.slice(0, showCount)
-    const hidden = shuffled.slice(showCount)
+    // 需给4个数保证唯一解：全顶点，或3顶点+1个约束缺失顶点的中点
+    const validShown = [
+      ['A', 'B', 'C', 'D'],
+      ['A', 'B', 'C', 'CD'],  ['A', 'B', 'C', 'DA'],
+      ['A', 'B', 'D', 'BC'],  ['A', 'B', 'D', 'CD'],
+      ['A', 'C', 'D', 'AB'],  ['A', 'C', 'D', 'BC'],
+      ['B', 'C', 'D', 'AB'],  ['B', 'C', 'D', 'DA'],
+    ]
+    const shown = validShown[Math.floor(Math.random() * validShown.length)]
+    const hidden = Object.keys(vals).filter(k => !shown.includes(k))
     return {
       expr: JSON.stringify({ target, vals, shown, hidden }),
       answer: JSON.stringify(hidden.map(k => String(vals[k]))),
