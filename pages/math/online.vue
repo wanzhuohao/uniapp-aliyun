@@ -1036,7 +1036,7 @@ onUnmounted(() => {
 .q-row {
   display: flex;
   align-items: center;
-  gap: 12rpx;
+  gap: 8rpx;
   padding: 20rpx 24rpx;
   margin-bottom: 12rpx;
   background: #fff;
@@ -1055,18 +1055,17 @@ onUnmounted(() => {
 .q-index {
   font-size: 24rpx;
   color: #bbb;
-  width: 56rpx;
+  width: 40rpx;
   text-align: right;
   flex-shrink: 0;
 }
 .q-expr {
   font-size: 36rpx;
   font-weight: bold;
-  min-width: 220rpx;
   flex-shrink: 0;
 }
 .q-input {
-  width: 130rpx;
+  width: 110rpx;
   height: 64rpx;
   border: 4rpx solid #E0E0E0;
   border-radius: 12rpx;
@@ -1090,17 +1089,17 @@ onUnmounted(() => {
 
 .compare-btns {
   display: flex;
-  gap: 16rpx;
+  gap: 6rpx;
 }
 .cmp-btn {
-  width: 80rpx;
-  height: 64rpx;
-  border: 4rpx solid #E0E0E0;
-  border-radius: 12rpx;
+  width: 60rpx;
+  height: 52rpx;
+  border: 3rpx solid #E0E0E0;
+  border-radius: 10rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 36rpx;
+  font-size: 32rpx;
   font-weight: bold;
   background: #fff;
   color: #555;
@@ -1146,7 +1145,7 @@ onUnmounted(() => {
 .shape-wrap {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   width: 100%;
 }
 .shape-hint {
@@ -1159,6 +1158,7 @@ onUnmounted(() => {
   height: 72rpx;
   border-radius: 50%;
   border: 3rpx solid #ccc;
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1198,7 +1198,7 @@ onUnmounted(() => {
   gap: 16rpx;
 }
 .tri-row-2 {
-  gap: 60rpx;
+  gap: 16rpx;
 }
 
 /* 方形布局 */
@@ -1432,7 +1432,7 @@ onUnmounted(() => {
   margin-top: 8rpx;
 }
 .wt-row { display: flex; justify-content: center; gap: 8rpx; }
-.wt-row-2 { gap: 36rpx; }
+.wt-row-2 { gap: 8rpx; }
 .wrong-sq {
   display: flex;
   flex-direction: column;
