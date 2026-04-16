@@ -1369,9 +1369,12 @@ onUnmounted(() => {
   margin-left: 12rpx;
 }
 
-/* 错题百数表网格 */
+/* 错题图形块（百数表/三角/方形共用） */
 .wrong-chart-block {
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 .wrong-chart-mini {
   display: grid;
