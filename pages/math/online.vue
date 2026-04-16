@@ -1425,7 +1425,7 @@ onUnmounted(() => {
   height: 44rpx;
 }
 .wrong-tri {
-  display: flex;
+  display: inline-flex;
   flex-direction: column;
   align-items: center;
   gap: 4rpx;
@@ -1434,7 +1434,7 @@ onUnmounted(() => {
 .wt-row { display: flex; justify-content: center; gap: 8rpx; }
 .wt-row-2 { gap: 8rpx; }
 .wrong-sq {
-  display: flex;
+  display: inline-flex;
   flex-direction: column;
   gap: 4rpx;
   margin-top: 8rpx;
