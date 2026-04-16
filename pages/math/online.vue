@@ -24,6 +24,10 @@
           <text class="setting-label">题型</text>
           <view class="setting-tags">
             <view
+              :class="['setting-tag', isAllTypesSelected && 'active']"
+              @click="toggleAllTypes"
+            >全选</view>
+            <view
               v-for="item in typeOptions"
               :key="item.value"
               :class="['setting-tag', selectedTypes.has(item.value) && 'active']"
@@ -469,6 +473,16 @@ function toggleType(val) {
   if (s.has(val)) { if (s.size > 1) s.delete(val) }
   else s.add(val)
   selectedTypes.value = new Set(s)
+}
+
+const isAllTypesSelected = computed(() => selectedTypes.value.size === typeOptions.length)
+
+function toggleAllTypes() {
+  if (isAllTypesSelected.value) {
+    selectedTypes.value = new Set([typeOptions[0].value])
+  } else {
+    selectedTypes.value = new Set(typeOptions.map(t => t.value))
+  }
 }
 
 const selectedType = computed(() => {
