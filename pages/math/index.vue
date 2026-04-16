@@ -31,6 +31,13 @@
           <text class="module-desc">间隔复习，重练错题</text>
         </view>
       </view>
+      <view class="module-card guide-card" @click="goTo('/pages/math/guide')">
+        <text class="module-icon">📌</text>
+        <view class="module-info">
+          <text class="module-name">使用说明</text>
+          <text class="module-desc">功能介绍与更新日志</text>
+        </view>
+      </view>
     </view>
   </view>
 </template>
@@ -90,6 +97,7 @@ function goTo(url) {
 .print-card   { border-left-color: #29B6F6; }
 .history-card { border-left-color: #0288D1; }
 .mistakes-card { border-left-color: #FF7043; }
+.guide-card    { border-left-color: #78909C; }
 .module-icon {
   font-size: 56rpx;
 }
