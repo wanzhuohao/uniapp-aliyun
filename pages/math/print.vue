@@ -47,7 +47,7 @@
       <!-- Trial sheet -->
       <div id="printArea" class="a4-sheet">
         <div class="sheet-header">
-          <div class="sheet-title">数学练习</div>
+          <div class="sheet-title">口算练习</div>
           <div class="sheet-info-row">
             <span class="sheet-info-item">姓名___________</span>
             <span class="sheet-info-item">班级___________</span>
@@ -72,7 +72,7 @@
         :style="{ display: showAnswerSheet ? 'block' : 'none' }"
       >
         <div class="sheet-header">
-          <div class="sheet-title">数学练习 — 答案</div>
+          <div class="sheet-title">口算练习 — 答案</div>
           <div class="sheet-info-row">
             <span class="sheet-info-item">日期：{{ todayStr }}</span>
             <span class="sheet-info-item">难度：{{ levelLabel }}</span>
