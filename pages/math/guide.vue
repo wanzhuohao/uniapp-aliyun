@@ -12,7 +12,7 @@
           <text class="item-desc">支持多种题型和难度，答完即时判分，错题自动记录。</text>
           <view class="item-detail">
             <text class="detail-line">题型：加法、减法、比大小、填空、连加连减、填运算符、百数表、图形填数</text>
-            <text class="detail-line">难度：20以内 / 加减整十 / 加减一位数</text>
+            <text class="detail-line">难度：20以内 / 100以内(整十) / 100以内</text>
             <text class="detail-line">题量：20/50/100/自定义（最多200题）</text>
             <text class="detail-line">计时：可选 5~20 分钟倒计时</text>
           </view>
