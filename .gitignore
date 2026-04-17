@@ -2,3 +2,5 @@ node_modules/
 unpackage/
 .hbuilderx/
 package-lock.json
+uniCloud-aliyun/
+uni_modules/

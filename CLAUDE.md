@@ -42,6 +42,19 @@ npm install              # 安装依赖
 - 打印用 html2canvas 转图片方式（不用 window.print 直接打印 DOM）
 - 新增页面记得在 pages.json 加路由（需要 `navigationStyle: custom`）
 
+## 测试注意事项
+
+### Playwright 自动化测试 uniCloud 站点有防刷风险
+
+headless Chromium 的 bot 特征（`navigator.webdriver`、UA、无鼠标轨迹）可能触发 uniCloud 防刷限流，即使 QPS 远低于上限也会返回 `[DCloud-clientDB]: 防刷限流异常-触发禁止访问规则`，IP 被临时封禁 360 秒。
+
+**使用前先告知用户风险**。启用时：
+- 操作间隔放到 2~3 秒
+- 多用 `browser_evaluate` 读 DOM，减少频繁 snapshot
+- 触发封禁时建议用户：换 4G 网络立即恢复 / 等 6 分钟 / 到 uniCloud 控制台直接看数据表证明数据未丢
+
+（2026-04-10 uniapp 父项目发布验证时踩过坑）
+
 ## 进度文档
 
 `docs/progress.md`

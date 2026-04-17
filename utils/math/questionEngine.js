@@ -255,9 +255,9 @@ function genTriangle(level) {
     // 确保6个数不全相同（有趣）
     const vals = { A, B, C, AB, BC, AC }
     // 必须给3个数才能保证唯一解；且不能3个都在同一条边上
+    // 至少保证一条边"已知2数"，让一年级学生能找到突破口（排除全中点）
     const validShown = [
       ['A', 'B', 'C'],       // 全顶点
-      ['AB', 'BC', 'AC'],    // 全中点
       ['A', 'BC', 'AB'],     // 混合
       ['A', 'BC', 'AC'],
       ['B', 'AB', 'AC'],
