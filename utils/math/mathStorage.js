@@ -3,25 +3,6 @@ import { toast } from '../common/toast.js'
 const MAX_RECORDS = 50
 const STORAGE_KEY = 'math_history'
 const WRONG_KEY = 'math_wrong_book'
-const DATA_VERSION_KEY = 'math_data_version'
-const CURRENT_VERSION = 2  // v2: 不规则百数表 + fillOp2
-
-// ====== 数据迁移 ======
-// 启动时调用，清理不兼容的旧数据
-export function migrateData() {
-  const ver = Number(uni.getStorageSync(DATA_VERSION_KEY) || 0)
-  if (ver < CURRENT_VERSION) {
-    // v1→v2: 旧百数表格式(values/hidden)不兼容新格式(cellMap/hiddenKeys)，清除历史
-    try {
-      uni.removeStorageSync(STORAGE_KEY)
-      uni.removeStorageSync(WRONG_KEY)
-      console.log('数据已迁移: 清除旧格式记录')
-    } catch (e) {
-      console.error('数据迁移失败', e)
-    }
-    uni.setStorageSync(DATA_VERSION_KEY, CURRENT_VERSION)
-  }
-}
 
 // ====== 历史记录 ======
 export function getHistory() {

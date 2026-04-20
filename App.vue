@@ -1,10 +1,8 @@
 <script>
-import { migrateData } from './utils/math/mathStorage.js'
 import { applyTheme } from './utils/common/theme.js'
 
 export default {
   onLaunch() {
-    migrateData()
     applyTheme()
   }
 }
