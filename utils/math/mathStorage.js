@@ -25,12 +25,6 @@ export function saveRecord(record) {
   }
 }
 
-export function getHistoryByType(type = 'all') {
-  const list = getHistory()
-  if (type === 'all') return list
-  return list.filter(r => r.type === type)
-}
-
 // ====== 错题本 (Leitner 盒子系统) ======
 // 间隔天数: box1=1天, box2=1天, box3=3天, box4=7天, box5=15天
 const BOX_INTERVALS = [1, 1, 3, 7, 15]

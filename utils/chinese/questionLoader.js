@@ -22,7 +22,3 @@ export function getQuestions(type, unit) {
   const list = all.filter(q => q.type === type && set.has(q.unit))
   return list.length > 0 ? list : null
 }
-
-export function getAllQuestions() {
-  return ensureIndexed()
-}

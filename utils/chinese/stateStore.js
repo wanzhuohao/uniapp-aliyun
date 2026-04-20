@@ -23,7 +23,3 @@ export function setCurrentUnit(unit) {
   s.currentUnit = unit
   save(s)
 }
-
-export function resetAll() {
-  save({ currentUnit: DEFAULT_UNIT })
-}
