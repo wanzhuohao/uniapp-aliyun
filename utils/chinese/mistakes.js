@@ -30,18 +30,6 @@ function nextReviewFromBox(box) {
   return Date.now() + BOX_INTERVALS_DAYS[idx] * DAY_MS
 }
 
-function effectiveNextReviewAt(record, now = Date.now()) {
-  if (record.nextReviewAt != null) return record.nextReviewAt
-  if (record.mastered && record.box == null) return now + 15 * DAY_MS
-  return 0
-}
-
-function effectiveBox(record) {
-  if (record.box != null) return clampBox(record.box)
-  if (record.mastered) return 5
-  return 1
-}
-
 // 记录一次错题。question_id 建议传 questionLoader 生成的稳定 _id
 export function recordWrong({ type, char, unit, question_id, qType }) {
   const all = loadAll()
@@ -121,28 +109,22 @@ export function getAllWrongList(type) {
 export function getDueList(type) {
   const all = getAllWrongList(type)
   const now = Date.now()
-  return all.filter(r => effectiveNextReviewAt(r, now) <= now)
-}
-
-export function getUnmasteredList(type) {
-  const all = getAllWrongList(type)
-  return all.filter(r => effectiveBox(r) < 5)
+  return all.filter(r => r.nextReviewAt <= now)
 }
 
 export function getWrongStats() {
   const all = getAllWrongList()
   const now = Date.now()
-  const due = all.filter(r => effectiveNextReviewAt(r, now) <= now)
+  const due = all.filter(r => r.nextReviewAt <= now)
   return {
     total: all.length,
     pinyinCount: all.filter(r => r.type === 'pinyin').length,
-    hanziCount: all.filter(r => r.type === 'stroke' || r.type === 'hanzi').length,
-    strokeCount: all.filter(r => r.type === 'stroke' || r.type === 'hanzi').length,
-    unmasteredCount: all.filter(r => effectiveBox(r) < 5).length,
-    masteredCount: all.filter(r => effectiveBox(r) >= 5).length,
+    hanziCount: all.filter(r => r.type === 'hanzi').length,
+    unmasteredCount: all.filter(r => r.box < 5).length,
+    masteredCount: all.filter(r => r.box >= 5).length,
     dueCount: due.length,
     pinyinDue: due.filter(r => r.type === 'pinyin').length,
-    hanziDue: due.filter(r => r.type === 'stroke' || r.type === 'hanzi').length,
-    top5: all.filter(r => effectiveBox(r) < 5).sort((a, b) => b.wrongCount - a.wrongCount).slice(0, 5),
+    hanziDue: due.filter(r => r.type === 'hanzi').length,
+    top5: all.filter(r => r.box < 5).sort((a, b) => b.wrongCount - a.wrongCount).slice(0, 5),
   }
 }

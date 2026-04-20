@@ -36,7 +36,7 @@
         <view class="top5-item" v-for="(item, i) in stats.top5" :key="item._id">
           <text class="top5-rank">{{ i + 1 }}</text>
           <text class="top5-char">{{ item.char }}</text>
-          <text class="top5-type">{{ ({ pinyin: '拼音', hanzi: '汉字', stroke: '汉字' })[item.type] || item.type }}</text>
+          <text class="top5-type">{{ ({ pinyin: '拼音', hanzi: '汉字' })[item.type] || item.type }}</text>
           <text class="top5-count">错 {{ item.wrongCount }} 次</text>
         </view>
       </view>
@@ -56,7 +56,7 @@
       >
         <view class="wrong-char">{{ item.char }}</view>
         <view class="wrong-info">
-          <text class="wrong-type">{{ ({ pinyin: '拼音', hanzi: '汉字', stroke: '汉字' })[item.type] || item.type }}</text>
+          <text class="wrong-type">{{ ({ pinyin: '拼音', hanzi: '汉字' })[item.type] || item.type }}</text>
           <text class="wrong-unit">{{ item.unit }}</text>
         </view>
         <view class="wrong-meta">
@@ -90,7 +90,6 @@ const stats = ref({
   total: 0,
   pinyinCount: 0,
   hanziCount: 0,
-  strokeCount: 0,
   unmasteredCount: 0,
   masteredCount: 0,
   top5: [],
@@ -106,17 +105,10 @@ const viewMode = ref('due')
 const filteredList = computed(() => {
   const now = Date.now()
   let list = viewMode.value === 'due'
-    ? wrongList.value.filter(r => {
-        const t = r.nextReviewAt != null ? r.nextReviewAt
-          : (r.mastered && r.box == null ? now + 15 * 86400000 : 0)
-        return t <= now
-      })
+    ? wrongList.value.filter(r => r.nextReviewAt <= now)
     : wrongList.value
 
   if (!filter.value) return list
-  if (filter.value === 'hanzi') {
-    return list.filter(item => item.type === 'hanzi' || item.type === 'stroke')
-  }
   return list.filter(item => item.type === filter.value)
 })
 
