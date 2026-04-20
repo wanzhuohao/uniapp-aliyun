@@ -254,10 +254,10 @@ function genTriangle(level) {
     if (AB > maxNum || BC > maxNum || AC > maxNum) continue
     // 确保6个数不全相同（有趣）
     const vals = { A, B, C, AB, BC, AC }
-    // 必须给3个数才能保证唯一解；且不能3个都在同一条边上
-    // 至少保证一条边"已知2数"，让一年级学生能找到突破口（排除全中点）
+    // 必须给3个数才能保证唯一解
     const validShown = [
       ['A', 'B', 'C'],       // 全顶点
+      ['AB', 'BC', 'AC'],    // 全中点
       ['A', 'BC', 'AB'],     // 混合
       ['A', 'BC', 'AC'],
       ['B', 'AB', 'AC'],
@@ -323,12 +323,88 @@ function genSquare(level) {
   return { expr: JSON.stringify({ target: 10, vals: { A: 1, B: 2, C: 3, D: 4, AB: 7, BC: 5, CD: 3, DA: 5 }, shown: ['A', 'B', 'C'], hidden: ['D', 'AB', 'BC', 'CD', 'DA'] }), answer: JSON.stringify(['4','7','5','3','5']), type: 'square' }
 }
 
-// 图形填数: 随机三角形或方形
+// 三角自由填: 6 个位置全空，给出 6 个数字作为数字池，用户自己摆放
+// 无唯一解，判题时动态校验 "三条边之和都 = target" + "数字池使用正确"
+// 数字池要求：6 个数字各不相同，从小到大展示
+function genTriangleFree(level) {
+  const cfg = LEVEL_CONFIG[level]
+  const maxNum = Math.min(cfg.max, 20)
+  for (let attempt = 0; attempt < 100; attempt++) {
+    const A = rand(1, Math.floor(maxNum / 2))
+    const B = rand(1, Math.floor(maxNum / 2))
+    const C = rand(1, Math.floor(maxNum / 2))
+    const target = rand(Math.max(A + B, B + C, A + C) + 1, A + B + C + maxNum)
+    const AB = target - A - B
+    const BC = target - B - C
+    const AC = target - A - C
+    if (AB < 1 || BC < 1 || AC < 1) continue
+    if (AB > maxNum || BC > maxNum || AC > maxNum) continue
+    const all = [A, B, C, AB, BC, AC]
+    if (new Set(all).size !== 6) continue
+    const vals = { A, B, C, AB, BC, AC }
+    const numbers = [...all].sort((x, y) => x - y)
+    const hidden = ['A', 'B', 'C', 'AB', 'BC', 'AC']
+    return {
+      expr: JSON.stringify({ target, vals, numbers, shown: [], hidden }),
+      answer: '',  // 开放题，交卷时动态判题
+      type: 'triangle-free',
+    }
+  }
+  // fallback
+  return {
+    expr: JSON.stringify({
+      target: 10, vals: { A: 1, B: 2, C: 3, AB: 7, BC: 5, AC: 6 },
+      numbers: [1, 2, 3, 5, 6, 7], shown: [], hidden: ['A', 'B', 'C', 'AB', 'BC', 'AC']
+    }),
+    answer: '',
+    type: 'triangle-free',
+  }
+}
+
+function shuffleArr(arr) {
+  const a = [...arr]
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[a[i], a[j]] = [a[j], a[i]]
+  }
+  return a
+}
+
+// 图形填数: 随机三角形或方形（唯一解）
 function genShapeFill(level) {
   return Math.random() > 0.5 ? genTriangle(level) : genSquare(level)
 }
 
-const TYPE_GENERATORS = { add: genAdd, sub: genSub, compare: genCompare, fill: genFillBlank, chain: genChain, fillOp: genFillOp, hundredChart: genHundredChart, shapeFill: genShapeFill }
+// 判题：triangle-free 动态校验，其他题型字符串比对
+export function checkAnswer(q) {
+  if (q.type === 'triangle-free') {
+    return checkTriangleFree(q)
+  }
+  return String(q.userAnswer) === String(q.answer)
+}
+
+function checkTriangleFree(q) {
+  let data, values
+  try {
+    data = JSON.parse(q.expr)
+    values = JSON.parse(q.userAnswer)
+  } catch {
+    return false
+  }
+  if (!Array.isArray(values) || values.length !== 6) return false
+  const nums = values.map(v => Number(v))
+  if (nums.some(n => !Number.isFinite(n))) return false
+  // 必须用尽数字池里的 6 个数（multiset 相等）
+  const sortedUser = [...nums].sort((x, y) => x - y)
+  const sortedPool = [...data.numbers].sort((x, y) => x - y)
+  if (sortedUser.some((v, i) => v !== sortedPool[i])) return false
+  // hidden 顺序固定 ['A','B','C','AB','BC','AC']
+  const [A, B, C, AB, BC, AC] = nums
+  const t = data.target
+  return (A + AB + B === t) && (B + BC + C === t) && (A + AC + C === t)
+}
+
+const TYPE_GENERATORS = { add: genAdd, sub: genSub, compare: genCompare, fill: genFillBlank, chain: genChain, fillOp: genFillOp, hundredChart: genHundredChart, shapeFill: genShapeFill, triangleFree: genTriangleFree }
 const MIX_TYPES = ['add', 'add', 'sub', 'sub', 'compare', 'fill', 'chain', 'fillOp', 'hundredChart', 'shapeFill']
 const PRINT_TYPES = ['add', 'add', 'sub', 'sub', 'chain']
 const PRINT_NO_CHAIN_TYPES = ['add', 'sub']

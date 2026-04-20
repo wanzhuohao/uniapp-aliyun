@@ -1,13 +1,13 @@
 {
-    "name" : "云工具箱",
+    "name" : "学习小天地",
     "appid" : "__UNI__4840389",
-    "description" : "阿里云工具平台",
+    "description" : "一年级数学语文练习",
     "versionName" : "1.0.0",
     "versionCode" : "100",
     "transformPx" : false,
     "vueVersion" : "3",
     "h5" : {
-        "title" : "云工具箱",
+        "title" : "学习小天地",
         "router" : {
             "mode" : "hash"
         }

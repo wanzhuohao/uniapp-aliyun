@@ -44,23 +44,25 @@
         <button class="action-btn btn-back" @click="goBack">返回</button>
       </view>
 
-      <!-- Trial sheet -->
-      <div id="printArea" class="a4-sheet">
-        <div class="sheet-header">
-          <div class="sheet-title">口算练习</div>
-          <div class="sheet-info-row">
-            <span class="sheet-info-item">姓名___________</span>
-            <span class="sheet-info-item">班级___________</span>
-            <span class="sheet-info-item">分数___________</span>
+      <!-- Trial sheet (wrapped for mobile scaling) -->
+      <div class="a4-wrapper" :style="a4WrapperStyle">
+        <div id="printArea" ref="printAreaRef" class="a4-sheet" :style="a4SheetStyle">
+          <div class="sheet-header">
+            <div class="sheet-title">口算练习</div>
+            <div class="sheet-info-row">
+              <span class="sheet-info-item">姓名___________</span>
+              <span class="sheet-info-item">班级___________</span>
+              <span class="sheet-info-item">分数___________</span>
+            </div>
           </div>
-        </div>
-        <div class="sheet-body">
-          <div
-            v-for="(q, i) in questions"
-            :key="i"
-            class="question-item"
-          >
-            {{ q.expr }} =
+          <div class="sheet-body">
+            <div
+              v-for="(q, i) in questions"
+              :key="i"
+              class="question-item"
+            >
+              {{ q.expr }} =
+            </div>
           </div>
         </div>
       </div>
@@ -94,7 +96,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue'
 import PageHeader from '../../components/PageHeader.vue'
 import { generateQuestions, LEVEL_CONFIG } from '../../utils/math/questionEngine.js'
 import { saveRecord } from '../../utils/math/mathStorage.js'
@@ -106,6 +108,51 @@ const selectedLevel = ref(1)
 const includeChain = ref(false)
 const questions = ref([])
 const showAnswerSheet = ref(false)
+
+// ─── Mobile scaling ───────────────────────────────────────────────────────────
+// A4 sheet 固定 210mm ≈ 794px 宽，窄屏上缩放显示，保证预览=打印
+const printAreaRef = ref(null)
+const sheetScale = ref(1)
+const sheetHeight = ref(0)
+const SHEET_WIDTH_PX = 794
+
+const a4SheetStyle = computed(() => {
+  if (sheetScale.value >= 1) return {}
+  return {
+    transform: `scale(${sheetScale.value})`,
+    transformOrigin: 'top left',
+  }
+})
+
+const a4WrapperStyle = computed(() => {
+  if (sheetScale.value >= 1) return {}
+  return {
+    width: `${SHEET_WIDTH_PX * sheetScale.value}px`,
+    height: sheetHeight.value ? `${sheetHeight.value * sheetScale.value}px` : undefined,
+    overflow: 'hidden',
+  }
+})
+
+function updateSheetScale() {
+  if (typeof window === 'undefined') return
+  const available = window.innerWidth - 32 // 预留两侧边距
+  sheetScale.value = available < SHEET_WIDTH_PX ? available / SHEET_WIDTH_PX : 1
+  nextTick(() => {
+    if (printAreaRef.value) {
+      // offsetHeight 不受 transform 影响，拿到的是原始高度
+      sheetHeight.value = printAreaRef.value.offsetHeight
+    }
+  })
+}
+
+onMounted(() => {
+  updateSheetScale()
+  window.addEventListener('resize', updateSheetScale)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', updateSheetScale)
+})
 
 // ─── Config ───────────────────────────────────────────────────────────────────
 
@@ -139,6 +186,7 @@ function generateSheet() {
     count: 100,
     questionType: includeChain.value ? 'print' : 'print-no-chain',
   })
+  nextTick(updateSheetScale)
 }
 
 function regenerate() {
@@ -169,7 +217,15 @@ async function handlePrint() {
   try {
     const { default: html2canvas } = await import('html2canvas')
     const el = document.getElementById('printArea')
-    const canvas = await html2canvas(el, { scale: 2, useCORS: true })
+    const canvas = await html2canvas(el, {
+      scale: 2,
+      useCORS: true,
+      // 克隆节点上去掉预览用的 scale，保证打印图保持 210mm 原始尺寸
+      onclone: (clonedDoc) => {
+        const clonedSheet = clonedDoc.getElementById('printArea')
+        if (clonedSheet) clonedSheet.style.transform = ''
+      },
+    })
     const dataUrl = canvas.toDataURL('image/png')
     toast.hideLoading()
 
@@ -404,13 +460,18 @@ async function exportAnswerImage() {
 .btn-regen  { background: #66BB6A; color: #fff; }
 .btn-back   { background: #78909C; color: #fff; }
 
+/* ── A4 sheet wrapper (handles mobile scaling) ────────────────── */
+.a4-wrapper {
+  margin: 20rpx auto;
+  max-width: 100%;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
 /* ── A4 sheet (screen) ────────────────────────────────────────── */
 .a4-sheet {
   width: 210mm;
-  margin: 20rpx auto;
   padding: 8mm 12mm;
   background: #fff !important;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   box-sizing: border-box;
   font-family: 'Arial', 'SimSun', sans-serif;
 }
@@ -533,10 +594,12 @@ html body.dark-mode .info-text {
 }
 
 /* ── Dark mode — A4 sheet stays white (print preview) ─────────── */
+html body.dark-mode .a4-wrapper {
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+}
 html body.dark-mode .a4-sheet {
   background: #fff !important;
   color: #111 !important;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
 }
 
 html body.dark-mode .sheet-title,

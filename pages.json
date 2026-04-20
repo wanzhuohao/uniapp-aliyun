@@ -1,17 +1,25 @@
 {
   "pages": [
-    { "path": "pages/index/index", "style": { "navigationStyle": "custom", "navigationBarTitleText": "云工具箱" } },
-    { "path": "pages/math/index", "style": { "navigationStyle": "custom", "navigationBarTitleText": "数学练习" } },
+    { "path": "pages/index/index", "style": { "navigationStyle": "custom", "navigationBarTitleText": "学习小天地" } },
+    { "path": "pages/math/index", "style": { "navigationStyle": "custom", "navigationBarTitleText": "数学" } },
     { "path": "pages/math/online", "style": { "navigationStyle": "custom", "navigationBarTitleText": "在线练习" } },
     { "path": "pages/math/print", "style": { "navigationStyle": "custom", "navigationBarTitleText": "打印出题" } },
     { "path": "pages/math/history", "style": { "navigationStyle": "custom", "navigationBarTitleText": "历史记录" } },
     { "path": "pages/math/mistakes", "style": { "navigationStyle": "custom", "navigationBarTitleText": "错题本" } },
     { "path": "pages/math/mistakes-practice", "style": { "navigationStyle": "custom", "navigationBarTitleText": "错题重练" } },
-    { "path": "pages/math/guide", "style": { "navigationStyle": "custom", "navigationBarTitleText": "使用说明" } }
+    { "path": "pages/math/guide", "style": { "navigationStyle": "custom", "navigationBarTitleText": "使用说明" } },
+    { "path": "pages/chinese/index", "style": { "navigationStyle": "custom", "navigationBarTitleText": "语文" } },
+    { "path": "pages/chinese/learn", "style": { "navigationStyle": "custom", "navigationBarTitleText": "生字学习" } },
+    { "path": "pages/chinese/pinyin", "style": { "navigationStyle": "custom", "navigationBarTitleText": "拼音练习" } },
+    { "path": "pages/chinese/hanzi", "style": { "navigationStyle": "custom", "navigationBarTitleText": "汉字练习" } },
+    { "path": "pages/chinese/result", "style": { "navigationStyle": "custom", "navigationBarTitleText": "练习结果" } },
+    { "path": "pages/chinese/mistakes", "style": { "navigationStyle": "custom", "navigationBarTitleText": "错题本" } },
+    { "path": "pages/chinese/mistakes-practice", "style": { "navigationStyle": "custom", "navigationBarTitleText": "错题重练" } },
+    { "path": "pages/chinese/guide", "style": { "navigationStyle": "custom", "navigationBarTitleText": "使用说明" } }
   ],
   "globalStyle": {
     "navigationBarTextStyle": "black",
-    "navigationBarTitleText": "数学练习",
+    "navigationBarTitleText": "学习小天地",
     "navigationBarBackgroundColor": "#F8F8F8",
     "backgroundColor": "#F8F8F8"
   }

@@ -1,6 +1,6 @@
 <template>
   <view class="index-page">
-    <PageHeader title="数学练习" />
+    <PageHeader title="数学" />
 
     <view class="modules">
       <view class="module-card online-card" @click="goTo('/pages/math/online')">

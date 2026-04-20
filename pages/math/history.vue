@@ -64,7 +64,7 @@
               :key="qi"
               :class="['grid-item',
                 record.type === 'online' && q.isCorrect === false && 'grid-item-wrong',
-                (q.type === 'hundredChart' || q.type === 'triangle' || q.type === 'square') && 'grid-item-chart']"
+                (q.type === 'hundredChart' || q.type === 'triangle' || q.type === 'triangle-free' || q.type === 'square') && 'grid-item-chart']"
             >
               <!-- 百数表：mini 网格 -->
               <template v-if="q.type === 'hundredChart'">
@@ -83,8 +83,8 @@
                   <text v-if="record.type === 'online' && q.isCorrect === false" class="grid-answer"> ✗</text>
                 </view>
               </template>
-              <!-- 三角形填数 -->
-              <template v-else-if="q.type === 'triangle'">
+              <!-- 三角形填数（含自由填） -->
+              <template v-else-if="q.type === 'triangle' || q.type === 'triangle-free'">
                 <view class="mini-shape-wrap">
                   <view class="mini-tri">
                     <view class="mt-row mt-row-1">

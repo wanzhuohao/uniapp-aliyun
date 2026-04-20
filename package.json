@@ -4,6 +4,7 @@
   "description": "阿里云工具平台 - UniApp H5",
   "private": true,
   "dependencies": {
+    "hanzi-writer": "^3.7.3",
     "html2canvas": "^1.4.1"
   }
 }

@@ -1,14 +1,19 @@
 <template>
   <view class="container">
     <view class="header">
-      <text class="title">云工具箱</text>
+      <text class="title">学习小天地</text>
     </view>
 
     <view class="cards">
       <view class="card card-math" @click="goTo('/pages/math/index')">
         <text class="card-icon">🔢</text>
-        <text class="card-title">数学练习</text>
+        <text class="card-title">数学</text>
         <text class="card-desc">在线练习、打印出题</text>
+      </view>
+      <view class="card card-chinese" @click="goTo('/pages/chinese/index')">
+        <text class="card-icon">📖</text>
+        <text class="card-title">语文</text>
+        <text class="card-desc">生字、拼音、汉字、错题本</text>
       </view>
     </view>
   </view>
@@ -57,4 +62,5 @@ function goTo(url) {
 .card-title { font-size: 36rpx; font-weight: bold; color: #333; }
 .card-desc { font-size: 26rpx; color: #888; }
 .card-math { border-left: 8rpx solid #42A5F5; }
+.card-chinese { border-left: 8rpx solid #FFA726; }
 </style>

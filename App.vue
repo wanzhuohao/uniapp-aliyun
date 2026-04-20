@@ -1,9 +1,11 @@
 <script>
 import { migrateData } from './utils/math/mathStorage.js'
+import { applyTheme } from './utils/common/theme.js'
 
 export default {
   onLaunch() {
     migrateData()
+    applyTheme()
   }
 }
 </script>
@@ -25,6 +27,9 @@ body {
   --color-danger: #E53935;
   --color-text: #333;
   --color-text-light: #888;
+  --color-star: #FFB300;
+  --color-stroke: #42A5F5;
   --radius-btn: 16rpx;
+  --radius-card: 20rpx;
 }
 </style>

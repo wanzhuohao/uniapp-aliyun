@@ -36,6 +36,23 @@
           </view>
         </view>
 
+        <!-- 特殊题型（与上面的题型互斥，只能选一个） -->
+        <view class="setting-group">
+          <text class="setting-label">特殊题型</text>
+          <text class="setting-sublabel">选中后与上面题型互斥</text>
+          <view class="special-cards">
+            <view
+              v-for="item in specialOptions"
+              :key="item.value"
+              :class="['special-card', selectedSpecial === item.value && 'active']"
+              @click="selectSpecial(item.value)"
+            >
+              <text class="special-name">{{ item.label }}</text>
+              <text class="special-desc">{{ item.desc }}</text>
+            </view>
+          </view>
+        </view>
+
         <!-- 题量 -->
         <view class="setting-group">
           <text class="setting-label">题量</text>
@@ -223,6 +240,40 @@
             </view>
           </template>
 
+          <!-- 三角自由填：6 格全空，给数字池，无唯一解 -->
+          <template v-else-if="q.type === 'triangle-free'">
+            <view class="shape-wrap">
+              <text class="shape-hint">每边之和 = {{ shapeData(q).target }}</text>
+              <text class="shape-pool">可选数字：{{ (shapeData(q).numbers || []).join('  ') }}</text>
+              <view class="tri-layout">
+                <view class="tri-row tri-row-1">
+                  <view class="shape-circle">
+                    <input class="shape-input" type="number" :value="shapeAnswer(q, 'A')" placeholder="?" @input="onShapeInput(i, 'A', $event)" />
+                  </view>
+                </view>
+                <view class="tri-row tri-row-2">
+                  <view class="shape-circle">
+                    <input class="shape-input" type="number" :value="shapeAnswer(q, 'AB')" placeholder="?" @input="onShapeInput(i, 'AB', $event)" />
+                  </view>
+                  <view class="shape-circle">
+                    <input class="shape-input" type="number" :value="shapeAnswer(q, 'AC')" placeholder="?" @input="onShapeInput(i, 'AC', $event)" />
+                  </view>
+                </view>
+                <view class="tri-row tri-row-3">
+                  <view class="shape-circle">
+                    <input class="shape-input" type="number" :value="shapeAnswer(q, 'B')" placeholder="?" @input="onShapeInput(i, 'B', $event)" />
+                  </view>
+                  <view class="shape-circle">
+                    <input class="shape-input" type="number" :value="shapeAnswer(q, 'BC')" placeholder="?" @input="onShapeInput(i, 'BC', $event)" />
+                  </view>
+                  <view class="shape-circle">
+                    <input class="shape-input" type="number" :value="shapeAnswer(q, 'C')" placeholder="?" @input="onShapeInput(i, 'C', $event)" />
+                  </view>
+                </view>
+              </view>
+            </view>
+          </template>
+
           <!-- 三角形填数 -->
           <template v-else-if="q.type === 'triangle'">
             <view class="shape-wrap">
@@ -372,6 +423,28 @@
               </view>
             </view>
           </template>
+          <!-- 三角自由填错题：展示推荐答案 + 数字池 -->
+          <template v-else-if="w.type === 'triangle-free'">
+            <view class="wrong-chart-block">
+              <text class="wrong-expr">{{ w.index + 1 }}. 三角自由填（每边和={{ shapeDataStatic(w.expr).target }}）</text>
+              <text class="wrong-sub">数字池：{{ (shapeDataStatic(w.expr).numbers || []).join('  ') }}</text>
+              <text class="wrong-sub">以下是一种推荐填法（答案不唯一）：</text>
+              <view class="wrong-tri">
+                <view class="wt-row wt-row-1">
+                  <text class="wt-c answer">{{ shapeDataStatic(w.expr).vals.A }}</text>
+                </view>
+                <view class="wt-row wt-row-2">
+                  <text class="wt-c answer">{{ shapeDataStatic(w.expr).vals.AB }}</text>
+                  <text class="wt-c answer">{{ shapeDataStatic(w.expr).vals.AC }}</text>
+                </view>
+                <view class="wt-row wt-row-3">
+                  <text class="wt-c answer">{{ shapeDataStatic(w.expr).vals.B }}</text>
+                  <text class="wt-c answer">{{ shapeDataStatic(w.expr).vals.BC }}</text>
+                  <text class="wt-c answer">{{ shapeDataStatic(w.expr).vals.C }}</text>
+                </view>
+              </view>
+            </view>
+          </template>
           <!-- 三角形错题：保持三角布局 -->
           <template v-else-if="w.type === 'triangle'">
             <view class="wrong-chart-block">
@@ -442,7 +515,7 @@
 <script setup>
 import { ref, computed, onUnmounted } from 'vue'
 import PageHeader from '../../components/PageHeader.vue'
-import { generateQuestions, LEVEL_CONFIG } from '../../utils/math/questionEngine.js'
+import { generateQuestions, LEVEL_CONFIG, checkAnswer } from '../../utils/math/questionEngine.js'
 import { saveRecord, recordWrong } from '../../utils/math/mathStorage.js'
 import { toast } from '../../utils/common/toast.js'
 
@@ -462,13 +535,22 @@ const typeOptions = [
   { value: 'hundredChart', label: '百数表' },
   { value: 'shapeFill',   label: '图形填数' },
 ]
+const specialOptions = [
+  {
+    value: 'triangleFree',
+    label: '三角自由填',
+    desc: '给 6 个数字，自己摆到 6 个位置，使三条边之和相等',
+  },
+]
 const countPresets = [20, 50, 100]
 
 // ---- 设置状态 ----
 const selectedLevel = ref(1)
 const selectedTypes  = ref(new Set(['add']))
+const selectedSpecial = ref('')
 
 function toggleType(val) {
+  selectedSpecial.value = ''
   const s = selectedTypes.value
   if (s.has(val)) { if (s.size > 1) s.delete(val) }
   else s.add(val)
@@ -478,6 +560,7 @@ function toggleType(val) {
 const isAllTypesSelected = computed(() => selectedTypes.value.size === typeOptions.length)
 
 function toggleAllTypes() {
+  selectedSpecial.value = ''
   if (isAllTypesSelected.value) {
     selectedTypes.value = new Set([typeOptions[0].value])
   } else {
@@ -485,7 +568,19 @@ function toggleAllTypes() {
   }
 }
 
+function selectSpecial(val) {
+  if (selectedSpecial.value === val) {
+    // 再次点击取消，回退到默认普通题型
+    selectedSpecial.value = ''
+    if (selectedTypes.value.size === 0) selectedTypes.value = new Set(['add'])
+  } else {
+    selectedSpecial.value = val
+    selectedTypes.value = new Set()
+  }
+}
+
 const selectedType = computed(() => {
+  if (selectedSpecial.value) return selectedSpecial.value
   const arr = [...selectedTypes.value]
   return arr.length === typeOptions.length ? 'mix' : arr.length === 1 ? arr[0] : arr
 })
@@ -524,7 +619,7 @@ const answeredCount = computed(() =>
 )
 
 const correctCount = computed(() =>
-  questions.value.filter(q => String(q.userAnswer) === String(q.answer)).length
+  questions.value.filter(q => checkAnswer(q)).length
 )
 
 const accuracy = computed(() => {
@@ -535,7 +630,7 @@ const accuracy = computed(() => {
 const wrongList = computed(() =>
   questions.value
     .map((q, i) => ({ ...q, index: i }))
-    .filter(q => String(q.userAnswer) !== String(q.answer))
+    .filter(q => !checkAnswer(q))
 )
 
 // ---- 题量设置 ----
@@ -763,7 +858,7 @@ function doSubmit() {
         answer: q.answer,
         type: q.type,
         userAnswer: q.userAnswer,
-        isCorrect: String(q.userAnswer) === String(q.answer),
+        isCorrect: checkAnswer(q),
       })),
     })
   } catch (e) {
@@ -772,7 +867,7 @@ function doSubmit() {
 
   // 错题写入错题本
   for (const q of questions.value) {
-    if (String(q.userAnswer) !== String(q.answer)) {
+    if (!checkAnswer(q)) {
       recordWrong({ expr: q.expr, answer: q.answer, type: q.type || 'add' })
     }
   }
@@ -944,6 +1039,43 @@ onUnmounted(() => {
   color: #fff;
   border-color: #42A5F5;
   font-weight: bold;
+}
+
+.setting-sublabel {
+  display: block;
+  font-size: 22rpx;
+  color: #999;
+  margin: -8rpx 0 14rpx;
+}
+.special-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 14rpx;
+}
+.special-card {
+  padding: 22rpx 24rpx;
+  border-radius: 16rpx;
+  background: #F5F7FA;
+  border: 3rpx solid #E0E0E0;
+  display: flex;
+  flex-direction: column;
+  gap: 6rpx;
+}
+.special-card:active { transform: scale(0.98); }
+.special-card.active {
+  background: linear-gradient(135deg, #FFF3E0, #FFE0B2);
+  border-color: #FFA726;
+}
+.special-name {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #333;
+}
+.special-card.active .special-name { color: #E65100; }
+.special-desc {
+  font-size: 22rpx;
+  color: #888;
+  line-height: 1.5;
 }
 
 .custom-count-row {
@@ -1167,6 +1299,13 @@ onUnmounted(() => {
   color: #999;
   margin-bottom: 12rpx;
 }
+.shape-pool {
+  font-size: 26rpx;
+  color: #E65100;
+  font-weight: bold;
+  margin-bottom: 12rpx;
+  letter-spacing: 2rpx;
+}
 .shape-circle {
   width: 72rpx;
   height: 72rpx;
@@ -1389,6 +1528,11 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+}
+.wrong-sub {
+  font-size: 22rpx;
+  color: #888;
+  margin: 4rpx 0 8rpx;
 }
 .wrong-chart-mini {
   display: grid;

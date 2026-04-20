@@ -19,6 +19,14 @@
         </view>
 
         <view class="item">
+          <text class="item-title">特殊题型（与普通题型互斥）</text>
+          <text class="item-desc">思考性更强的开放题，没有唯一解。</text>
+          <view class="item-detail">
+            <text class="detail-line">三角自由填：给 6 个数字，自己摆到三角 6 个位置（3 顶点 + 3 中点），使三条边之和相等。交卷时校验"数字用尽 + 三边之和都等于目标值"；错题里会展示一种推荐填法。</text>
+          </view>
+        </view>
+
+        <view class="item">
           <text class="item-title">打印出题</text>
           <text class="item-desc">生成 A4 口算试卷，100题4列排版，支持打印和导出答案图片。</text>
         </view>
@@ -39,14 +47,18 @@
         <text class="section-title">更新日志</text>
 
         <view class="log-item">
-          <text class="log-version">v1.0.0</text>
+          <text class="log-version">v1.1</text>
+          <text class="log-date">2026-04-17</text>
+          <view class="log-changes">
+            <text class="log-line">新增特殊题型 · 三角自由填</text>
+          </view>
+        </view>
+
+        <view class="log-item">
+          <text class="log-version">v1.0</text>
           <text class="log-date">2026-04-15</text>
           <view class="log-changes">
             <text class="log-line">首次发布</text>
-            <text class="log-line">在线练习：8种题型（加减法、比大小、填空、连加连减、填运算符、百数表、图形填数）</text>
-            <text class="log-line">打印出题：A4试卷生成、图片打印、答案导出</text>
-            <text class="log-line">错题本：自动收集、错题重练</text>
-            <text class="log-line">历史记录：练习和打印记录查看</text>
           </view>
         </view>
       </view>

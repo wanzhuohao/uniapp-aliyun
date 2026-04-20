@@ -7,13 +7,14 @@
 </template>
 
 <script setup>
-defineProps({
+const props = defineProps({
   title: { type: String, default: '' },
   showBack: { type: Boolean, default: true },
+  fallback: { type: String, default: '/pages/index/index' },
 })
 
 function onBack() {
-  uni.navigateBack({ fail: () => uni.reLaunch({ url: '/pages/math/index' }) })
+  uni.navigateBack({ fail: () => uni.reLaunch({ url: props.fallback }) })
 }
 </script>
 
