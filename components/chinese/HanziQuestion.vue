@@ -10,13 +10,14 @@
         <view :id="outlineId" class="char-outline-target quiz-size" v-show="outlineReady"></view>
       </view>
 
-      <!-- quiz 完成后的结果 -->
-      <view v-if="strokeResult" class="stroke-result">
-        <text :class="['result-verdict', strokeResult.correct ? 'correct' : 'wrong']">
-          {{ strokeResult.correct ? '全对!' : `有 ${strokeResult.mistakes} 笔写错` }}
-        </text>
+      <!-- quiz 完成后自评 -->
+      <view v-if="strokeDone" class="stroke-result">
+        <text class="self-judge-hint">自己判断掌握情况：</text>
         <view class="answer-btn" @click="replayAnim">▶ 播放笔顺动画</view>
-        <view class="next-btn" @click="emitStrokeResult">下一题</view>
+        <view class="self-judge">
+          <view class="judge-btn judge-correct" @click="markResult(true)">✓ 我掌握了</view>
+          <view class="judge-btn judge-wrong" @click="markResult(false)">✗ 没掌握</view>
+        </view>
       </view>
     </template>
 
@@ -58,7 +59,7 @@ const emit = defineEmits(['answer'])
 
 const choiceState = ref('')
 const selectedOpt = ref(-1)
-const strokeResult = ref(null) // { correct: boolean, mistakes: number }
+const strokeDone = ref(false)
 const outlineId = 'hq-' + Date.now() + '-' + Math.floor(Math.random() * 1e6)
 const outlineReady = ref(false)
 let writerInstance = null
@@ -68,7 +69,7 @@ let pendingTimer = null
 function resetState() {
   choiceState.value = ''
   selectedOpt.value = -1
-  strokeResult.value = null
+  strokeDone.value = false
   outlineReady.value = false
 }
 
@@ -78,7 +79,7 @@ function qTypeLabel(t) {
 
 async function initOutline() {
   outlineReady.value = false
-  strokeResult.value = null
+  strokeDone.value = false
   await nextTick()
   const el = document.getElementById(outlineId)
   if (!el || !props.question?.char) return
@@ -103,13 +104,9 @@ async function initOutline() {
         outlineReady.value = true
         try {
           writerInstance?.quiz({
-            onComplete: (summaryData) => {
+            onComplete: () => {
               if (myToken !== loadToken) return
-              strokeResult.value = {
-                correct: summaryData.totalMistakes === 0,
-                mistakes: summaryData.totalMistakes
-              }
-              // quiz 完成后显示完整字
+              strokeDone.value = true
               try {
                 writerInstance?.showCharacter()
               } catch (e) {}
@@ -135,10 +132,10 @@ function replayAnim() {
   }
 }
 
-function emitStrokeResult() {
-  if (strokeResult.value) {
-    emit('answer', { isCorrect: strokeResult.value.correct })
-  }
+function markResult(isCorrect) {
+  if (choiceState.value) return
+  choiceState.value = isCorrect ? 'correct' : 'wrong'
+  emit('answer', { isCorrect })
 }
 
 function pickOption(i) {
@@ -319,14 +316,12 @@ onBeforeUnmount(() => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20rpx;
+  gap: 24rpx;
 }
-.result-verdict {
-  font-size: 36rpx;
-  font-weight: bold;
+.self-judge-hint {
+  font-size: 28rpx;
+  color: #666;
 }
-.result-verdict.correct { color: #2E7D32; }
-.result-verdict.wrong { color: #C62828; }
 .answer-btn {
   padding: 16rpx 48rpx;
   background: #E3F2FD;
@@ -335,14 +330,23 @@ onBeforeUnmount(() => {
   font-size: 28rpx;
 }
 .answer-btn:active { transform: scale(0.95); }
-.next-btn {
-  padding: 24rpx 80rpx;
-  background: linear-gradient(135deg, #42A5F5, #1E88E5);
-  color: #fff;
+.self-judge {
+  display: flex;
+  gap: 32rpx;
+}
+.judge-btn {
+  padding: 24rpx 56rpx;
   border-radius: 40rpx;
   font-size: 32rpx;
   font-weight: bold;
-  box-shadow: 0 8rpx 24rpx rgba(66,165,245,0.3);
+  color: #fff;
+  box-shadow: 0 8rpx 20rpx rgba(0,0,0,0.15);
 }
-.next-btn:active { transform: scale(0.97); }
+.judge-btn:active { transform: scale(0.96); }
+.judge-correct {
+  background: linear-gradient(135deg, #66BB6A, #43A047);
+}
+.judge-wrong {
+  background: linear-gradient(135deg, #EF5350, #E53935);
+}
 </style>

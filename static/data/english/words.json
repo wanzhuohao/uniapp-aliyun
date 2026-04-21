@@ -1,0 +1,53 @@
+{
+  "animals": [
+    { "word": "cat", "zh": "猫", "emoji": "🐱" },
+    { "word": "dog", "zh": "狗", "emoji": "🐶" },
+    { "word": "pig", "zh": "猪", "emoji": "🐷" },
+    { "word": "cow", "zh": "牛", "emoji": "🐮" },
+    { "word": "duck", "zh": "鸭子", "emoji": "🦆" },
+    { "word": "bird", "zh": "鸟", "emoji": "🐦" },
+    { "word": "fish", "zh": "鱼", "emoji": "🐟" },
+    { "word": "rabbit", "zh": "兔子", "emoji": "🐰" },
+    { "word": "mouse", "zh": "老鼠", "emoji": "🐭" },
+    { "word": "tiger", "zh": "老虎", "emoji": "🐯" },
+    { "word": "lion", "zh": "狮子", "emoji": "🦁" },
+    { "word": "bear", "zh": "熊", "emoji": "🐻" },
+    { "word": "monkey", "zh": "猴子", "emoji": "🐵" },
+    { "word": "panda", "zh": "熊猫", "emoji": "🐼" },
+    { "word": "elephant", "zh": "大象", "emoji": "🐘" }
+  ],
+  "colors": [
+    { "word": "red", "zh": "红色", "emoji": "🔴" },
+    { "word": "blue", "zh": "蓝色", "emoji": "🔵" },
+    { "word": "yellow", "zh": "黄色", "emoji": "🟡" },
+    { "word": "green", "zh": "绿色", "emoji": "🟢" },
+    { "word": "black", "zh": "黑色", "emoji": "⚫" },
+    { "word": "white", "zh": "白色", "emoji": "⚪" },
+    { "word": "orange", "zh": "橙色", "emoji": "🟠" },
+    { "word": "purple", "zh": "紫色", "emoji": "🟣" }
+  ],
+  "numbers": [
+    { "word": "one", "zh": "一", "emoji": "1️⃣" },
+    { "word": "two", "zh": "二", "emoji": "2️⃣" },
+    { "word": "three", "zh": "三", "emoji": "3️⃣" },
+    { "word": "four", "zh": "四", "emoji": "4️⃣" },
+    { "word": "five", "zh": "五", "emoji": "5️⃣" },
+    { "word": "six", "zh": "六", "emoji": "6️⃣" },
+    { "word": "seven", "zh": "七", "emoji": "7️⃣" },
+    { "word": "eight", "zh": "八", "emoji": "8️⃣" },
+    { "word": "nine", "zh": "九", "emoji": "9️⃣" },
+    { "word": "ten", "zh": "十", "emoji": "🔟" }
+  ],
+  "fruits": [
+    { "word": "apple", "zh": "苹果", "emoji": "🍎" },
+    { "word": "banana", "zh": "香蕉", "emoji": "🍌" },
+    { "word": "orange", "zh": "橙子", "emoji": "🍊" },
+    { "word": "grape", "zh": "葡萄", "emoji": "🍇" },
+    { "word": "watermelon", "zh": "西瓜", "emoji": "🍉" },
+    { "word": "strawberry", "zh": "草莓", "emoji": "🍓" },
+    { "word": "peach", "zh": "桃子", "emoji": "🍑" },
+    { "word": "pear", "zh": "梨", "emoji": "🍐" },
+    { "word": "pineapple", "zh": "菠萝", "emoji": "🍍" },
+    { "word": "lemon", "zh": "柠檬", "emoji": "🍋" }
+  ]
+}

@@ -2,13 +2,13 @@
 
 ## 项目概述
 
-阿里云 UniApp H5 工具平台，从 `D:\code\uniapp`（支付宝云）独立出来。包含数学练习和语文练习两大模块。
+阿里云 UniApp H5 工具平台，从 `D:\code\uniapp`（支付宝云）独立出来。包含数学练习、语文练习、英语启蒙三大模块。
 
 ## 技术栈
 
 - **框架**: UniApp Vue3 + Composition API (`<script setup>`)
 - **云**: uniCloud-aliyun（暂未使用云函数，纯前端 localStorage）
-- **依赖**: html2canvas（数学打印）、hanzi-writer（语文笔顺动画）
+- **依赖**: html2canvas（数学打印）、hanzi-writer（语文笔顺动画）、SpeechSynthesis（中/英 TTS）
 - **构建**: HBuilderX
 
 ## 目录结构
@@ -26,6 +26,9 @@ pages/math/                 — 数学练习模块
 pages/chinese/              — 语文练习模块
   index / learn / pinyin / hanzi / result / mistakes / mistakes-practice / guide
 
+pages/english/              — 英语启蒙模块
+  index / letters / words / result / mistakes / mistakes-practice / guide
+
 utils/math/                 — 数学工具
   questionEngine.js / mathStorage.js
 
@@ -36,12 +39,20 @@ utils/chinese/              — 语文工具（全纯前端 localStorage）
   stateStore.js             — 当前单元，key: chinese_state
   unitConfig.js / questionHelper.js
 
+utils/english/              — 英语工具（全纯前端 localStorage）
+  questionLoader.js         — 读 static/data/english/*.json
+  mistakes.js               — Leitner 5 级错题算法，key: english_mistakes
+  practiceLog.js            — 练习日志，key: english_practice_logs
+  themeConfig.js / questionHelper.js
+
 utils/common/
-  toast.js / speech.js / theme.js
+  toast.js / speech.js (speak 中 / speakEn 英) / theme.js
 
 static/data/
-  questions.json            — 语文题库 425 条（pinyin 219 + stroke 206）
+  questions.json            — 语文题库 400 条（pinyin 200 + stroke 200）
   pinyin.json / strokes.json — 字典数据
+  english/letters.json      — 26 字母 + phonics + 例词
+  english/words.json        — 英语单词（4 主题 43 词）
 
 tools/
   extract-questions.mjs     — 从 uniapp 的 seed-questions.js 抽题库 JSON（参数化可复用）

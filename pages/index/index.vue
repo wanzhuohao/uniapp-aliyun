@@ -15,6 +15,11 @@
         <text class="card-title">语文</text>
         <text class="card-desc">生字、拼音、汉字、错题本</text>
       </view>
+      <view class="card card-english" @click="goTo('/pages/english/index')">
+        <text class="card-icon">🔤</text>
+        <text class="card-title">英语启蒙</text>
+        <text class="card-desc">字母、单词、一年级入门</text>
+      </view>
     </view>
   </view>
 </template>
@@ -63,4 +68,5 @@ function goTo(url) {
 .card-desc { font-size: 26rpx; color: #888; }
 .card-math { border-left: 8rpx solid #42A5F5; }
 .card-chinese { border-left: 8rpx solid #FFA726; }
+.card-english { border-left: 8rpx solid #26A69A; }
 </style>
