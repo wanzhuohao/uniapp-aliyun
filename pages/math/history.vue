@@ -289,66 +289,82 @@ onShow(() => {
   flex-direction: column;
 }
 
-/* Header */
-.header {
-  background: #42A5F5;
-  padding: 40rpx 30rpx 24rpx;
-}
-
-.header-title {
-  font-size: 36rpx;
-  font-weight: bold;
-  color: #fff;
+.container {
+  background: #F0F4F9;
+  background-image:
+    linear-gradient(rgba(66,165,245,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(66,165,245,0.05) 1px, transparent 1px);
+  background-size: 40rpx 40rpx;
 }
 
 /* Tab Bar */
 .tab-row {
   display: flex;
-  padding: 20rpx 20rpx 12rpx;
-  gap: 16rpx;
-  background: #fff;
-  border-bottom: 1rpx solid #f0f0f0;
+  padding: 20rpx 20rpx 16rpx;
+  gap: 12rpx;
+  background: transparent;
 }
 
 .tab-btn {
-  padding: 12rpx 36rpx;
+  padding: 12rpx 32rpx;
   border-radius: 32rpx;
   font-size: 28rpx;
-  color: #666;
-  background: #F0F4F9;
+  color: #6B88A3;
+  background: #fff;
   font-weight: 500;
+  border: 2rpx solid #D8E4F0;
+  box-shadow: 0 2rpx 8rpx rgba(30,90,142,0.04);
+  transition: all 0.2s cubic-bezier(.4,0,.2,1);
+  font-family: 'Courier New', 'Consolas', monospace;
+  letter-spacing: 1rpx;
 }
 
 .tab-btn.active {
-  background: #42A5F5;
+  background: linear-gradient(135deg, #42A5F5, #1E88E5);
   color: #fff;
+  border-color: transparent;
   font-weight: bold;
+  box-shadow: 0 4rpx 12rpx rgba(66,165,245,0.25);
 }
 
 /* Record List */
 .record-list {
   flex: 1;
-  padding: 20rpx;
+  padding: 8rpx 20rpx 40rpx;
 }
 
 /* Empty State */
 .empty {
   text-align: center;
-  padding: 120rpx 0;
+  padding: 160rpx 0;
 }
 
 .empty-text {
-  font-size: 30rpx;
-  color: #bbb;
+  font-size: 28rpx;
+  color: #8EA8BF;
+  font-family: 'Courier New', 'Consolas', monospace;
+  letter-spacing: 4rpx;
 }
 
 /* Record Card */
 .record-card {
+  position: relative;
   background: #fff;
   border-radius: 16rpx;
   margin-bottom: 20rpx;
   overflow: hidden;
-  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4rpx 14rpx rgba(30,90,142,0.05);
+  border: 2rpx solid #D8E4F0;
+  transition: transform 0.2s;
+}
+.record-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 6rpx;
+  background: linear-gradient(180deg, #42A5F5, #1E88E5);
 }
 
 /* Card Header */
@@ -364,41 +380,49 @@ onShow(() => {
   align-items: center;
   gap: 14rpx;
   flex: 1;
+  min-width: 0;
 }
 
 .card-header-right {
   display: flex;
   align-items: center;
   gap: 16rpx;
+  flex-shrink: 0;
 }
 
 /* Type Badge */
 .type-badge {
-  font-size: 22rpx;
-  font-weight: bold;
+  font-size: 20rpx;
+  font-weight: 900;
   padding: 4rpx 14rpx;
-  border-radius: 20rpx;
+  border-radius: 6rpx;
   color: #fff;
+  font-family: 'Courier New', 'Consolas', monospace;
+  letter-spacing: 2rpx;
 }
 
 .badge-online {
-  background: #4CAF50;
+  background: #1E5A8E;
 }
 
 .badge-print {
-  background: #9E9E9E;
+  background: #8EA8BF;
 }
 
 /* Difficulty + Count */
 .difficulty-name {
   font-size: 28rpx;
   font-weight: bold;
-  color: #333;
+  color: #0F2B48;
 }
 
 .question-count {
-  font-size: 26rpx;
-  color: #888;
+  font-size: 24rpx;
+  color: #6B88A3;
+  font-family: 'Courier New', 'Consolas', monospace;
+  padding: 2rpx 10rpx;
+  background: #E3F0FA;
+  border-radius: 6rpx;
 }
 
 /* Meta */
@@ -415,38 +439,45 @@ onShow(() => {
 }
 
 .accuracy-text {
-  font-size: 28rpx;
-  font-weight: bold;
-  color: #42A5F5;
+  font-size: 30rpx;
+  font-weight: 900;
+  color: #1E5A8E;
+  font-family: 'Courier New', 'Consolas', monospace;
 }
 
 .time-text {
-  font-size: 24rpx;
-  color: #888;
+  font-size: 22rpx;
+  color: #6B88A3;
+  font-family: 'Courier New', 'Consolas', monospace;
 }
 
 .print-label {
-  font-size: 24rpx;
-  color: #9E9E9E;
+  font-size: 22rpx;
+  color: #8EA8BF;
+  font-family: 'Courier New', 'Consolas', monospace;
+  letter-spacing: 1rpx;
 }
 
 .date-text {
-  font-size: 22rpx;
-  color: #bbb;
+  font-size: 20rpx;
+  color: #8EA8BF;
+  font-family: 'Courier New', 'Consolas', monospace;
+  letter-spacing: 1rpx;
 }
 
 /* Expand Arrow */
 .expand-arrow {
-  font-size: 24rpx;
-  color: #aaa;
-  margin-left: 8rpx;
+  font-size: 20rpx;
+  color: #2A7AB8;
+  margin-left: 4rpx;
+  transition: transform 0.2s;
 }
 
 /* Card Detail */
 .card-detail {
-  border-top: 1rpx solid #f0f0f0;
-  padding: 16rpx 20rpx;
-  background: #fafafa;
+  border-top: 2rpx dashed #D8E4F0;
+  padding: 18rpx 20rpx;
+  background: #F7FAFD;
 }
 
 .detail-grid {
@@ -472,7 +503,8 @@ onShow(() => {
 }
 
 .grid-item-wrong {
-  background: #fff3f3;
+  background: #FFEBEE;
+  border: 1rpx solid #FFCDD2;
 }
 
 /* 百数表占满整行 */

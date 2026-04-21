@@ -1017,38 +1017,56 @@ onUnmounted(() => {
 }
 
 .setting-group {
+  position: relative;
   background: #fff;
   border-radius: 20rpx;
   padding: 28rpx 28rpx 20rpx;
-  margin-bottom: 24rpx;
-  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.04);
+  margin-bottom: 20rpx;
+  box-shadow: 0 4rpx 14rpx rgba(30,90,142,0.05);
+  border: 2rpx solid #D8E4F0;
+}
+.setting-group::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 24rpx;
+  bottom: 24rpx;
+  width: 4rpx;
+  background: linear-gradient(180deg, #42A5F5, #1E88E5);
+  border-radius: 0 4rpx 4rpx 0;
 }
 .setting-label {
   font-size: 28rpx;
-  font-weight: bold;
-  color: #333;
+  font-weight: 900;
+  color: #0F2B48;
   margin-bottom: 18rpx;
   display: block;
+  letter-spacing: 2rpx;
 }
 .setting-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 14rpx;
+  gap: 12rpx;
 }
 .setting-tag {
-  padding: 14rpx 28rpx;
-  border-radius: 20rpx;
+  padding: 12rpx 28rpx;
+  border-radius: 24rpx;
   font-size: 26rpx;
-  background: #F0F4F9;
-  color: #666;
-  border: 3rpx solid #E0E0E0;
+  background: #fff;
+  color: #6B88A3;
+  border: 2rpx solid #D8E4F0;
+  box-shadow: 0 2rpx 6rpx rgba(30,90,142,0.03);
+  transition: all 0.2s cubic-bezier(.4,0,.2,1);
+  font-family: 'Courier New', 'Consolas', monospace;
+  letter-spacing: 1rpx;
 }
 .setting-tag:active { transform: scale(0.95); }
 .setting-tag.active {
-  background: #42A5F5;
+  background: linear-gradient(135deg, #42A5F5, #1E88E5);
   color: #fff;
-  border-color: #42A5F5;
+  border-color: transparent;
   font-weight: bold;
+  box-shadow: 0 4rpx 12rpx rgba(66,165,245,0.25);
 }
 
 .setting-sublabel {
@@ -1064,27 +1082,29 @@ onUnmounted(() => {
 }
 .special-card {
   padding: 22rpx 24rpx;
-  border-radius: 16rpx;
-  background: #F0F4F9;
-  border: 3rpx solid #E0E0E0;
+  border-radius: 14rpx;
+  background: #F7FAFD;
+  border: 2rpx solid #D8E4F0;
   display: flex;
   flex-direction: column;
   gap: 6rpx;
+  transition: all 0.2s;
 }
 .special-card:active { transform: scale(0.98); }
 .special-card.active {
-  background: linear-gradient(135deg, #FFF3E0, #FFE0B2);
-  border-color: #FFA726;
+  background: linear-gradient(135deg, #E3F0FA, #C7E2F5);
+  border-color: #42A5F5;
+  box-shadow: 0 4rpx 12rpx rgba(66,165,245,0.15);
 }
 .special-name {
   font-size: 28rpx;
   font-weight: bold;
-  color: #333;
+  color: #0F2B48;
 }
-.special-card.active .special-name { color: #E65100; }
+.special-card.active .special-name { color: #1E5A8E; }
 .special-desc {
   font-size: 22rpx;
-  color: #888;
+  color: #6B88A3;
   line-height: 1.5;
 }
 
@@ -1097,30 +1117,34 @@ onUnmounted(() => {
 .custom-count-input {
   width: 180rpx;
   height: 64rpx;
-  border: 4rpx solid #42A5F5;
+  border: 3rpx solid #42A5F5;
   border-radius: 12rpx;
   text-align: center;
   font-size: 32rpx;
   font-weight: bold;
   background: #fff;
+  color: #1E5A8E;
+  font-family: 'Courier New', 'Consolas', monospace;
 }
 .custom-count-unit {
-  font-size: 28rpx;
-  color: #666;
+  font-size: 26rpx;
+  color: #6B88A3;
+  font-family: 'Courier New', 'Consolas', monospace;
 }
 
 .desc-area {
   background: #fff;
+  border: 2rpx solid #D8E4F0;
   border-radius: 20rpx;
   padding: 24rpx 32rpx;
   margin-bottom: 32rpx;
-  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.04);
+  box-shadow: 0 4rpx 14rpx rgba(30,90,142,0.04);
 }
 .desc {
   display: block;
   font-size: 26rpx;
-  color: #666;
-  line-height: 2;
+  color: #6B88A3;
+  line-height: 1.9;
 }
 
 .start-btn {
