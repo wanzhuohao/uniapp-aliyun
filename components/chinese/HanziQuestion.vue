@@ -206,30 +206,33 @@ onBeforeUnmount(() => {
 
 .speak-btn {
   margin: 12rpx 0;
-  font-size: 44rpx;
+  font-size: 40rpx;
   width: 72rpx;
   height: 72rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #E3F2FD;
+  background: #FDF1E6;
+  border: 2rpx solid #E8D5B7;
   border-radius: 50%;
 }
 .speak-btn:active { transform: scale(0.9); }
 
 .type-badge {
   text-align: center;
-  font-size: 24rpx;
-  font-weight: bold;
-  padding: 6rpx 24rpx;
-  border-radius: 20rpx;
+  font-size: 22rpx;
+  font-weight: 900;
+  padding: 6rpx 22rpx;
+  border-radius: 8rpx;
   margin-bottom: 16rpx;
   display: inline-block;
+  letter-spacing: 3rpx;
+  font-family: 'STKaiti', 'KaiTi', '楷体', serif;
 }
-.stroke-badge { background: #E3F2FD; color: #1565C0; }
-.radical-badge { background: #FFF3E0; color: #E65100; }
-.structure-badge { background: #E8F5E9; color: #2E7D32; }
-.strokeCount-badge { background: #F3E5F5; color: #7B1FA2; }
+.stroke-badge      { background: #FDE7E9; color: #A62D33; }
+.radical-badge     { background: #FDF1E6; color: #7F1F25; border: 1rpx solid #E8D5B7; }
+.structure-badge   { background: #E8F5E9; color: #2E7D32; }
+.strokeCount-badge { background: #F3EDE0; color: #7A5A3A; }
 
 .hint-text {
   text-align: center;
@@ -285,15 +288,16 @@ onBeforeUnmount(() => {
 }
 .option-btn {
   background: #fff;
-  border: 3rpx solid #BDBDBD;
-  border-radius: 20rpx;
+  border: 2rpx solid #D6CBB8;
+  border-radius: 16rpx;
   padding: 32rpx 16rpx;
   text-align: center;
   font-size: 36rpx;
   font-weight: 500;
-  color: #333;
-  box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.06);
+  color: #1F1F1F;
+  box-shadow: 0 3rpx 10rpx rgba(31,31,31,0.04);
   transition: all 0.2s;
+  font-family: 'STKaiti', 'KaiTi', '楷体', serif;
 }
 .option-btn:active { transform: scale(0.96); }
 .option-btn.correct {
@@ -322,10 +326,13 @@ onBeforeUnmount(() => {
 }
 .answer-btn {
   padding: 16rpx 48rpx;
-  background: #E3F2FD;
-  color: #1565C0;
+  background: #FDF1E6;
+  color: #A62D33;
+  border: 2rpx solid #E8D5B7;
   border-radius: 24rpx;
   font-size: 28rpx;
+  font-family: 'STKaiti', 'KaiTi', '楷体', serif;
+  font-weight: bold;
 }
 .answer-btn:active { transform: scale(0.95); }
 .self-judge {
