@@ -1,6 +1,6 @@
 <template>
   <view class="words-page">
-    <PageHeader v-if="!started" title="单词练习" />
+    <PageHeader v-if="!started" title="单词练习" theme="english" />
     <view v-if="started" class="practice-bar">
       <view class="back-btn" @click="goBack">←</view>
       <view v-if="totalQuestions > 0" class="progress-dots">
@@ -167,7 +167,11 @@ onShow(() => {
 </script>
 
 <style scoped>
-.words-page { min-height: 100vh; background: #F5F7FA; }
+.words-page {
+  min-height: 100vh;
+  background: #F5FBFB;
+  font-family: 'Quicksand', 'Trebuchet MS', sans-serif;
+}
 
 .practice-bar {
   display: flex;
@@ -213,9 +217,11 @@ onShow(() => {
   padding: 48rpx 32rpx;
 }
 .filter-title {
-  font-size: 36rpx;
-  font-weight: bold;
+  font-size: 34rpx;
+  font-weight: 900;
+  color: #1F3A3A;
   margin-bottom: 24rpx;
+  letter-spacing: 2rpx;
 }
 .unit-tags {
   display: flex;
@@ -226,18 +232,21 @@ onShow(() => {
 }
 .unit-tag {
   padding: 16rpx 28rpx;
-  border-radius: 24rpx;
+  border-radius: 28rpx;
   font-size: 28rpx;
   background: #fff;
-  color: #666;
-  border: 3rpx solid #E0E0E0;
+  color: #1F3A3A;
+  border: 2rpx solid #B2DFDB;
+  box-shadow: 0 2rpx 6rpx rgba(31,58,58,0.04);
+  transition: all 0.2s;
 }
 .unit-tag:active { transform: scale(0.95); }
 .unit-tag.active {
-  background: #26A69A;
+  background: linear-gradient(135deg, #26A69A, #1E8E82);
   color: #fff;
-  border-color: #26A69A;
+  border-color: #1E8E82;
   font-weight: bold;
+  box-shadow: 0 4rpx 10rpx rgba(38,166,154,0.25);
 }
 .filter-tags {
   display: flex;

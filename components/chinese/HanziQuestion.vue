@@ -49,7 +49,6 @@
 import { ref, watch, nextTick, onMounted, onBeforeUnmount } from 'vue'
 import HanziWriter from 'hanzi-writer'
 import { speak } from '../../utils/common/speech.js'
-import { isDark } from '../../utils/common/theme.js'
 
 const props = defineProps({
   question: { type: Object, required: true }
@@ -86,14 +85,13 @@ async function initOutline() {
   el.innerHTML = ''
   const myToken = ++loadToken
   try {
-    const dark = isDark()
     writerInstance = HanziWriter.create(outlineId, props.question.char, {
       width: 280,
       height: 280,
       padding: 10,
-      strokeColor: dark ? '#80cbc4' : '#2E7D32',
-      outlineColor: dark ? '#888' : '#DDD',
-      radicalColor: dark ? '#80cbc4' : '#168F16',
+      strokeColor: '#2E7D32',
+      outlineColor: '#DDD',
+      radicalColor: '#168F16',
       strokeAnimationSpeed: 2,
       delayBetweenStrokes: 200,
       showCharacter: false,

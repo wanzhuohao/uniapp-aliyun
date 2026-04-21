@@ -57,12 +57,23 @@ export function speak(text) {
 }
 
 // 英语只走有道 TTS type=2（美式女声）；失败就静音，不回退 SpeechSynthesis（手机系统默认可能是男声）
-// 返回 Promise：播完 / 失败 / 被打断 都会 resolve（不 reject，避免卡流程）
+// 返回 Promise：播完 / 失败 / 被打断 / 超时 都会 resolve（不 reject，避免卡流程）
+// Why timeout: audio 可能因网络慢 / 浏览器静默阻止自动播放而永不触发 onended/onerror，
+//              没有兜底会让调用方的 Promise.all 永远挂起，导致下一题进不去。
 export function speakEn(text) {
   if (!text || typeof window === 'undefined') return Promise.resolve()
   const word = String(text).trim()
   if (!word) return Promise.resolve()
   return new Promise((resolve) => {
+    let settled = false
+    let timer = null
+    const finish = () => {
+      if (settled) return
+      settled = true
+      if (timer) { clearTimeout(timer); timer = null }
+      speaking = false
+      resolve()
+    }
     try {
       if (enAudio) {
         enAudio.onended = null
@@ -76,18 +87,18 @@ export function speakEn(text) {
       speaking = true
       const done = () => {
         if (currentAudio !== enAudio) return
-        speaking = false
-        resolve()
+        finish()
       }
       enAudio.onended = done
       enAudio.onerror = done
+      // 兜底：最多等 4 秒，够正常单词发音（1~2 秒）；网络慢 / 静默失败也会放行
+      timer = setTimeout(finish, 4000)
       const p = enAudio.play()
       if (p && typeof p.catch === 'function') {
         p.catch(() => done())
       }
     } catch (e) {
-      speaking = false
-      resolve()
+      finish()
     }
   })
 }

@@ -72,7 +72,7 @@ function draw() {
 
   if (points.length > 1) {
     // 折线
-    ctx.setStrokeStyle('#667eea')
+    ctx.setStrokeStyle('#A62D33')
     ctx.setLineWidth(2)
     ctx.beginPath()
     ctx.moveTo(points[0].x, points[0].y)
@@ -84,7 +84,7 @@ function draw() {
 
   // 数据点圆圈
   for (const p of points) {
-    ctx.setFillStyle('#667eea')
+    ctx.setFillStyle('#A62D33')
     ctx.beginPath()
     ctx.arc(p.x, p.y, 3, 0, 2 * Math.PI)
     ctx.fill()

@@ -1,10 +1,6 @@
 <script>
-import { applyTheme } from './utils/common/theme.js'
-
 export default {
-  onLaunch() {
-    applyTheme()
-  }
+  onLaunch() {}
 }
 </script>
 

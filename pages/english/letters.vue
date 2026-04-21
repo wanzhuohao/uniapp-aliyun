@@ -1,6 +1,6 @@
 <template>
   <view class="letters-page">
-    <PageHeader title="字母认读" />
+    <PageHeader title="字母认读" theme="english" />
 
     <view class="letter-grid">
       <view
@@ -78,7 +78,11 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.letters-page { min-height: 100vh; background: #F5F7FA; }
+.letters-page {
+  min-height: 100vh;
+  background: #F5FBFB;
+  font-family: 'Quicksand', 'Trebuchet MS', sans-serif;
+}
 
 .letter-grid {
   display: grid;
@@ -88,36 +92,42 @@ onMounted(() => {
 }
 .letter-cell {
   background: #fff;
-  border-radius: 14rpx;
+  border-radius: 16rpx;
   padding: 16rpx 0;
   text-align: center;
-  box-shadow: 0 2rpx 6rpx rgba(0,0,0,0.05);
+  box-shadow: 0 2rpx 6rpx rgba(31,58,58,0.05);
   border: 3rpx solid transparent;
+  transition: all 0.2s;
 }
 .letter-cell.active {
-  background: #AB47BC;
-  border-color: #7B1FA2;
+  background: linear-gradient(135deg, #26A69A, #1E8E82);
+  border-color: #00796B;
+  transform: translateY(-2rpx);
+  box-shadow: 0 6rpx 16rpx rgba(38,166,154,0.35);
 }
 .letter-cell.active .letter-upper,
 .letter-cell.active .letter-lower { color: #fff; }
 .letter-upper {
   display: block;
-  font-size: 44rpx;
-  font-weight: bold;
-  color: #333;
+  font-size: 48rpx;
+  font-weight: 900;
+  color: #1F3A3A;
+  font-family: 'Quicksand', 'Trebuchet MS', sans-serif;
+  line-height: 1.1;
 }
 .letter-lower {
   display: block;
-  font-size: 28rpx;
-  color: #888;
+  font-size: 30rpx;
+  color: #6B8787;
+  font-family: 'Quicksand', 'Trebuchet MS', sans-serif;
 }
 
 .letter-detail {
   margin: 16rpx 24rpx 48rpx;
   padding: 40rpx 32rpx;
   background: #fff;
-  border-radius: 20rpx;
-  box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.06);
+  border-radius: 28rpx;
+  box-shadow: 0 6rpx 20rpx rgba(31,58,58,0.06);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -129,33 +139,39 @@ onMounted(() => {
   gap: 16rpx;
 }
 .big-upper {
-  font-size: 180rpx;
-  font-weight: bold;
-  color: #AB47BC;
+  font-size: 200rpx;
+  font-weight: 900;
+  color: #26A69A;
   line-height: 1;
+  font-family: 'Quicksand', 'Trebuchet MS', sans-serif;
 }
 .big-lower {
-  font-size: 120rpx;
-  font-weight: bold;
-  color: #7B1FA2;
+  font-size: 130rpx;
+  font-weight: 900;
+  color: #FF8A65;
   line-height: 1;
+  font-family: 'Quicksand', 'Trebuchet MS', sans-serif;
 }
 .phonics {
   font-size: 34rpx;
-  color: #555;
-  font-family: monospace;
+  color: #00695C;
+  font-family: 'Georgia', 'Times New Roman', serif;
+  font-style: italic;
+  letter-spacing: 2rpx;
 }
 .detail-actions {
   display: flex;
   gap: 20rpx;
 }
 .act-btn {
-  padding: 16rpx 36rpx;
-  background: #F3E5F5;
-  color: #6A1B9A;
-  border-radius: 24rpx;
+  padding: 18rpx 36rpx;
+  background: #E0F2F1;
+  color: #00695C;
+  border: 2rpx solid #B2DFDB;
+  border-radius: 32rpx;
   font-size: 28rpx;
-  font-weight: 500;
+  font-weight: bold;
+  font-family: 'Quicksand', 'Trebuchet MS', sans-serif;
 }
 .act-btn:active { transform: scale(0.95); }
 
@@ -164,18 +180,24 @@ onMounted(() => {
   flex-direction: column;
   align-items: center;
   gap: 8rpx;
-  padding: 24rpx;
-  background: #FAFAFA;
-  border-radius: 16rpx;
+  padding: 32rpx 24rpx;
+  background: linear-gradient(135deg, #FFF4E6 0%, #E0F2F1 100%);
+  border-radius: 20rpx;
   width: 100%;
 }
-.example-emoji { font-size: 120rpx; line-height: 1; }
+.example-emoji { font-size: 140rpx; line-height: 1; }
 .example-word {
-  font-size: 42rpx;
-  font-weight: bold;
-  color: #333;
+  font-size: 48rpx;
+  font-weight: 900;
+  color: #1F3A3A;
+  font-family: 'Quicksand', 'Trebuchet MS', sans-serif;
+  letter-spacing: 2rpx;
 }
-.example-zh { font-size: 28rpx; color: #888; }
+.example-zh {
+  font-size: 26rpx;
+  color: #6B8787;
+  letter-spacing: 2rpx;
+}
 
 .nav-actions {
   display: flex;
@@ -183,16 +205,19 @@ onMounted(() => {
   margin-top: 16rpx;
 }
 .nav-btn {
-  padding: 20rpx 40rpx;
-  background: #AB47BC;
+  padding: 20rpx 44rpx;
+  background: linear-gradient(135deg, #26A69A, #1E8E82);
   color: #fff;
-  border-radius: 24rpx;
+  border-radius: 32rpx;
   font-size: 28rpx;
-  font-weight: 500;
+  font-weight: bold;
+  font-family: 'Quicksand', 'Trebuchet MS', sans-serif;
+  letter-spacing: 1rpx;
+  box-shadow: 0 4rpx 12rpx rgba(38,166,154,0.25);
 }
 .nav-btn.disabled {
-  background: #D1C4E9;
-  color: #fff;
+  background: #B2DFDB;
+  box-shadow: none;
 }
 .nav-btn:active { transform: scale(0.96); }
 </style>

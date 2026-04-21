@@ -336,6 +336,7 @@ onMounted(() => {
 <style scoped>
 .wbp-page {
   min-height: 100vh;
+  background: #FAF6EE;
   display: flex;
   flex-direction: column;
 }
@@ -383,7 +384,7 @@ onMounted(() => {
   justify-content: space-between;
   align-items: center;
   padding: 16rpx 24rpx;
-  background: #F0F4FF;
+  background: #FDF1E6;
   border-radius: 16rpx;
   margin-bottom: 24rpx;
   font-size: 26rpx;
@@ -392,7 +393,7 @@ onMounted(() => {
   max-width: 600rpx;
 }
 .switch-link {
-  color: #667eea;
+  color: #A62D33;
   font-weight: bold;
 }
 .type-cards {
@@ -413,8 +414,8 @@ onMounted(() => {
   border-left: 8rpx solid;
 }
 .type-card:active { transform: scale(0.98); opacity: 0.9; }
-.type-pinyin { border-left-color: #FFA726; }
-.type-hanzi { border-left-color: #42A5F5; }
+.type-pinyin { border-left-color: #A62D33; }
+.type-hanzi { border-left-color: #A62D33; }
 
 .type-icon { font-size: 56rpx; flex-shrink: 0; }
 .type-name {
@@ -443,7 +444,7 @@ onMounted(() => {
 }
 .start-btn {
   padding: 24rpx 80rpx;
-  background: linear-gradient(135deg, #FFA726, #F57C00);
+  background: linear-gradient(135deg, #A62D33, #7F1F25);
   color: #fff;
   border-radius: 40rpx;
   font-size: 32rpx;
@@ -497,8 +498,8 @@ onMounted(() => {
 }
 .action-btn:active { transform: scale(0.97); }
 .action-btn.primary {
-  background: linear-gradient(135deg, #FFA726, #F57C00);
+  background: linear-gradient(135deg, #A62D33, #7F1F25);
   color: #fff;
-  border-color: #FFA726;
+  border-color: #A62D33;
 }
 </style>

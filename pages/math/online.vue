@@ -2,7 +2,7 @@
   <view class="online-page">
 
     <!-- ===================== PHASE: SETUP ===================== -->
-    <PageHeader v-if="phase === 'setup'" title="在线练习" />
+    <PageHeader v-if="phase === 'setup'" title="在线练习" theme="math" />
     <view v-if="phase === 'setup'" class="setup-area">
 
       <scroll-view scroll-y class="setup-scroll">
@@ -392,10 +392,20 @@
     <!-- ===================== PHASE: RESULT ===================== -->
     <view v-if="phase === 'result'" class="result-area">
       <view class="result-header">
-        <text class="result-title">完成！</text>
-        <text class="result-score">{{ correctCount }}/{{ questions.length }} 正确</text>
-        <text class="result-accuracy">正确率：{{ accuracy }}%</text>
-        <text v-if="timerEnabled" class="result-time">用时：{{ formatTime(finalTime) }}</text>
+        <view class="result-check">
+          <text class="result-check-mark">{{ accuracy >= 80 ? '✓' : accuracy >= 60 ? '◎' : '◇' }}</text>
+        </view>
+        <text class="result-tag">DONE</text>
+        <view class="result-score-row">
+          <text class="result-score-num">{{ correctCount }}</text>
+          <text class="result-score-slash">/</text>
+          <text class="result-score-total">{{ questions.length }}</text>
+        </view>
+        <view class="result-meta">
+          <text class="result-accuracy">{{ accuracy }}% 正确率</text>
+          <text v-if="timerEnabled" class="result-dot">·</text>
+          <text v-if="timerEnabled" class="result-time">{{ formatTime(finalTime) }}</text>
+        </view>
       </view>
 
       <view class="result-actions">
@@ -972,7 +982,7 @@ onUnmounted(() => {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #F5F7FA;
+  background: #F0F4F9;
 }
 
 /* ===== SETUP ===== */
@@ -1029,7 +1039,7 @@ onUnmounted(() => {
   padding: 14rpx 28rpx;
   border-radius: 20rpx;
   font-size: 26rpx;
-  background: #F5F7FA;
+  background: #F0F4F9;
   color: #666;
   border: 3rpx solid #E0E0E0;
 }
@@ -1055,7 +1065,7 @@ onUnmounted(() => {
 .special-card {
   padding: 22rpx 24rpx;
   border-radius: 16rpx;
-  background: #F5F7FA;
+  background: #F0F4F9;
   border: 3rpx solid #E0E0E0;
   display: flex;
   flex-direction: column;
@@ -1441,29 +1451,78 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 40rpx;
+  margin-bottom: 48rpx;
 }
-.result-title {
-  font-size: 60rpx;
+.result-check {
+  width: 180rpx;
+  height: 180rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #42A5F5, #1E88E5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 12rpx 28rpx rgba(66,165,245,0.35);
+  margin-bottom: 32rpx;
+  position: relative;
+}
+.result-check::after {
+  content: '';
+  position: absolute;
+  inset: -12rpx;
+  border: 2rpx dashed #B8D9F0;
+  border-radius: 50%;
+}
+.result-check-mark {
+  font-size: 110rpx;
+  color: #fff;
+  font-weight: 900;
+  line-height: 1;
+  font-family: 'Courier New', 'Consolas', monospace;
+}
+.result-tag {
+  font-size: 22rpx;
+  color: #2A7AB8;
+  letter-spacing: 10rpx;
   font-weight: bold;
-  color: #42A5F5;
-  margin-bottom: 20rpx;
+  font-family: 'Courier New', 'Consolas', monospace;
+  margin-bottom: 12rpx;
 }
-.result-score {
-  font-size: 40rpx;
+.result-score-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6rpx;
+  margin-bottom: 16rpx;
+}
+.result-score-num {
+  font-size: 140rpx;
+  font-weight: 900;
+  color: #1E5A8E;
+  font-family: 'Courier New', 'Consolas', monospace;
+  line-height: 1;
+}
+.result-score-slash {
+  font-size: 72rpx;
+  color: #8EA8BF;
   font-weight: bold;
-  margin-bottom: 8rpx;
 }
-.result-accuracy {
-  font-size: 30rpx;
-  color: #999;
-  margin-bottom: 8rpx;
+.result-score-total {
+  font-size: 72rpx;
+  color: #6B88A3;
+  font-weight: bold;
+  font-family: 'Courier New', 'Consolas', monospace;
 }
-.result-time {
-  font-size: 32rpx;
-  font-family: monospace;
-  color: #666;
+.result-meta {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  font-size: 28rpx;
+  color: #6B88A3;
+  font-family: 'Courier New', 'Consolas', monospace;
+  letter-spacing: 2rpx;
 }
+.result-dot { opacity: 0.5; }
+.result-accuracy { color: #2A7AB8; font-weight: bold; }
+.result-time { color: #6B88A3; }
 
 .result-actions {
   display: flex;
@@ -1647,125 +1706,4 @@ onUnmounted(() => {
   display: inline-block;
 }
 .time-alert-btn:active { transform: scale(0.97); }
-
-/* ===== 深色模式 ===== */
-:global(html body.dark-mode) .online-page {
-  background: #1A1A2E;
-}
-:global(html body.dark-mode) .setup-header,
-:global(html body.dark-mode) .top-bar,
-:global(html body.dark-mode) .setting-group,
-:global(html body.dark-mode) .desc-area {
-  background: #242440;
-  box-shadow: none;
-}
-:global(html body.dark-mode) .setup-title,
-:global(html body.dark-mode) .setting-label,
-:global(html body.dark-mode) .result-score {
-  color: #E0E0E0;
-}
-:global(html body.dark-mode) .setting-tag {
-  background: #2A2A4A;
-  color: #AAA;
-  border-color: #444;
-}
-:global(html body.dark-mode) .setting-tag.active {
-  background: #42A5F5;
-  color: #fff;
-  border-color: #42A5F5;
-}
-:global(html body.dark-mode) .desc {
-  color: #888;
-}
-:global(html body.dark-mode) .q-row {
-  background: #242440;
-  box-shadow: none;
-}
-:global(html body.dark-mode) .q-row.current {
-  background: #1A3A5C;
-}
-:global(html body.dark-mode) .q-expr {
-  color: #E0E0E0;
-}
-:global(html body.dark-mode) .q-input,
-:global(html body.dark-mode) .cmp-btn {
-  background: #1A1A2E;
-  border-color: #444;
-  color: #E0E0E0;
-}
-:global(html body.dark-mode) .cmp-btn.selected {
-  background: #42A5F5;
-  color: #fff;
-  border-color: #42A5F5;
-}
-:global(html body.dark-mode) .fillop2-btn {
-  background: #1A1A2E;
-  border-color: #444;
-  color: #E0E0E0;
-}
-:global(html body.dark-mode) .fillop2-btn.selected {
-  background: #42A5F5;
-  color: #fff;
-  border-color: #42A5F5;
-}
-:global(html body.dark-mode) .fillop2-num {
-  color: #E0E0E0;
-}
-:global(html body.dark-mode) .q-index {
-  color: #666;
-}
-:global(html body.dark-mode) .submit-bar,
-:global(html body.dark-mode) .submit-btn {
-  background: #42A5F5;
-}
-:global(html body.dark-mode) .submit-bar {
-  background: #242440;
-  box-shadow: none;
-}
-:global(html body.dark-mode) .result-area {
-  background: #1A1A2E;
-}
-:global(html body.dark-mode) .action-btn {
-  background: #242440;
-  border-color: #444;
-  color: #E0E0E0;
-}
-:global(html body.dark-mode) .action-btn.primary {
-  background: #42A5F5;
-  color: #fff;
-  border-color: #42A5F5;
-}
-:global(html body.dark-mode) .result-accuracy,
-:global(html body.dark-mode) .result-time {
-  color: #888;
-}
-:global(html body.dark-mode) .timer {
-  color: #E0E0E0;
-}
-:global(html body.dark-mode) .progress-text {
-  color: #888;
-}
-:global(html body.dark-mode) .time-alert-box {
-  background: #242440;
-}
-:global(html body.dark-mode) .time-alert-text {
-  color: #FF7043;
-}
-:global(html body.dark-mode) .wrong-item {
-  background: #3A1A1A;
-}
-:global(html body.dark-mode) .wrong-expr {
-  color: #E0E0E0;
-}
-:global(html body.dark-mode) .all-correct {
-  background: #1A2E1A;
-}
-:global(html body.dark-mode) .all-correct-text {
-  color: #81C784;
-}
-:global(html body.dark-mode) .custom-count-input {
-  background: #1A1A2E;
-  border-color: #42A5F5;
-  color: #E0E0E0;
-}
 </style>

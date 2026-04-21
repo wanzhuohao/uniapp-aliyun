@@ -6,7 +6,11 @@
     <template v-if="qType === 'img2word'">
       <view class="big-emoji">{{ question.emoji }}</view>
       <text class="hint-text">这是什么？</text>
-      <view class="speak-btn" v-if="answered && selectedIdx >= 0" @click="speakOption">🔊</view>
+      <view
+        class="speak-btn"
+        :style="{ visibility: (answered && selectedIdx >= 0) ? 'visible' : 'hidden' }"
+        @click="speakOption"
+      >🔊</view>
       <view class="options-grid">
         <view
           v-for="(opt, i) in options"
@@ -24,7 +28,10 @@
     <template v-else>
       <view class="hint-text">听一听，选一选</view>
       <view class="speak-btn big" @click="playWord">🔊</view>
-      <text class="word-text" v-if="answered">{{ question.word }}</text>
+      <text
+        class="word-text"
+        :style="{ visibility: answered ? 'visible' : 'hidden' }"
+      >{{ question.word || '—' }}</text>
       <view class="options-grid emoji-grid">
         <view
           v-for="(opt, i) in options"
@@ -117,33 +124,38 @@ watch(() => props.question?.word, (nw) => {
   flex-direction: column;
   align-items: center;
   padding: 32rpx;
+  font-family: 'Quicksand', 'Trebuchet MS', sans-serif;
 }
 .type-badge {
-  font-size: 24rpx;
-  font-weight: bold;
-  padding: 6rpx 24rpx;
+  font-size: 22rpx;
+  font-weight: 900;
+  padding: 8rpx 28rpx;
   border-radius: 20rpx;
   margin-bottom: 24rpx;
+  letter-spacing: 4rpx;
 }
-.img2word-badge { background: #E3F2FD; color: #1565C0; }
-.word2img-badge { background: #FFF3E0; color: #E65100; }
+.img2word-badge { background: #E0F2F1; color: #00695C; }
+.word2img-badge { background: #FFF4E6; color: #E65100; }
 
 .big-emoji {
   font-size: 200rpx;
   line-height: 1.1;
   margin: 16rpx 0;
+  filter: drop-shadow(0 6rpx 12rpx rgba(31,58,58,0.15));
 }
 .word-text {
-  font-size: 56rpx;
-  font-weight: bold;
-  color: #1565C0;
+  font-size: 60rpx;
+  font-weight: 900;
+  color: #00695C;
   letter-spacing: 4rpx;
   margin-top: 16rpx;
+  font-family: 'Quicksand', 'Trebuchet MS', sans-serif;
 }
 .hint-text {
-  color: #666;
+  color: #6B8787;
   font-size: 28rpx;
   margin-bottom: 16rpx;
+  letter-spacing: 2rpx;
 }
 .speak-btn {
   margin: 16rpx 0;
@@ -153,14 +165,18 @@ watch(() => props.question?.word, (nw) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #E3F2FD;
+  background: #E0F2F1;
+  border: 2rpx solid #B2DFDB;
   border-radius: 50%;
 }
 .speak-btn.big {
-  width: 180rpx;
-  height: 180rpx;
-  font-size: 100rpx;
-  box-shadow: 0 8rpx 24rpx rgba(66,165,245,0.3);
+  width: 200rpx;
+  height: 200rpx;
+  font-size: 110rpx;
+  background: linear-gradient(135deg, #26A69A, #1E8E82);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 12rpx 28rpx rgba(38,166,154,0.35);
   margin: 40rpx 0;
 }
 .speak-btn:active { transform: scale(0.92); }
@@ -168,26 +184,27 @@ watch(() => props.question?.word, (nw) => {
 .options-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 24rpx;
-  padding: 0 24rpx;
+  gap: 20rpx;
+  padding: 0 8rpx;
   width: 100%;
   margin-top: 32rpx;
 }
 .option-btn {
   background: #fff;
-  border: 3rpx solid #BDBDBD;
-  border-radius: 20rpx;
+  border: 3rpx solid #B2DFDB;
+  border-radius: 24rpx;
   text-align: center;
-  box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.06);
+  box-shadow: 0 4rpx 12rpx rgba(31,58,58,0.05);
   transition: all 0.2s;
 }
 .option-btn:active { transform: scale(0.96); }
 .word-btn {
   padding: 36rpx 16rpx;
   font-size: 40rpx;
-  font-weight: 500;
-  color: #333;
+  font-weight: 900;
+  color: #1F3A3A;
   letter-spacing: 2rpx;
+  font-family: 'Quicksand', 'Trebuchet MS', sans-serif;
 }
 .emoji-btn {
   padding: 36rpx 16rpx;

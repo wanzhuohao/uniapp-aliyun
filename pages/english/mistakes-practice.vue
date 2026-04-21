@@ -175,7 +175,7 @@ onMounted(() => { loadRecords() })
 </script>
 
 <style scoped>
-.mp-page { min-height: 100vh; background: #F5F7FA; }
+.mp-page { min-height: 100vh; background: #F5FBFB; }
 
 .top-bar {
   display: flex;
@@ -212,8 +212,8 @@ onMounted(() => { loadRecords() })
   width: 20rpx; height: 20rpx; border-radius: 50%;
   background: #E0E0E0; transition: all 0.3s;
 }
-.dot.active { background: #FF5722; transform: scale(1.2); }
-.dot.done { background: #FF5722; }
+.dot.active { background: #26A69A; transform: scale(1.2); }
+.dot.done { background: #26A69A; }
 .progress-text { font-size: 26rpx; color: #666; min-width: 72rpx; text-align: right; }
 
 .filter-area {
@@ -229,7 +229,7 @@ onMounted(() => { loadRecords() })
   font-size: 26rpx; color: #666;
   width: 100%; max-width: 600rpx;
 }
-.switch-link { color: #FF5722; font-weight: bold; }
+.switch-link { color: #26A69A; font-weight: bold; }
 
 .start-card {
   background: #fff;
@@ -239,7 +239,7 @@ onMounted(() => { loadRecords() })
   align-items: center;
   gap: 24rpx;
   box-shadow: 0 6rpx 20rpx rgba(0,0,0,0.06);
-  border-left: 8rpx solid #FF5722;
+  border-left: 8rpx solid #26A69A;
   width: 100%;
   max-width: 600rpx;
 }
@@ -258,7 +258,7 @@ onMounted(() => { loadRecords() })
 }
 .start-btn {
   padding: 24rpx 80rpx;
-  background: linear-gradient(135deg, #FFA726, #F57C00);
+  background: linear-gradient(135deg, #26A69A, #1E8E82);
   color: #fff; border-radius: 40rpx;
   font-size: 32rpx; font-weight: bold;
 }
@@ -283,7 +283,7 @@ onMounted(() => { loadRecords() })
 }
 .action-btn:active { transform: scale(0.97); }
 .action-btn.primary {
-  background: linear-gradient(135deg, #FF5722, #E64A19);
-  color: #fff; border-color: #FF5722;
+  background: linear-gradient(135deg, #26A69A, #1E8E82);
+  color: #fff; border-color: #26A69A;
 }
 </style>

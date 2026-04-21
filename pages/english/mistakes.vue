@@ -1,58 +1,89 @@
 <template>
-  <view class="mistakes-page">
-    <PageHeader title="英语错题本" />
+  <view class="container">
+    <PageHeader title="英语错题本" theme="english" />
 
-    <view class="stats-card">
-      <view class="stat">
+    <!-- 统计概览 -->
+    <view class="stats-row">
+      <view class="stat-card">
         <text class="stat-num">{{ stats.total }}</text>
         <text class="stat-label">总错题</text>
       </view>
-      <view class="stat">
-        <text class="stat-num" style="color:#FF5722">{{ stats.dueCount }}</text>
-        <text class="stat-label">待复习</text>
+      <view class="stat-card">
+        <text class="stat-num">{{ stats.unmasteredCount }}</text>
+        <text class="stat-label">未掌握</text>
       </view>
-      <view class="stat">
-        <text class="stat-num" style="color:#66BB6A">{{ stats.masteredCount }}</text>
+      <view class="stat-card">
+        <text class="stat-num">{{ stats.masteredCount }}</text>
         <text class="stat-label">已掌握</text>
       </view>
-    </view>
-
-    <view class="actions">
-      <view class="action-btn primary" @click="startPractice" v-if="stats.dueCount > 0">
-        开始复习（{{ stats.dueCount }} 题）
+      <view class="stat-card">
+        <text class="stat-num due-num">{{ stats.dueCount }}</text>
+        <text class="stat-label">今日待复习</text>
       </view>
-      <view class="action-btn" v-else>暂无待复习题目</view>
     </view>
 
-    <view class="list-title" v-if="list.length > 0">错题列表</view>
-    <view class="word-list">
-      <view v-for="r in list" :key="r._id" class="word-item">
+    <!-- 视图切换 -->
+    <view class="tab-row">
+      <text :class="['tab-btn', viewMode === 'due' && 'active']" @click="viewMode = 'due'">
+        待复习 {{ stats.dueCount }}
+      </text>
+      <text :class="['tab-btn', viewMode === 'all' && 'active']" @click="viewMode = 'all'">
+        全部 {{ stats.total }}
+      </text>
+    </view>
+
+    <!-- 错题列表 -->
+    <view class="wrong-list">
+      <view v-if="displayList.length === 0" class="empty">
+        <text class="empty-text">{{ viewMode === 'due' ? '今天没有待复习的题目' : '暂无错题，继续加油！' }}</text>
+      </view>
+
+      <view
+        v-for="r in displayList"
+        :key="r._id"
+        :class="['wrong-item', r.mastered && 'mastered']"
+      >
         <text class="item-emoji">{{ r.emoji || '🔤' }}</text>
         <view class="item-info">
           <text class="item-word">{{ r.word }}</text>
           <text class="item-zh">{{ r.zh || '' }}</text>
         </view>
         <view class="item-meta">
-          <text class="box-badge" :class="'box-' + r.box">L{{ r.box }}</text>
           <text class="wrong-count">错 {{ r.wrongCount }} 次</text>
+          <text v-if="r.mastered" class="mastered-badge">已掌握</text>
+          <text v-else class="box-badge">Box {{ r.box || 1 }}</text>
         </view>
+      </view>
+    </view>
+
+    <!-- 底部重练按钮 -->
+    <view class="bottom-bar" v-if="stats.dueCount > 0 || stats.unmasteredCount > 0">
+      <view class="practice-btn" @click="startPractice">
+        开始重练（{{ viewMode === 'due' ? '今日 ' + stats.dueCount : '全部 ' + stats.unmasteredCount }} 题）
       </view>
     </view>
   </view>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import PageHeader from '../../components/PageHeader.vue'
-import { getAllWrongList, getWrongStats } from '../../utils/english/mistakes.js'
+import { getAllWrongList, getDueList, getWrongStats } from '../../utils/english/mistakes.js'
 
-const list = ref([])
-const stats = ref({ total: 0, dueCount: 0, masteredCount: 0 })
+const stats = ref({ total: 0, unmasteredCount: 0, masteredCount: 0, dueCount: 0 })
+const allList = ref([])
+const dueList = ref([])
+const viewMode = ref('due')
+
+const displayList = computed(() => {
+  return viewMode.value === 'due' ? dueList.value : allList.value
+})
 
 function refresh() {
-  list.value = getAllWrongList()
   stats.value = getWrongStats()
+  allList.value = getAllWrongList()
+  dueList.value = getDueList()
 }
 
 function startPractice() {
@@ -63,78 +94,145 @@ onShow(() => { refresh() })
 </script>
 
 <style scoped>
-.mistakes-page { min-height: 100vh; background: #F5F7FA; }
-
-.stats-card {
-  display: flex;
-  justify-content: space-around;
-  margin: 32rpx;
-  padding: 32rpx;
-  background: #fff;
-  border-radius: 20rpx;
-  box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.06);
-}
-.stat {
+.container {
+  min-height: 100vh;
+  background: #F5FBFB;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  padding-bottom: 120rpx;
 }
-.stat-num { font-size: 52rpx; font-weight: bold; color: #26A69A; }
-.stat-label { font-size: 24rpx; color: #888; margin-top: 8rpx; }
 
-.actions {
-  padding: 0 32rpx 24rpx;
+/* 统计卡 */
+.stats-row {
+  display: flex;
+  padding: 20rpx;
+  gap: 12rpx;
 }
-.action-btn {
-  padding: 28rpx;
-  text-align: center;
-  border-radius: 16rpx;
-  font-size: 30rpx;
+.stat-card {
+  flex: 1;
   background: #fff;
-  color: #888;
-  border: 3rpx solid #E0E0E0;
+  border-radius: 16rpx;
+  padding: 20rpx 8rpx;
+  text-align: center;
+  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.04);
 }
-.action-btn.primary {
-  background: linear-gradient(135deg, #FF5722, #E64A19);
-  color: #fff;
-  border-color: #FF5722;
+.stat-num {
+  display: block;
+  font-size: 40rpx;
   font-weight: bold;
+  color: #26A69A;
 }
-.action-btn.primary:active { transform: scale(0.97); }
+.stat-num.due-num { color: #FF5722; }
+.stat-label {
+  display: block;
+  font-size: 22rpx;
+  color: #999;
+  margin-top: 4rpx;
+}
 
-.list-title {
-  padding: 24rpx 32rpx 16rpx;
+/* Tab */
+.tab-row {
+  display: flex;
+  padding: 0 20rpx 12rpx;
+  gap: 16rpx;
+}
+.tab-btn {
+  padding: 12rpx 32rpx;
+  border-radius: 32rpx;
   font-size: 28rpx;
   color: #666;
+  background: #fff;
+  font-weight: 500;
+  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.04);
+  transition: all 0.2s cubic-bezier(.4,0,.2,1);
+}
+.tab-btn.active {
+  background: #26A69A;
+  color: #fff;
   font-weight: bold;
 }
-.word-list { padding: 0 32rpx 48rpx; }
-.word-item {
+
+/* 错题列表 */
+.wrong-list {
+  flex: 1;
+  padding: 0 20rpx;
+}
+.empty {
+  text-align: center;
+  padding: 80rpx 0;
+}
+.empty-text {
+  font-size: 28rpx;
+  color: #bbb;
+}
+
+.wrong-item {
   display: flex;
   align-items: center;
   gap: 20rpx;
   background: #fff;
-  padding: 24rpx;
-  border-radius: 14rpx;
-  margin-bottom: 16rpx;
+  border-radius: 12rpx;
+  padding: 20rpx 24rpx;
+  margin-bottom: 12rpx;
   box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.04);
 }
+.wrong-item.mastered { opacity: 0.5; }
+
 .item-emoji { font-size: 56rpx; }
-.item-info { flex: 1; display: flex; flex-direction: column; gap: 4rpx; }
+.item-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
 .item-word { font-size: 34rpx; font-weight: bold; color: #333; }
 .item-zh { font-size: 24rpx; color: #888; }
-.item-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 6rpx; }
-.box-badge {
-  font-size: 22rpx;
-  padding: 4rpx 12rpx;
-  border-radius: 10rpx;
-  color: #fff;
-  background: #BDBDBD;
+
+.item-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6rpx;
+  flex-shrink: 0;
 }
-.box-1 { background: #EF5350; }
-.box-2 { background: #FFA726; }
-.box-3 { background: #42A5F5; }
-.box-4 { background: #26A69A; }
-.box-5 { background: #66BB6A; }
-.wrong-count { font-size: 22rpx; color: #999; }
+.wrong-count { font-size: 24rpx; color: #FF5722; }
+
+.box-badge {
+  font-size: 20rpx;
+  color: #26A69A;
+  padding: 4rpx 12rpx;
+  background: #E0F2F1;
+  border-radius: 12rpx;
+}
+.mastered-badge {
+  font-size: 20rpx;
+  color: #4CAF50;
+  font-weight: bold;
+  padding: 4rpx 12rpx;
+  background: #E8F5E9;
+  border-radius: 12rpx;
+}
+
+/* 底部重练按钮 */
+.bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20rpx 30rpx;
+  background: #fff;
+  box-shadow: 0 -4rpx 12rpx rgba(0,0,0,0.06);
+}
+.practice-btn {
+  text-align: center;
+  padding: 24rpx;
+  background: linear-gradient(135deg, #26A69A, #00897B);
+  color: #fff;
+  border-radius: 40rpx;
+  font-size: 30rpx;
+  font-weight: bold;
+  box-shadow: 0 6rpx 20rpx rgba(38,166,154,0.3);
+  transition: transform 0.2s cubic-bezier(.4,0,.2,1);
+}
+.practice-btn:active { transform: scale(0.97); }
 </style>

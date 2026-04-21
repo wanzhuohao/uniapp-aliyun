@@ -1,8 +1,9 @@
 <template>
   <view class="guide-page">
-    <PageHeader title="使用说明" />
+    <PageHeader title="使用说明" theme="chinese" />
 
     <view class="content">
+      <!-- 功能介绍 -->
       <view class="section">
         <text class="section-title">功能介绍</text>
 
@@ -33,6 +34,7 @@
         </view>
       </view>
 
+      <!-- 数据说明 -->
       <view class="section">
         <text class="section-title">数据说明</text>
         <view class="item">
@@ -40,6 +42,7 @@
         </view>
       </view>
 
+      <!-- 更新日志 -->
       <view class="section">
         <text class="section-title">更新日志</text>
 
@@ -71,85 +74,94 @@ import PageHeader from '../../components/PageHeader.vue'
 <style scoped>
 .guide-page {
   min-height: 100vh;
-  background: #F5F7FA;
+  background: #FAF6EE;
+  padding-bottom: 60rpx;
 }
 .content {
-  padding: 24rpx;
+  padding: 32rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 40rpx;
 }
 .section {
   background: #fff;
   border-radius: 16rpx;
-  padding: 32rpx;
-  margin-bottom: 24rpx;
+  padding: 40rpx 32rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 32rpx;
 }
 .section-title {
-  font-size: 32rpx;
+  font-size: 36rpx;
   font-weight: bold;
   color: #222;
-  margin-bottom: 24rpx;
-  display: block;
+  border-left: 8rpx solid #A62D33;
+  padding-left: 20rpx;
 }
 .item {
-  margin-bottom: 32rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
 }
-.item:last-child { margin-bottom: 0; }
 .item-title {
   font-size: 30rpx;
   font-weight: bold;
-  color: #42A5F5;
-  margin-bottom: 12rpx;
-  display: block;
+  color: #333;
 }
 .item-desc {
   font-size: 26rpx;
-  color: #555;
+  color: #666;
   line-height: 1.6;
-  display: block;
 }
 .item-detail {
-  margin-top: 12rpx;
+  margin-top: 8rpx;
   padding: 16rpx 20rpx;
-  background: #F5F7FA;
-  border-radius: 12rpx;
-  border-left: 4rpx solid #42A5F5;
+  background: #F0F7FF;
+  border-radius: 10rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 6rpx;
 }
 .detail-line {
-  display: block;
-  font-size: 24rpx;
-  color: #666;
-  line-height: 1.8;
-}
-.log-item {
-  padding: 16rpx;
-  background: #F5F7FA;
-  border-radius: 12rpx;
-  margin-bottom: 16rpx;
-}
-.log-item:last-child { margin-bottom: 0; }
-.log-version {
-  font-size: 28rpx;
-  font-weight: bold;
-  color: #42A5F5;
-  margin-right: 16rpx;
-}
-.log-date {
-  font-size: 22rpx;
-  color: #888;
-}
-.log-changes {
-  margin-top: 12rpx;
-}
-.log-line {
-  display: block;
   font-size: 24rpx;
   color: #555;
-  line-height: 1.8;
-  padding-left: 12rpx;
-  position: relative;
+  line-height: 1.6;
+}
+
+/* 更新日志 */
+.log-item {
+  padding-bottom: 24rpx;
+  border-bottom: 1rpx solid #eee;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+.log-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+.log-version {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #A62D33;
+}
+.log-date {
+  font-size: 24rpx;
+  color: #999;
+}
+.log-changes {
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+.log-line {
+  font-size: 26rpx;
+  color: #555;
+  line-height: 1.6;
 }
 .log-line::before {
-  content: '·';
-  position: absolute;
-  left: 0;
+  content: '· ';
+  color: #A62D33;
 }
 </style>

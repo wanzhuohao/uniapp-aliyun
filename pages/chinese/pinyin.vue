@@ -167,7 +167,7 @@ onShow(() => {
 </script>
 
 <style scoped>
-.pinyin-page { min-height: 100vh; }
+.pinyin-page { min-height: 100vh; background: #FAF6EE; }
 
 .filter-area {
   display: flex;
@@ -192,9 +192,9 @@ onShow(() => {
 }
 .unit-tag:active { transform: scale(0.95); }
 .unit-tag.active {
-  background: #FFA726;
+  background: #A62D33;
   color: #fff;
-  border-color: #FFA726;
+  border-color: #A62D33;
   font-weight: bold;
 }
 .filter-title {
@@ -220,19 +220,19 @@ onShow(() => {
 }
 .filter-tag:active { transform: scale(0.95); }
 .filter-tag.active {
-  background: #FFA726;
+  background: #A62D33;
   color: #fff;
-  border-color: #FFA726;
+  border-color: #A62D33;
   font-weight: bold;
 }
 .start-btn {
   padding: 24rpx 100rpx;
-  background: linear-gradient(135deg, #FFA726, #F57C00);
+  background: linear-gradient(135deg, #A62D33, #7F1F25);
   color: #fff;
   border-radius: 40rpx;
   font-size: 34rpx;
   font-weight: bold;
-  box-shadow: 0 8rpx 24rpx rgba(255,167,38,0.3);
+  box-shadow: 0 8rpx 24rpx rgba(166,45,51,0.3);
 }
 .start-btn:active { transform: scale(0.97); }
 
@@ -242,6 +242,6 @@ onShow(() => {
 }
 .back-btn {
   margin-top: 32rpx; padding: 20rpx 48rpx;
-  background: #FFA726; color: #fff; border-radius: 20rpx; font-size: 28rpx;
+  background: #A62D33; color: #fff; border-radius: 20rpx; font-size: 28rpx;
 }
 </style>

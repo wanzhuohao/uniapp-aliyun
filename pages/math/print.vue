@@ -1,7 +1,7 @@
 <template>
   <view class="print-page">
     <!-- Phase 1: Setup panel -->
-    <PageHeader title="打印出题" />
+    <PageHeader title="打印出题" theme="math" />
     <view v-if="!questions.length" class="setup-panel">
 
       <view class="config-card">
@@ -548,70 +548,8 @@ async function exportAnswerImage() {
 }
 </style>
 
-<!-- Global styles (dark mode + print) -->
+<!-- Global styles (print) -->
 <style>
-/* ── Dark mode — setup panel ──────────────────────────────────── */
-html body.dark-mode .print-page {
-  background: #1a1a2e;
-}
-
-html body.dark-mode .title {
-  color: #e0e0e0;
-}
-
-html body.dark-mode .back-btn {
-  color: #64B5F6;
-}
-
-html body.dark-mode .config-card {
-  background: #252545;
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.3);
-}
-
-html body.dark-mode .config-label {
-  color: #ccc;
-}
-
-html body.dark-mode .level-tab {
-  background: #1e1e3a;
-  border-color: #444;
-  color: #aaa;
-}
-
-html body.dark-mode .level-tab.active {
-  background: #42A5F5;
-  border-color: #42A5F5;
-  color: #fff;
-}
-
-html body.dark-mode .info-row {
-  background: #1e2d3a;
-  border-left-color: #42A5F5;
-}
-
-html body.dark-mode .info-text {
-  color: #9ab;
-}
-
-/* ── Dark mode — A4 sheet stays white (print preview) ─────────── */
-html body.dark-mode .a4-wrapper {
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
-}
-html body.dark-mode .a4-sheet {
-  background: #fff !important;
-  color: #111 !important;
-}
-
-html body.dark-mode .sheet-title,
-html body.dark-mode .sheet-info-item,
-html body.dark-mode .question-item {
-  color: #111 !important;
-}
-
-html body.dark-mode .answer-text {
-  color: #E53935 !important;
-}
-
 /* ── Print media ──────────────────────────────────────────────── */
 @media print {
   @page {

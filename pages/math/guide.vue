@@ -1,6 +1,6 @@
 <template>
   <view class="guide-page">
-    <PageHeader title="使用说明" />
+    <PageHeader title="使用说明" theme="math" />
 
     <view class="content">
       <!-- 功能介绍 -->
@@ -73,7 +73,7 @@ import PageHeader from '../../components/PageHeader.vue'
 <style scoped>
 .guide-page {
   min-height: 100vh;
-  background: #F5F7FA;
+  background: #F0F4F9;
   padding-bottom: 60rpx;
 }
 .content {
@@ -162,32 +162,5 @@ import PageHeader from '../../components/PageHeader.vue'
 .log-line::before {
   content: '· ';
   color: #42A5F5;
-}
-</style>
-
-<style>
-html body.dark-mode .guide-page {
-  background: #1a1a2e;
-}
-html body.dark-mode .section {
-  background: #252545;
-  box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.3);
-}
-html body.dark-mode .section-title {
-  color: #e0e0e0;
-}
-html body.dark-mode .item-title {
-  color: #ddd;
-}
-html body.dark-mode .item-desc,
-html body.dark-mode .detail-line,
-html body.dark-mode .log-line {
-  color: #aaa;
-}
-html body.dark-mode .item-detail {
-  background: #1e2d3a;
-}
-html body.dark-mode .log-item {
-  border-bottom-color: #333;
 }
 </style>

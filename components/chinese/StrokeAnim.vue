@@ -12,7 +12,6 @@
 <script setup>
 import { ref, onMounted, watch, nextTick } from 'vue'
 import HanziWriter from 'hanzi-writer'
-import { isDark } from '../../utils/common/theme.js'
 
 const props = defineProps({
   char: String,
@@ -38,17 +37,16 @@ async function initWriter() {
   error.value = ''
 
   try {
-    const dark = isDark()
     writer = HanziWriter.create(writerId.value, props.char, {
       width: 200,
       height: 200,
       padding: 10,
       strokeAnimationSpeed: 1,
       delayBetweenStrokes: 400,
-      strokeColor: dark ? '#e0e0e0' : '#333',
-      radicalColor: dark ? '#80cbc4' : '#168F16',
-      outlineColor: dark ? '#555' : '#DDD',
-      drawingColor: dark ? '#90caf9' : '#42A5F5',
+      strokeColor: '#333',
+      radicalColor: '#168F16',
+      outlineColor: '#DDD',
+      drawingColor: '#A62D33',
       showOutline: true,
       showCharacter: false,
     })

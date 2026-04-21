@@ -322,7 +322,7 @@ function confirmBack() {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #f5f7fa;
+  background: #F0F4F9;
 }
 
 .top-bar {

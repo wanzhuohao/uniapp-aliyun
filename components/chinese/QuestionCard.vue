@@ -75,6 +75,7 @@ function handleClick(opt) {
 <style scoped>
 .question-card {
   padding: 40rpx 32rpx;
+  font-family: 'STKaiti', 'KaiTi', '楷体', serif;
 }
 .question-area {
   position: relative;
@@ -82,31 +83,40 @@ function handleClick(opt) {
   flex-direction: column;
   align-items: center;
   margin-bottom: 32rpx;
+  background: #fff;
+  padding: 48rpx 32rpx 32rpx;
+  border-radius: 24rpx;
+  border: 2rpx solid #E8D5B7;
+  box-shadow: 0 6rpx 20rpx rgba(31,31,31,0.05);
 }
 .char-display {
-  font-size: 120rpx;
+  font-size: 140rpx;
   font-weight: bold;
   text-align: center;
   line-height: 1.3;
-  color: #333;
-  min-height: 140rpx;
+  color: #1F1F1F;
+  min-height: 160rpx;
+  font-family: 'STKaiti', 'KaiTi', '楷体', serif;
 }
 .pinyin-display {
-  font-size: 72rpx;
-  font-family: serif;
+  font-size: 76rpx;
+  /* 用中文字体栈，保证拼音声调符号位置正确（Georgia/Times 等西文字体会错位） */
+  font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
   text-align: center;
-  color: #E65100;
+  color: #A62D33;
+  letter-spacing: 4rpx;
 }
 .speak-btn {
-  margin-top: 20rpx;
-  margin-bottom: 8rpx;
-  font-size: 44rpx;
+  margin-top: 24rpx;
+  margin-bottom: 4rpx;
+  font-size: 40rpx;
   width: 72rpx;
   height: 72rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #E3F2FD;
+  background: #FDF1E6;
+  border: 2rpx solid #E8D5B7;
   border-radius: 50%;
   transition: transform 0.2s;
 }
@@ -117,29 +127,31 @@ function handleClick(opt) {
   font-size: 64rpx;
   font-weight: bold;
   text-align: center;
-  color: #333;
+  color: #1F1F1F;
+  font-family: 'STKaiti', 'KaiTi', '楷体', serif;
 }
 .options-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 24rpx;
-  padding: 0 24rpx;
+  gap: 20rpx;
+  padding: 0 8rpx;
 }
 .option-btn {
   background: #fff;
-  border: 3rpx solid #BDBDBD;
-  border-radius: 20rpx;
+  border: 2rpx solid #D6CBB8;
+  border-radius: 16rpx;
   padding: 32rpx 16rpx;
   text-align: center;
   font-size: 40rpx;
   font-weight: 500;
-  color: #333;
-  box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.06);
+  color: #1F1F1F;
+  box-shadow: 0 3rpx 10rpx rgba(31,31,31,0.04);
   transition: all 0.2s ease;
+  font-family: 'STKaiti', 'KaiTi', '楷体', serif;
 }
 .option-btn:active {
   transform: scale(0.96);
-  box-shadow: 0 2rpx 6rpx rgba(0,0,0,0.1);
+  box-shadow: 0 2rpx 6rpx rgba(31,31,31,0.08);
 }
 .option-btn.correct {
   border-color: #66BB6A;

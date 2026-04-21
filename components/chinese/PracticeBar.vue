@@ -76,11 +76,11 @@ function goBack() {
   transition: all 0.3s;
 }
 .dot.active {
-  background: #42A5F5;
+  background: #A62D33;
   transform: scale(1.2);
 }
 .dot.done {
-  background: #42A5F5;
+  background: #A62D33;
 }
 .progress-text {
   font-size: 26rpx;

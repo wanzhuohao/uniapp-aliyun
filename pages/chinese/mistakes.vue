@@ -1,6 +1,6 @@
 <template>
   <view class="container">
-    <PageHeader title="错题本" />
+    <PageHeader title="错题本" theme="chinese" />
 
     <view class="stats-row">
       <view class="stat-card">
@@ -133,32 +133,40 @@ function goPractice() {
 <style scoped>
 .container {
   min-height: 100vh;
-  background: #f5f7fa;
+  background: #FAF6EE;
   padding-bottom: 120rpx;
 }
 
 .stats-row {
   display: flex;
   padding: 20rpx;
-  gap: 16rpx;
+  gap: 12rpx;
 }
 
 .stat-card {
   flex: 1;
   background: #fff;
   border-radius: 16rpx;
-  padding: 20rpx 10rpx;
+  padding: 20rpx 8rpx;
   text-align: center;
+  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.04);
 }
 
 .stat-num {
   display: block;
   font-size: 40rpx;
   font-weight: bold;
-  color: #667eea;
+  color: #A62D33;
 }
 
 .stat-num.due-num { color: #FF5722; }
+
+.stat-label {
+  display: block;
+  font-size: 22rpx;
+  color: #999;
+  margin-top: 4rpx;
+}
 
 .tab-row {
   display: flex;
@@ -166,48 +174,45 @@ function goPractice() {
   gap: 16rpx;
 }
 .tab-btn {
-  padding: 14rpx 32rpx;
+  padding: 12rpx 32rpx;
   border-radius: 32rpx;
   font-size: 28rpx;
   color: #666;
   background: #fff;
   font-weight: 500;
+  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.04);
+  transition: all 0.2s cubic-bezier(.4,0,.2,1);
 }
 .tab-btn.active {
-  background: #667eea;
+  background: #A62D33;
   color: #fff;
   font-weight: bold;
 }
 
-.stat-label {
-  display: block;
-  font-size: 22rpx;
-  color: #999;
-  margin-top: 6rpx;
-}
-
 .section {
-  margin: 20rpx;
+  margin: 0 20rpx 16rpx;
 }
 
 .section-title {
+  display: block;
   font-size: 28rpx;
   font-weight: bold;
   color: #333;
-  margin-bottom: 16rpx;
+  margin-bottom: 12rpx;
 }
 
 .top5-list {
   background: #fff;
   border-radius: 16rpx;
-  padding: 16rpx;
+  padding: 12rpx 16rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.04);
 }
 
 .top5-item {
   display: flex;
   align-items: center;
   padding: 12rpx 0;
-  border-bottom: 1rpx solid #f0f0f0;
+  border-bottom: 1rpx solid #f5f5f5;
 }
 
 .top5-item:last-child { border-bottom: none; }
@@ -216,7 +221,7 @@ function goPractice() {
   width: 40rpx;
   font-size: 28rpx;
   font-weight: bold;
-  color: #ff6b6b;
+  color: #FF5722;
   text-align: center;
 }
 
@@ -224,7 +229,7 @@ function goPractice() {
   font-size: 36rpx;
   font-weight: bold;
   color: #333;
-  margin-left: 16rpx;
+  margin-left: 12rpx;
 }
 
 .top5-type {
@@ -236,29 +241,32 @@ function goPractice() {
 .top5-count {
   margin-left: auto;
   font-size: 24rpx;
-  color: #ff6b6b;
+  color: #FF5722;
 }
 
 .filter-row {
   display: flex;
-  padding: 20rpx;
+  padding: 0 20rpx 12rpx;
   gap: 16rpx;
 }
 
 .filter-btn {
-  padding: 10rpx 30rpx;
-  border-radius: 30rpx;
-  font-size: 26rpx;
+  padding: 12rpx 32rpx;
+  border-radius: 32rpx;
+  font-size: 28rpx;
   color: #666;
   background: #fff;
+  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.04);
+  transition: all 0.2s cubic-bezier(.4,0,.2,1);
 }
 
 .filter-btn.active {
-  background: #667eea;
+  background: #A62D33;
   color: #fff;
 }
 
 .wrong-list {
+  flex: 1;
   padding: 0 20rpx;
 }
 
@@ -266,9 +274,10 @@ function goPractice() {
   display: flex;
   align-items: center;
   background: #fff;
-  border-radius: 16rpx;
-  padding: 24rpx;
-  margin-bottom: 16rpx;
+  border-radius: 12rpx;
+  padding: 20rpx 24rpx;
+  margin-bottom: 12rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.04);
 }
 
 .wrong-item.mastered { opacity: 0.5; }
@@ -294,25 +303,36 @@ function goPractice() {
   margin-left: 12rpx;
 }
 
-.wrong-meta { text-align: right; }
+.wrong-meta {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  flex-shrink: 0;
+}
 
 .wrong-count {
   font-size: 24rpx;
-  color: #ff6b6b;
+  color: #FF5722;
 }
 
 .mastered-badge {
-  display: block;
   font-size: 20rpx;
-  color: #52c41a;
-  margin-top: 4rpx;
+  color: #4CAF50;
+  font-weight: bold;
+  padding: 4rpx 12rpx;
+  background: #E8F5E9;
+  border-radius: 12rpx;
 }
 
 .empty {
   text-align: center;
   padding: 80rpx 0;
-  color: #999;
+}
+
+.empty-text,
+.empty text {
   font-size: 28rpx;
+  color: #bbb;
 }
 
 .bottom-bar {
@@ -322,15 +342,20 @@ function goPractice() {
   right: 0;
   padding: 20rpx 30rpx;
   background: #fff;
-  box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.05);
+  box-shadow: 0 -4rpx 12rpx rgba(0,0,0,0.06);
 }
 
 .practice-btn {
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  text-align: center;
+  padding: 24rpx;
+  background: linear-gradient(135deg, #A62D33, #7F1F25);
   color: #fff;
   border: none;
-  border-radius: 50rpx;
+  border-radius: 40rpx;
   font-size: 30rpx;
-  padding: 24rpx 0;
+  font-weight: bold;
+  box-shadow: 0 6rpx 20rpx rgba(166,45,51,0.3);
+  transition: transform 0.2s cubic-bezier(.4,0,.2,1);
 }
+.practice-btn:active { transform: scale(0.97); }
 </style>

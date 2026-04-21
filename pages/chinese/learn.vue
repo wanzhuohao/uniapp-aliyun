@@ -1,6 +1,6 @@
 <template>
   <view class="mock-page">
-    <PageHeader title="生字学习">
+    <PageHeader title="生字学习" theme="chinese">
       <text v-if="started && totalQuestions > 0" class="progress-indicator">{{ currentIndex + 1 }}/{{ totalQuestions }}</text>
     </PageHeader>
 
@@ -97,10 +97,8 @@ import { onShow } from '@dcloudio/uni-app'
 import HanziWriter from 'hanzi-writer'
 import { speak } from '../../utils/common/speech.js'
 import { recordWrong } from '../../utils/chinese/mistakes.js'
-import { toast } from '../../utils/common/toast.js'
 import { recordPractice } from '../../utils/chinese/practiceLog.js'
 import { getQuestions } from '../../utils/chinese/questionLoader.js'
-import { isDark } from '../../utils/common/theme.js'
 import { getCurrentUnit, setCurrentUnit } from '../../utils/chinese/stateStore.js'
 import { UNIT_CONFIG, UNIT_KEYS, getLessonKeys } from '../../utils/chinese/unitConfig.js'
 import PageHeader from '../../components/PageHeader.vue'
@@ -153,12 +151,11 @@ async function initOutline() {
   if (!el || !currentQ.value) return
   el.innerHTML = ''
   try {
-    const dark = isDark()
     writerInstance = HanziWriter.create(outlineId.value, currentQ.value.char, {
       width: 200, height: 200, padding: 20,
-      strokeColor: dark ? '#e0e0e0' : '#333',
-      outlineColor: dark ? '#555' : '#DDD',
-      radicalColor: dark ? '#80cbc4' : '#168F16',
+      strokeColor: '#333',
+      outlineColor: '#DDD',
+      radicalColor: '#168F16',
       strokeAnimationSpeed: 1.5,
       delayBetweenStrokes: 400,
       showCharacter: true, showOutline: true,
@@ -221,11 +218,9 @@ function advanceQuestion() {
       totalCount: totalQuestions.value,
       correctCount: correctCount.value
     })
-    toast.info(`完成！答对 ${correctCount.value}/${totalQuestions.value}`, 2000)
-    setTimeout(() => {
-      started.value = false
-      roundFinished.value = false
-    }, 2000)
+    uni.navigateTo({
+      url: `/pages/chinese/result?module=learn&correct=${correctCount.value}&total=${totalQuestions.value}`
+    })
   }
 }
 
@@ -246,7 +241,7 @@ onShow(() => {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #F5F7FA;
+  background: #FAF6EE;
 }
 .progress-indicator {
   color: #fff;
@@ -282,9 +277,9 @@ onShow(() => {
   border: 3rpx solid #E0E0E0;
 }
 .unit-tag.active {
-  background: #00897B;
+  background: #A62D33;
   color: #fff;
-  border-color: #00897B;
+  border-color: #A62D33;
   font-weight: bold;
 }
 .desc-area {
@@ -303,12 +298,12 @@ onShow(() => {
 }
 .start-btn {
   padding: 28rpx 120rpx;
-  background: linear-gradient(135deg, #00897B, #00695C);
+  background: linear-gradient(135deg, #A62D33, #7F1F25);
   color: #fff;
   border-radius: 40rpx;
   font-size: 36rpx;
   font-weight: bold;
-  box-shadow: 0 8rpx 24rpx rgba(0,137,123,0.3);
+  box-shadow: 0 8rpx 24rpx rgba(166,45,51,0.3);
   margin-top: 24rpx;
 }
 .start-btn:active { transform: scale(0.97); }
@@ -324,7 +319,7 @@ onShow(() => {
 .back-inline-btn {
   margin-top: 32rpx;
   padding: 20rpx 48rpx;
-  background: #00897B;
+  background: #A62D33;
   color: #fff;
   border-radius: 20rpx;
   font-size: 28rpx;
@@ -368,7 +363,7 @@ onShow(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #E3F2FD;
+  background: #FDF1E6;
   border-radius: 50%;
 }
 .speak-btn:active { transform: scale(0.9); }
@@ -403,14 +398,14 @@ onShow(() => {
   color: #333;
 }
 .answer-value.pinyin {
-  color: #E65100;
+  color: #A62D33;
   font-family: serif;
 }
 .answer-btn {
   margin-top: 16rpx;
   padding: 16rpx;
-  background: #E3F2FD;
-  color: #1565C0;
+  background: #FDF1E6;
+  color: #A62D33;
   border-radius: 12rpx;
   text-align: center;
   font-size: 28rpx;
@@ -420,12 +415,12 @@ onShow(() => {
 .show-answer-btn {
   margin-top: 32rpx;
   padding: 24rpx 80rpx;
-  background: linear-gradient(135deg, #00897B, #00695C);
+  background: linear-gradient(135deg, #A62D33, #7F1F25);
   color: #fff;
   border-radius: 40rpx;
   font-size: 32rpx;
   font-weight: bold;
-  box-shadow: 0 8rpx 24rpx rgba(0,137,123,0.3);
+  box-shadow: 0 8rpx 24rpx rgba(166,45,51,0.3);
 }
 .show-answer-btn:active { transform: scale(0.97); }
 
@@ -454,11 +449,11 @@ onShow(() => {
 .extend-toggle {
   text-align: center;
   padding: 16rpx;
-  color: #00897B;
+  color: #A62D33;
   font-size: 28rpx;
   background: #fff;
   border-radius: 12rpx;
-  border: 2rpx dashed #00897B;
+  border: 2rpx dashed #A62D33;
 }
 .extend-toggle:active { transform: scale(0.98); }
 .iframe-wrap {

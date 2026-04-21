@@ -1,6 +1,6 @@
 <template>
   <view class="container">
-    <PageHeader title="错题本" />
+    <PageHeader title="错题本" theme="math" />
 
     <!-- 统计概览 -->
     <view class="stats-row">
@@ -142,7 +142,7 @@ onShow(() => {
 <style scoped>
 .container {
   min-height: 100vh;
-  background: #f5f7fa;
+  background: #F0F4F9;
   display: flex;
   flex-direction: column;
   padding-bottom: 120rpx;
@@ -234,6 +234,7 @@ onShow(() => {
   background: #fff;
   font-weight: 500;
   box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.04);
+  transition: all 0.2s cubic-bezier(.4,0,.2,1);
 }
 .tab-btn.active {
   background: #42A5F5;
@@ -324,6 +325,7 @@ onShow(() => {
   font-size: 30rpx;
   font-weight: bold;
   box-shadow: 0 6rpx 20rpx rgba(66,165,245,0.3);
+  transition: transform 0.2s cubic-bezier(.4,0,.2,1);
 }
 .practice-btn:active { transform: scale(0.97); }
 </style>

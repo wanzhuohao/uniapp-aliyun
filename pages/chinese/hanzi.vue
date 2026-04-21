@@ -211,7 +211,7 @@ onShow(() => {
 </script>
 
 <style scoped>
-.hanzi-page { min-height: 100vh; }
+.hanzi-page { min-height: 100vh; background: #FAF6EE; }
 
 .filter-area {
   display: flex;
@@ -236,9 +236,9 @@ onShow(() => {
 }
 .unit-tag:active { transform: scale(0.95); }
 .unit-tag.active {
-  background: #42A5F5;
+  background: #A62D33;
   color: #fff;
-  border-color: #42A5F5;
+  border-color: #A62D33;
   font-weight: bold;
 }
 .filter-title {
@@ -264,19 +264,19 @@ onShow(() => {
 }
 .filter-tag:active { transform: scale(0.95); }
 .filter-tag.active {
-  background: #42A5F5;
+  background: #A62D33;
   color: #fff;
-  border-color: #42A5F5;
+  border-color: #A62D33;
   font-weight: bold;
 }
 .start-btn {
   padding: 24rpx 100rpx;
-  background: linear-gradient(135deg, #42A5F5, #1E88E5);
+  background: linear-gradient(135deg, #A62D33, #7F1F25);
   color: #fff;
   border-radius: 40rpx;
   font-size: 34rpx;
   font-weight: bold;
-  box-shadow: 0 8rpx 24rpx rgba(66,165,245,0.3);
+  box-shadow: 0 8rpx 24rpx rgba(166,45,51,0.3);
 }
 .start-btn:active { transform: scale(0.97); }
 
@@ -286,6 +286,6 @@ onShow(() => {
 }
 .back-btn {
   margin-top: 32rpx; padding: 20rpx 48rpx;
-  background: #42A5F5; color: #fff; border-radius: 20rpx; font-size: 28rpx;
+  background: #A62D33; color: #fff; border-radius: 20rpx; font-size: 28rpx;
 }
 </style>
