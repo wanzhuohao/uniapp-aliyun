@@ -1,4 +1,4 @@
-// 中文用浏览器原生 TTS；英文用有道词典公开 TTS mp3 接口（稳定 + 音质好）
+// 中文用浏览器原生 TTS；英文只用有道词典公开 TTS mp3（type=2 美式女声）
 let speaking = false
 let cachedVoices = []
 let primed = false
@@ -56,34 +56,30 @@ export function speak(text) {
   speakWith(text, { lang: 'zh-CN', rate: 0.8, pitch: 1.1, voiceLangPrefix: 'zh' })
 }
 
-// 英语用有道 TTS：type=2 是美式发音
-// 如果 mp3 播放失败（网络/跨域），回退到浏览器原生 TTS
+// 英语只走有道 TTS type=2（美式女声）；失败就静音，不回退 SpeechSynthesis（手机系统默认可能是男声）
 export function speakEn(text) {
   if (!text || typeof window === 'undefined') return
   const word = String(text).trim()
   if (!word) return
   try {
     if (enAudio) {
-      enAudio.pause()
-      enAudio.src = ''
+      enAudio.onended = null
+      enAudio.onerror = null
+      try { enAudio.pause() } catch (e) {}
+      try { enAudio.removeAttribute('src'); enAudio.load() } catch (e) {}
     }
     const url = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(word)}&type=2`
     enAudio = new Audio(url)
+    const currentAudio = enAudio
     speaking = true
-    enAudio.onended = () => { speaking = false }
-    enAudio.onerror = () => {
-      speaking = false
-      speakWith(word, { lang: 'en-US', rate: 0.75, pitch: 1.0, voiceLangPrefix: 'en' })
-    }
+    enAudio.onended = () => { if (currentAudio === enAudio) speaking = false }
+    enAudio.onerror = () => { if (currentAudio === enAudio) speaking = false }
     const p = enAudio.play()
     if (p && typeof p.catch === 'function') {
-      p.catch(() => {
-        speaking = false
-        speakWith(word, { lang: 'en-US', rate: 0.75, pitch: 1.0, voiceLangPrefix: 'en' })
-      })
+      p.catch(() => { if (currentAudio === enAudio) speaking = false })
     }
   } catch (e) {
-    speakWith(word, { lang: 'en-US', rate: 0.75, pitch: 1.0, voiceLangPrefix: 'en' })
+    speaking = false
   }
 }
 
