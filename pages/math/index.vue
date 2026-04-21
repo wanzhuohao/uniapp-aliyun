@@ -1,6 +1,6 @@
 <template>
   <view class="index-page">
-    <PageHeader title="数学" theme="math" />
+    <PageHeader title="数学" theme="math" home-on-back />
 
     <!-- Hero：数学范 -->
     <view class="hero">

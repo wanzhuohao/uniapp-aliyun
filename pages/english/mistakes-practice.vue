@@ -19,22 +19,35 @@
     </view>
 
     <view v-if="!started" class="filter-area">
-      <view v-if="dueCount === 0 && allCount === 0" class="empty-state">
+      <view v-if="allCount === 0" class="empty-state">
         <text class="empty-icon">🎉</text>
-        <text class="empty-text">太棒了！没有错题！</text>
-        <view class="start-btn" style="background:#888" @click="goBack">返回错题本</view>
+        <text v-if="!practiceAll" class="empty-text">今天没有待复习的错题</text>
+        <text v-else class="empty-text">太棒了！没有错题！</text>
+        <view v-if="!practiceAll" class="start-btn" @click="togglePracticeAll">练全部错题</view>
+        <view class="start-btn" style="margin-top: 16rpx; background: #888" @click="goBack">返回错题本</view>
       </view>
       <template v-else>
-        <view class="practice-mode-hint" @click="togglePracticeAll">
-          <text>{{ practiceAll ? '📖 练全部错题' : '📚 今日待复习' }}</text>
-          <text class="switch-link">切换 »</text>
+        <text class="filter-title">选择要重练的类型</text>
+        <view v-if="!practiceAll" class="practice-mode-hint" @click="togglePracticeAll">
+          <text>📚 今日待复习</text>
+          <text class="switch-link">切换到练全部 »</text>
         </view>
-        <view class="start-card" v-if="currentCount > 0" @click="startPractice">
-          <text class="sc-icon">🖼️</text>
-          <text class="sc-name">英语单词</text>
-          <text class="sc-count">{{ practiceAll ? '全部' : '今日' }} {{ currentCount }} 题</text>
+        <view v-else class="practice-mode-hint" @click="togglePracticeAll">
+          <text>📖 练全部错题</text>
+          <text class="switch-link">切换到今日待复习 »</text>
         </view>
-        <view class="empty-state" v-else>
+        <view class="type-cards">
+          <view
+            v-if="currentCount > 0"
+            class="type-card type-word"
+            @click="startPractice"
+          >
+            <text class="type-icon">🖼️</text>
+            <text class="type-name">英语单词</text>
+            <text class="type-count">{{ practiceAll ? '全部' : '今日' }} {{ currentCount }} 题</text>
+          </view>
+        </view>
+        <view v-if="currentCount === 0" class="empty-state">
           <text class="empty-icon">🎉</text>
           <text class="empty-text">
             {{ practiceAll ? '太棒了，没有错题' : '今天没有待复习的错题' }}
@@ -231,22 +244,44 @@ onMounted(() => { loadRecords() })
 }
 .switch-link { color: #26A69A; font-weight: bold; }
 
-.start-card {
-  background: #fff;
-  border-radius: 24rpx;
-  padding: 40rpx 32rpx;
+.filter-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #1F3A3A;
+  margin-bottom: 16rpx;
+  align-self: flex-start;
+}
+
+.type-cards {
   display: flex;
-  align-items: center;
-  gap: 24rpx;
-  box-shadow: 0 6rpx 20rpx rgba(0,0,0,0.06);
-  border-left: 8rpx solid #26A69A;
+  flex-direction: column;
+  gap: 20rpx;
   width: 100%;
   max-width: 600rpx;
 }
-.start-card:active { transform: scale(0.98); }
-.sc-icon { font-size: 56rpx; }
-.sc-name { flex: 1; font-size: 36rpx; font-weight: bold; color: #333; }
-.sc-count { font-size: 26rpx; color: #888; }
+.type-card {
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 36rpx 32rpx;
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  box-shadow: 0 6rpx 20rpx rgba(31,58,58,0.06);
+  border-left: 8rpx solid #26A69A;
+  transition: transform 0.2s;
+}
+.type-card:active { transform: scale(0.98); opacity: 0.9; }
+.type-icon { font-size: 56rpx; flex-shrink: 0; }
+.type-name {
+  flex: 1;
+  font-size: 34rpx;
+  font-weight: bold;
+  color: #1F3A3A;
+}
+.type-count {
+  font-size: 26rpx;
+  color: #6B8787;
+}
 
 .empty-state {
   display: flex; flex-direction: column; align-items: center;

@@ -1,6 +1,6 @@
 <template>
   <view class="index-page">
-    <PageHeader title="语文" theme="chinese" />
+    <PageHeader title="语文" theme="chinese" home-on-back />
 
     <!-- Hero 区：书卷气 -->
     <view class="hero">

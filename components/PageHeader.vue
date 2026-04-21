@@ -11,6 +11,9 @@ const props = defineProps({
   title: { type: String, default: '' },
   showBack: { type: Boolean, default: true },
   fallback: { type: String, default: '/pages/index/index' },
+  // 二级首页（学科 index）传 true，返回键无条件 reLaunch 到根首页；
+  // 其余页面默认 navigateBack（带 fail 兜底 reLaunch）。
+  homeOnBack: { type: Boolean, default: false },
   theme: {
     type: String,
     default: 'default',
@@ -19,6 +22,10 @@ const props = defineProps({
 })
 
 function onBack() {
+  if (props.homeOnBack) {
+    uni.reLaunch({ url: props.fallback })
+    return
+  }
   uni.navigateBack({ fail: () => uni.reLaunch({ url: props.fallback }) })
 }
 </script>

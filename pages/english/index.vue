@@ -1,6 +1,6 @@
 <template>
   <view class="index-page">
-    <PageHeader title="英语" theme="english" />
+    <PageHeader title="英语" theme="english" home-on-back />
 
     <!-- Hero：ABC 游乐场 -->
     <view class="hero">

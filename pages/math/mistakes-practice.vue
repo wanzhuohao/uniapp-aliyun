@@ -8,7 +8,11 @@
 
     <!-- 空状态 -->
     <view v-if="questions.length === 0" class="empty-state">
-      <text class="empty-text">没有需要重练的题目</text>
+      <text class="empty-icon">🎉</text>
+      <text class="empty-text">
+        {{ currentMode === 'due' ? '今天没有待复习的错题' : '太棒了，没有错题！' }}
+      </text>
+      <view v-if="currentMode === 'due'" class="action-btn primary" @click="switchToAll">练全部未掌握</view>
       <view class="action-btn" @click="goBack">返回错题本</view>
     </view>
 
@@ -188,13 +192,14 @@ const submitted = ref(false)
 const finished = ref(false)
 const correctCount = ref(0)
 const masteredCount = ref(0)
+const currentMode = ref('due')
 
 const answeredCount = computed(() =>
   questions.value.filter(q => q.userAnswer !== '' && q.userAnswer !== undefined).length
 )
 
-onLoad((options) => {
-  const mode = options.mode || 'due'
+function loadByMode(mode) {
+  currentMode.value = mode
   const list = mode === 'due' ? getDueList() : getAllWrong().filter(r => !r.mastered)
   questions.value = list.map(item => ({
     ...item,
@@ -205,6 +210,14 @@ onLoad((options) => {
     _op2Answers: ['', ''],
     _shapeAnswers: {},
   }))
+}
+
+function switchToAll() {
+  loadByMode('all')
+}
+
+onLoad((options) => {
+  loadByMode(options.mode || 'due')
 })
 
 // ---- 拆分辅助 ----
