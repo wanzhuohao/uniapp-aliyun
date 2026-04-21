@@ -1171,40 +1171,47 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 24rpx 32rpx;
+  padding: 20rpx 28rpx;
   background: #fff;
-  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.04);
+  box-shadow: 0 2rpx 8rpx rgba(30,90,142,0.06);
   position: sticky;
   top: 0;
   z-index: 10;
+  border-bottom: 2rpx solid #D8E4F0;
 }
 .back-btn {
-  font-size: 36rpx;
+  font-size: 34rpx;
   width: 56rpx;
   height: 56rpx;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background: #f0f0f0;
+  background: #E3F0FA;
+  color: #1E5A8E;
+  font-weight: bold;
   cursor: pointer;
+  transition: transform 0.2s;
 }
 .back-btn:active { transform: scale(0.9); }
 
 .timer {
   font-size: 40rpx;
-  font-weight: bold;
-  font-family: monospace;
-  color: #333;
+  font-weight: 900;
+  font-family: 'Courier New', 'Consolas', monospace;
+  color: #1E5A8E;
+  letter-spacing: 2rpx;
 }
-.timer.warn { color: #F44336; }
+.timer.warn { color: #E53935; }
 .timer-placeholder {
   width: 120rpx;
 }
 .progress-text {
-  font-size: 28rpx;
-  color: #999;
+  font-size: 26rpx;
+  color: #2A7AB8;
   font-weight: bold;
+  font-family: 'Courier New', 'Consolas', monospace;
+  letter-spacing: 2rpx;
 }
 
 .question-list {
@@ -1220,39 +1227,55 @@ onUnmounted(() => {
   padding: 20rpx 24rpx;
   margin-bottom: 12rpx;
   background: #fff;
-  border-radius: 16rpx;
+  border: 2rpx solid #D8E4F0;
+  border-radius: 14rpx;
   border-left: 6rpx solid transparent;
-  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.04);
+  box-shadow: 0 2rpx 8rpx rgba(30,90,142,0.04);
+  transition: all 0.2s;
 }
 .q-row.current {
   border-left-color: #42A5F5;
-  background: #E3F2FD;
+  background: #E3F0FA;
+  border-color: #42A5F5;
+  box-shadow: 0 4rpx 14rpx rgba(66,165,245,0.15);
 }
 .q-row.done {
   border-left-color: #42A5F5;
 }
 
 .q-index {
-  font-size: 24rpx;
-  color: #bbb;
-  width: 40rpx;
+  font-size: 22rpx;
+  color: #8EA8BF;
+  width: 44rpx;
   text-align: right;
   flex-shrink: 0;
+  font-family: 'Courier New', 'Consolas', monospace;
+  font-weight: bold;
 }
 .q-expr {
   font-size: 36rpx;
-  font-weight: bold;
+  font-weight: 900;
   flex-shrink: 0;
+  color: #0F2B48;
+  font-family: 'Courier New', 'Consolas', monospace;
+  letter-spacing: 1rpx;
 }
 .q-input {
   width: 110rpx;
   height: 64rpx;
-  border: 4rpx solid #E0E0E0;
+  border: 3rpx solid #D8E4F0;
   border-radius: 12rpx;
   text-align: center;
   font-size: 36rpx;
-  font-weight: bold;
+  font-weight: 900;
   background: #fff;
+  color: #1E5A8E;
+  font-family: 'Courier New', 'Consolas', monospace;
+  transition: border-color 0.15s;
+}
+.q-input:focus {
+  border-color: #42A5F5;
+  outline: none;
 }
 .q-input-inline {
   display: inline-block;
@@ -1274,17 +1297,24 @@ onUnmounted(() => {
 .cmp-btn {
   width: 60rpx;
   height: 52rpx;
-  border: 3rpx solid #E0E0E0;
+  border: 2rpx solid #D8E4F0;
   border-radius: 10rpx;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 32rpx;
-  font-weight: bold;
+  font-weight: 900;
   background: #fff;
-  color: #555;
+  color: #1E5A8E;
+  font-family: 'Courier New', 'Consolas', monospace;
+  transition: all 0.15s;
 }
 .cmp-btn:active { transform: scale(0.93); }
+.cmp-btn.selected {
+  background: #42A5F5;
+  color: #fff;
+  border-color: #42A5F5;
+}
 
 /* 双边填运算符紧凑布局 */
 .fillop2-row {
@@ -1294,8 +1324,10 @@ onUnmounted(() => {
 }
 .fillop2-num {
   font-size: 34rpx;
-  font-weight: bold;
+  font-weight: 900;
   white-space: nowrap;
+  color: #0F2B48;
+  font-family: 'Courier New', 'Consolas', monospace;
 }
 .fillop2-btns {
   display: flex;
@@ -1304,15 +1336,17 @@ onUnmounted(() => {
 .fillop2-btn {
   width: 56rpx;
   height: 52rpx;
-  border: 3rpx solid #E0E0E0;
+  border: 2rpx solid #D8E4F0;
   border-radius: 10rpx;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 32rpx;
-  font-weight: bold;
+  font-weight: 900;
   background: #fff;
-  color: #555;
+  color: #1E5A8E;
+  font-family: 'Courier New', 'Consolas', monospace;
+  transition: all 0.15s;
 }
 .fillop2-btn:active { transform: scale(0.93); }
 .fillop2-btn.selected {
@@ -1446,19 +1480,23 @@ onUnmounted(() => {
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 24rpx 48rpx;
+  padding: 20rpx 32rpx;
   background: #fff;
-  box-shadow: 0 -4rpx 12rpx rgba(0,0,0,0.06);
+  box-shadow: 0 -4rpx 12rpx rgba(30,90,142,0.08);
+  border-top: 2rpx solid #D8E4F0;
   z-index: 10;
 }
 .submit-btn {
   text-align: center;
   padding: 24rpx;
-  background: #42A5F5;
+  background: linear-gradient(135deg, #42A5F5, #1E88E5);
   color: #fff;
   border-radius: 40rpx;
   font-size: 32rpx;
-  font-weight: bold;
+  font-weight: 900;
+  letter-spacing: 6rpx;
+  box-shadow: 0 6rpx 18rpx rgba(66,165,245,0.3);
+  transition: transform 0.2s;
 }
 .submit-btn:active { transform: scale(0.97); }
 
