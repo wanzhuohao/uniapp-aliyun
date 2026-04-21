@@ -40,6 +40,15 @@
 - 另外切换 Audio 时先清 `onended/onerror` 再 `removeAttribute('src') + load()`，用 `currentAudio` 闭包防止旧回调污染新请求的 speaking 状态
 - 有道 `type` 参数只决定口音（1 英式 / 2 美式），不影响男女声——男女声由服务端按词固定，切不掉
 
+## 2026-04-21 单词选择题等 TTS 播完再切题
+
+- **现象**：选完答案后固定 900ms / 1600ms 就切下一题，有道 mp3 还没念完就被下一题打断
+- **方案**：
+  - `speakEn` 改成返回 Promise（播完 / 失败 / 打断都 resolve，不 reject）
+  - `components/english/WordQuestion.vue` `pickOption` 用 `Promise.all([speakPromise, minDelay])` 等两者都完成再 `emit('answer')`
+  - 最少展示时长：对 600ms / 错 1200ms（保证看到颜色反馈），单词长的话播完时间自然更长
+  - emit 前再次判断 `choiceState.value` 防止组件已 reset 时误触发
+
 ## 项目来源
 
 从 `D:\code\uniapp`（支付宝云）提取数学和语文模块，独立部署到阿里云。两个项目独立维护，后续新功能在本项目开发。

@@ -57,30 +57,39 @@ export function speak(text) {
 }
 
 // 英语只走有道 TTS type=2（美式女声）；失败就静音，不回退 SpeechSynthesis（手机系统默认可能是男声）
+// 返回 Promise：播完 / 失败 / 被打断 都会 resolve（不 reject，避免卡流程）
 export function speakEn(text) {
-  if (!text || typeof window === 'undefined') return
+  if (!text || typeof window === 'undefined') return Promise.resolve()
   const word = String(text).trim()
-  if (!word) return
-  try {
-    if (enAudio) {
-      enAudio.onended = null
-      enAudio.onerror = null
-      try { enAudio.pause() } catch (e) {}
-      try { enAudio.removeAttribute('src'); enAudio.load() } catch (e) {}
+  if (!word) return Promise.resolve()
+  return new Promise((resolve) => {
+    try {
+      if (enAudio) {
+        enAudio.onended = null
+        enAudio.onerror = null
+        try { enAudio.pause() } catch (e) {}
+        try { enAudio.removeAttribute('src'); enAudio.load() } catch (e) {}
+      }
+      const url = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(word)}&type=2`
+      enAudio = new Audio(url)
+      const currentAudio = enAudio
+      speaking = true
+      const done = () => {
+        if (currentAudio !== enAudio) return
+        speaking = false
+        resolve()
+      }
+      enAudio.onended = done
+      enAudio.onerror = done
+      const p = enAudio.play()
+      if (p && typeof p.catch === 'function') {
+        p.catch(() => done())
+      }
+    } catch (e) {
+      speaking = false
+      resolve()
     }
-    const url = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(word)}&type=2`
-    enAudio = new Audio(url)
-    const currentAudio = enAudio
-    speaking = true
-    enAudio.onended = () => { if (currentAudio === enAudio) speaking = false }
-    enAudio.onerror = () => { if (currentAudio === enAudio) speaking = false }
-    const p = enAudio.play()
-    if (p && typeof p.catch === 'function') {
-      p.catch(() => { if (currentAudio === enAudio) speaking = false })
-    }
-  } catch (e) {
-    speaking = false
-  }
+  })
 }
 
 export function isSpeaking() {

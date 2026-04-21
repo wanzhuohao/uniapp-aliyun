@@ -75,13 +75,16 @@ function pickOption(i) {
   if (!opt) return
   const isCorrect = !!opt.isCorrect
   choiceState.value = isCorrect ? 'correct' : 'wrong'
-  // 答题后朗读正确单词，帮助记忆
-  try { speakEn(props.question.word) } catch (e) {}
-  if (pendingTimer) clearTimeout(pendingTimer)
-  pendingTimer = setTimeout(() => {
+  // 答题后朗读正确单词，等播完 + 最少展示时长都满足再切下一题
+  const minDelay = isCorrect ? 600 : 1200
+  const speakPromise = (() => {
+    try { return speakEn(props.question.word) || Promise.resolve() } catch (e) { return Promise.resolve() }
+  })()
+  const delayPromise = new Promise((r) => { pendingTimer = setTimeout(r, minDelay) })
+  Promise.all([speakPromise, delayPromise]).then(() => {
     pendingTimer = null
-    emit('answer', { isCorrect, optionIndex: i })
-  }, isCorrect ? 900 : 1600)
+    if (choiceState.value) emit('answer', { isCorrect, optionIndex: i })
+  })
 }
 
 function playWord() {
