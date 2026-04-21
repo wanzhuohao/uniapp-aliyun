@@ -286,77 +286,73 @@ async function exportAnswerImage() {
 /* ── Page wrapper ─────────────────────────────────────────────── */
 .print-page {
   min-height: 100vh;
-  background: #F0F4F8;
+  background: #F0F4F9;
   padding-bottom: 40rpx;
 }
 
 /* ── Setup panel ──────────────────────────────────────────────── */
 .setup-panel {
-  padding: 48rpx 32rpx;
-}
-
-.header {
-  display: flex;
-  align-items: center;
-  gap: 24rpx;
-  margin-bottom: 48rpx;
-}
-
-.back-btn {
-  font-size: 44rpx;
-  color: #42A5F5;
-  font-weight: bold;
-  padding: 8rpx 16rpx;
-  cursor: pointer;
-}
-
-.title {
-  font-size: 48rpx;
-  font-weight: bold;
-  color: #222;
+  padding: 32rpx 28rpx;
 }
 
 .config-card {
+  position: relative;
   background: #fff;
-  border-radius: 16rpx;
-  padding: 48rpx 40rpx;
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.07);
+  border: 2rpx solid #D8E4F0;
+  border-radius: 20rpx;
+  padding: 40rpx 32rpx;
+  box-shadow: 0 6rpx 18rpx rgba(30,90,142,0.05);
   display: flex;
   flex-direction: column;
-  gap: 32rpx;
+  gap: 28rpx;
+}
+.config-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 28rpx;
+  bottom: 28rpx;
+  width: 4rpx;
+  background: linear-gradient(180deg, #42A5F5, #1E88E5);
+  border-radius: 0 4rpx 4rpx 0;
 }
 
 .config-label {
-  font-size: 32rpx;
-  font-weight: bold;
-  color: #333;
+  font-size: 28rpx;
+  font-weight: 900;
+  color: #0F2B48;
+  letter-spacing: 2rpx;
 }
 
 .level-tabs {
   display: flex;
-  gap: 16rpx;
+  gap: 12rpx;
   flex-wrap: wrap;
 }
 
 .level-tab {
   flex: 1;
-  min-width: 100rpx;
+  min-width: 120rpx;
   text-align: center;
-  padding: 20rpx 0;
+  padding: 18rpx 12rpx;
   border-radius: 12rpx;
-  border: 2rpx solid #ddd;
-  font-size: 28rpx;
-  color: #555;
-  background: #F8F9FA;
+  border: 2rpx solid #D8E4F0;
+  font-size: 26rpx;
+  color: #6B88A3;
+  background: #fff;
+  box-shadow: 0 2rpx 6rpx rgba(30,90,142,0.03);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s cubic-bezier(.4,0,.2,1);
+  font-family: 'Courier New', 'Consolas', monospace;
+  letter-spacing: 1rpx;
 }
 
 .level-tab.active {
-  background: #42A5F5;
-  border-color: #42A5F5;
+  background: linear-gradient(135deg, #42A5F5, #1E88E5);
+  border-color: transparent;
   color: #fff;
   font-weight: bold;
+  box-shadow: 0 4rpx 12rpx rgba(66,165,245,0.25);
 }
 
 .chain-toggle {
@@ -369,11 +365,12 @@ async function exportAnswerImage() {
   width: 80rpx;
   height: 40rpx;
   border-radius: 20rpx;
-  background: #ccc;
+  background: #D8E4F0;
   position: relative;
   transition: background 0.2s;
+  flex-shrink: 0;
 }
-.toggle-track.on { background: #42A5F5; }
+.toggle-track.on { background: linear-gradient(135deg, #42A5F5, #1E88E5); }
 .toggle-thumb {
   width: 32rpx;
   height: 32rpx;
@@ -383,41 +380,46 @@ async function exportAnswerImage() {
   top: 4rpx;
   left: 4rpx;
   transition: left 0.2s;
+  box-shadow: 0 2rpx 6rpx rgba(0,0,0,0.15);
 }
 .toggle-track.on .toggle-thumb { left: 44rpx; }
 .toggle-label {
   font-size: 26rpx;
-  color: #666;
+  color: #6B88A3;
 }
 
 .info-row {
   padding: 16rpx 20rpx;
-  background: #EFF8FF;
+  background: #E3F0FA;
   border-radius: 10rpx;
-  border-left: 6rpx solid #42A5F5;
+  border-left: 4rpx solid #42A5F5;
 }
 
 .info-text {
-  font-size: 26rpx;
-  color: #555;
+  font-size: 24rpx;
+  color: #1E5A8E;
   line-height: 1.6;
+  font-family: 'Courier New', 'Consolas', monospace;
+  letter-spacing: 1rpx;
 }
 
 .gen-btn {
-  background: #42A5F5;
+  background: linear-gradient(135deg, #42A5F5, #1E88E5);
   color: #fff;
-  font-size: 34rpx;
-  font-weight: bold;
+  font-size: 32rpx;
+  font-weight: 900;
   border: none;
-  border-radius: 12rpx;
+  border-radius: 40rpx;
   padding: 28rpx 0;
   width: 100%;
+  letter-spacing: 6rpx;
   cursor: pointer;
-  transition: background 0.2s;
+  box-shadow: 0 6rpx 18rpx rgba(66,165,245,0.3);
+  transition: transform 0.2s;
 }
 
 .gen-btn:active {
-  background: #1E88E5;
+  transform: scale(0.97);
 }
 
 /* ── Preview panel ────────────────────────────────────────────── */
@@ -444,21 +446,27 @@ async function exportAnswerImage() {
   min-width: 180rpx;
   padding: 22rpx 28rpx;
   border: none;
-  border-radius: 10rpx;
+  border-radius: 40rpx;
   font-size: 28rpx;
-  font-weight: bold;
+  font-weight: 900;
   cursor: pointer;
-  transition: opacity 0.2s;
+  letter-spacing: 2rpx;
+  transition: transform 0.2s, opacity 0.2s;
 }
 
 .action-btn:active {
-  opacity: 0.8;
+  transform: scale(0.97);
+  opacity: 0.9;
 }
 
-.btn-print  { background: #42A5F5; color: #fff; }
+.btn-print  {
+  background: linear-gradient(135deg, #42A5F5, #1E88E5);
+  color: #fff;
+  box-shadow: 0 4rpx 12rpx rgba(66,165,245,0.3);
+}
 .btn-export { background: #E53935; color: #fff; }
 .btn-regen  { background: #66BB6A; color: #fff; }
-.btn-back   { background: #78909C; color: #fff; }
+.btn-back   { background: #8EA8BF; color: #fff; }
 
 /* ── A4 sheet wrapper (handles mobile scaling) ────────────────── */
 .a4-wrapper {
