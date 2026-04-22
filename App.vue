@@ -59,7 +59,7 @@ body {
   --space-6: 48rpx;
 
   /* 字体栈 */
-  --font-chinese: 'STKaiti', 'KaiTi', '楷体', 'DFKai-SB', 'BiauKai', serif;
+  --font-chinese: 'LXGW WenKai Screen', 'LXGW WenKai', 'STKaiti', 'KaiTi', '楷体', 'DFKai-SB', 'BiauKai', serif;
   --font-english: 'Quicksand', 'Trebuchet MS', sans-serif;
   --font-math: 'Courier New', 'Consolas', monospace;
 }

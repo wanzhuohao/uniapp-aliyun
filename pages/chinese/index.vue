@@ -100,15 +100,15 @@ function goTo(url) {
 }
 .hero-title {
   font-size: 52rpx;
-  font-weight: bold;
+  font-weight: 500;
   color: #1F1F1F;
-  font-family: 'STKaiti', 'KaiTi', '楷体', serif;
+  font-family: 'LXGW WenKai Screen', 'LXGW WenKai', 'STKaiti', 'KaiTi', '楷体', serif;
   letter-spacing: 6rpx;
 }
 .hero-sub {
   font-size: 26rpx;
   color: #8C8275;
-  font-family: 'STKaiti', 'KaiTi', '楷体', serif;
+  font-family: 'LXGW WenKai Screen', 'LXGW WenKai', 'STKaiti', 'KaiTi', '楷体', serif;
   letter-spacing: 2rpx;
 }
 /* ── 主入口 ───────────────────────────────────────── */
@@ -151,9 +151,9 @@ function goTo(url) {
 }
 .pc-name {
   font-size: 44rpx;
-  font-weight: bold;
+  font-weight: 500;
   color: #1F1F1F;
-  font-family: 'STKaiti', 'KaiTi', '楷体', serif;
+  font-family: 'LXGW WenKai Screen', 'LXGW WenKai', 'STKaiti', 'KaiTi', '楷体', serif;
   letter-spacing: 4rpx;
 }
 .pc-desc {
@@ -168,8 +168,8 @@ function goTo(url) {
   border: 2rpx solid #E8D5B7;
   border-radius: 16rpx;
   font-size: 100rpx;
-  font-family: 'STKaiti', 'KaiTi', '楷体', serif;
-  font-weight: bold;
+  font-family: 'LXGW WenKai Screen', 'LXGW WenKai', 'STKaiti', 'KaiTi', '楷体', serif;
+  font-weight: 500;
   color: #A62D33;
   display: flex;
   align-items: center;
@@ -203,8 +203,8 @@ function goTo(url) {
   background: #FDF1E6;
   color: #A62D33;
   font-size: 36rpx;
-  font-family: 'STKaiti', 'KaiTi', '楷体', serif;
-  font-weight: bold;
+  font-family: 'LXGW WenKai Screen', 'LXGW WenKai', 'STKaiti', 'KaiTi', '楷体', serif;
+  font-weight: 500;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -212,9 +212,9 @@ function goTo(url) {
 }
 .sub-name {
   font-size: 30rpx;
-  font-weight: bold;
+  font-weight: 500;
   color: #1F1F1F;
-  font-family: 'STKaiti', 'KaiTi', '楷体', serif;
+  font-family: 'LXGW WenKai Screen', 'LXGW WenKai', 'STKaiti', 'KaiTi', '楷体', serif;
   letter-spacing: 2rpx;
 }
 .sub-desc {
@@ -250,9 +250,9 @@ function goTo(url) {
 }
 .wc-name {
   font-size: 30rpx;
-  font-weight: bold;
+  font-weight: 500;
   color: #1F1F1F;
-  font-family: 'STKaiti', 'KaiTi', '楷体', serif;
+  font-family: 'LXGW WenKai Screen', 'LXGW WenKai', 'STKaiti', 'KaiTi', '楷体', serif;
   letter-spacing: 2rpx;
 }
 .wc-desc { font-size: 22rpx; color: #A39585; }
@@ -269,6 +269,6 @@ function goTo(url) {
   font-size: 24rpx;
   color: #A39585;
   letter-spacing: 2rpx;
-  font-family: 'STKaiti', 'KaiTi', '楷体', serif;
+  font-family: 'LXGW WenKai Screen', 'LXGW WenKai', 'STKaiti', 'KaiTi', '楷体', serif;
 }
 </style>

@@ -426,21 +426,21 @@ onShow(() => {
 
 .self-judge {
   display: flex;
-  gap: 32rpx;
-  margin-top: 32rpx;
-  justify-content: center;
+  gap: 16rpx;
+  margin-top: 16rpx;
+  width: 100%;
+  max-width: 600rpx;
 }
 .judge-btn {
-  padding: 28rpx 56rpx;
-  border-radius: 24rpx;
-  font-size: 32rpx;
-  font-weight: bold;
-  border: 3rpx solid;
-  box-shadow: 0 6rpx 16rpx rgba(0,0,0,0.08);
+  flex: 1;
+  padding: 16rpx;
+  border-radius: 12rpx;
+  text-align: center;
+  font-size: 28rpx;
 }
-.judge-btn:active { transform: scale(0.95); }
-.judge-btn.correct { background: #E8F5E9; color: #2E7D32; border-color: #66BB6A; }
-.judge-btn.wrong { background: #FFEBEE; color: #C62828; border-color: #EF5350; }
+.judge-btn:active { transform: scale(0.97); }
+.judge-btn.correct { background: #E8F5E9; color: #2E7D32; }
+.judge-btn.wrong { background: #FFEBEE; color: #C62828; }
 
 .extend-area {
   width: 100%;

@@ -82,8 +82,9 @@ function goTo(url) {
 }
 .hero-title {
   font-size: 64rpx;
-  font-weight: 900;
+  font-weight: 500;
   color: #2A2520;
+  font-family: var(--font-chinese);
   letter-spacing: 4rpx;
   line-height: 1.2;
 }
@@ -137,8 +138,9 @@ function goTo(url) {
 }
 .card-title {
   font-size: 44rpx;
-  font-weight: 900;
+  font-weight: 500;
   color: #2A2520;
+  font-family: var(--font-chinese);
   letter-spacing: 2rpx;
 }
 .card-desc {
@@ -160,7 +162,7 @@ function goTo(url) {
   grid-template-columns: 1fr 1fr 1fr;
   grid-template-rows: 1fr 1fr;
   gap: 4rpx;
-  padding: 16rpx;
+  padding: 28rpx;
 }
 .deco-num, .deco-sign {
   display: flex;
@@ -169,7 +171,7 @@ function goTo(url) {
   font-family: 'Courier New', monospace;
   font-weight: bold;
   color: #1E5A8E;
-  font-size: 32rpx;
+  font-size: 26rpx;
 }
 .deco-sign { color: #2A7AB8; }
 .card-math .card-tag { color: #2A7AB8; }
