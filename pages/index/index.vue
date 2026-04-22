@@ -157,12 +157,15 @@ function goTo(url) {
 
 /* 数学：网格 + 数字 */
 .math-deco {
+  width: 120rpx;
+  height: 120rpx;
+  margin: 20rpx;
   background: linear-gradient(135deg, #E3F0FA 0%, #B8D9F0 100%);
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   grid-template-rows: 1fr 1fr;
-  gap: 4rpx;
-  padding: 28rpx;
+  gap: 2rpx;
+  padding: 14rpx;
 }
 .deco-num, .deco-sign {
   display: flex;
@@ -171,7 +174,7 @@ function goTo(url) {
   font-family: 'Courier New', monospace;
   font-weight: bold;
   color: #1E5A8E;
-  font-size: 26rpx;
+  font-size: 24rpx;
 }
 .deco-sign { color: #2A7AB8; }
 .card-math .card-tag { color: #2A7AB8; }
