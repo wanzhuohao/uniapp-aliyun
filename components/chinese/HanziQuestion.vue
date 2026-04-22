@@ -15,8 +15,8 @@
         <text class="self-judge-hint">自己判断掌握情况：</text>
         <view class="answer-btn" @click="replayAnim">▶ 播放笔顺动画</view>
         <view class="self-judge">
-          <view class="judge-btn judge-correct" @click="markResult(true)">✓ 我掌握了</view>
-          <view class="judge-btn judge-wrong" @click="markResult(false)">✗ 没掌握</view>
+          <view class="judge-btn judge-wrong" @click="markResult(false)">❌ 我不会</view>
+          <view class="judge-btn judge-correct" @click="markResult(true)">✅ 我会了</view>
         </view>
       </view>
     </template>

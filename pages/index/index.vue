@@ -155,17 +155,15 @@ function goTo(url) {
   flex-shrink: 0;
 }
 
-/* 数学：网格 + 数字 */
+/* 数学：网格 + 数字（渐变色更淡、字号更小，视觉重量与语文/英语齐平） */
 .math-deco {
-  width: 120rpx;
-  height: 120rpx;
-  margin: 20rpx;
-  background: linear-gradient(135deg, #E3F0FA 0%, #B8D9F0 100%);
+  box-sizing: border-box;
+  background: linear-gradient(135deg, #F0F6FB 0%, #D6E8F5 100%);
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   grid-template-rows: 1fr 1fr;
   gap: 2rpx;
-  padding: 14rpx;
+  padding: 20rpx;
 }
 .deco-num, .deco-sign {
   display: flex;
@@ -173,8 +171,8 @@ function goTo(url) {
   justify-content: center;
   font-family: 'Courier New', monospace;
   font-weight: bold;
-  color: #1E5A8E;
-  font-size: 24rpx;
+  color: #5A8EC3;
+  font-size: 22rpx;
 }
 .deco-sign { color: #2A7AB8; }
 .card-math .card-tag { color: #2A7AB8; }
