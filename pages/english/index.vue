@@ -29,12 +29,17 @@
       </view>
     </view>
 
-    <!-- 次级入口：2 列 -->
+    <!-- 次级入口：3 列 -->
     <view class="sub-grid">
       <view class="sub-card letters" @click="goTo('/pages/english/letters')">
         <view class="sub-bubble">Aa</view>
         <text class="sub-name">字母认读</text>
         <text class="sub-desc">26 letters</text>
+      </view>
+      <view class="sub-card phonics" @click="goTo('/pages/english/phonics')">
+        <view class="sub-bubble phonics-bubble">sh</view>
+        <text class="sub-name">自然拼读</text>
+        <text class="sub-desc">42 sounds</text>
       </view>
       <view class="sub-card mistakes" @click="goTo('/pages/english/mistakes')">
         <view class="sub-bubble mistakes-bubble">📕</view>
@@ -202,8 +207,8 @@ function goTo(url) {
 /* ── 次级 2 列 ────────────────────────────────────── */
 .sub-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20rpx;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16rpx;
   margin: 0 32rpx 24rpx;
 }
 .sub-card {
@@ -232,6 +237,13 @@ function goTo(url) {
   justify-content: center;
   margin-bottom: 6rpx;
   transform: rotate(-4deg);
+}
+.sub-card.phonics .sub-bubble {
+  background: #E0F2F1;
+  color: #1E8E82;
+  transform: rotate(2deg);
+  font-size: 32rpx;
+  font-style: italic;
 }
 .sub-card.mistakes .sub-bubble {
   background: #FFEDE7;

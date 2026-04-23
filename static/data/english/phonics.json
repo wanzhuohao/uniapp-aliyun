@@ -1,0 +1,93 @@
+[
+  {
+    "group": 1,
+    "groupName": "第 1 组",
+    "groupHint": "学完就能拼 sat / pin / tap",
+    "sounds": [
+      { "letters": "s", "ipa": "/s/", "tip": "学小蛇嘶嘶叫", "examples": ["sun", "snake", "sit"], "audioFiles": ["s.mp3"] },
+      { "letters": "a", "ipa": "/æ/", "tip": "蚂蚁爬手臂 a-a-a", "examples": ["ant", "apple", "cat"], "audioFiles": ["ae.mp3"] },
+      { "letters": "t", "ipa": "/t/", "tip": "手表滴答 t-t-t", "examples": ["top", "tap", "ten"], "audioFiles": [] },
+      { "letters": "i", "ipa": "/ɪ/", "tip": "捏鼻子 i-i-i", "examples": ["ink", "in", "pig"], "audioFiles": ["i_short.mp3"] },
+      { "letters": "p", "ipa": "/p/", "tip": "吹蜡烛 p-p-p", "examples": ["pig", "pen", "pan"], "audioFiles": ["p.mp3"] },
+      { "letters": "n", "ipa": "/n/", "tip": "小飞机 nnnn", "examples": ["net", "nut", "nose"], "audioFiles": ["n.mp3"] }
+    ]
+  },
+  {
+    "group": 2,
+    "groupName": "第 2 组",
+    "groupHint": "认识 ck 双胞胎",
+    "sounds": [
+      { "letters": "c, k", "ipa": "/k/", "tip": "敲响板 c-c-c", "examples": ["cat", "key", "cup"], "audioFiles": ["k.mp3"] },
+      { "letters": "e", "ipa": "/e/", "tip": "敲鸡蛋 e-e-e", "examples": ["egg", "elf", "red"], "audioFiles": ["e.mp3"] },
+      { "letters": "h", "ipa": "/h/", "tip": "跑步喘气 h-h-h", "examples": ["hat", "hen", "hop"], "audioFiles": ["h.mp3"] },
+      { "letters": "r", "ipa": "/r/", "tip": "小狗咆哮 rrr", "examples": ["red", "run", "rat"], "audioFiles": ["r.mp3"] },
+      { "letters": "m", "ipa": "/m/", "tip": "好吃 mmmm", "examples": ["mum", "map", "moon"], "audioFiles": ["m.mp3"] },
+      { "letters": "d", "ipa": "/d/", "tip": "敲鼓 d-d-d", "examples": ["dog", "dad", "dot"], "audioFiles": ["d.mp3"] }
+    ]
+  },
+  {
+    "group": 3,
+    "groupName": "第 3 组",
+    "groupHint": "再加 6 个就能拼几十个词",
+    "sounds": [
+      { "letters": "g", "ipa": "/g/", "tip": "水管漏气 g-g-g", "examples": ["go", "goat", "gum"], "audioFiles": ["g.mp3"] },
+      { "letters": "o", "ipa": "/ɒ/", "tip": "电灯关上 o-o-o", "examples": ["on", "ox", "dog"], "audioFiles": ["o_short.mp3"] },
+      { "letters": "u", "ipa": "/ʌ/", "tip": "雨伞撑开 u-u-u", "examples": ["up", "umbrella", "bus"], "audioFiles": ["caret.mp3"] },
+      { "letters": "l", "ipa": "/l/", "tip": "舔棒棒糖 lll", "examples": ["lip", "leg", "lion"], "audioFiles": ["l.mp3"] },
+      { "letters": "f", "ipa": "/f/", "tip": "鱼游来游去 fff", "examples": ["fish", "fan", "fox"], "audioFiles": ["f.mp3"] },
+      { "letters": "b", "ipa": "/b/", "tip": "敲大鼓 b-b-b", "examples": ["bag", "bat", "ball"], "audioFiles": ["b.mp3"] }
+    ]
+  },
+  {
+    "group": 4,
+    "groupName": "第 4 组",
+    "groupHint": "首批元音组合上场",
+    "sounds": [
+      { "letters": "ai", "ipa": "/eɪ/", "tip": "ai 喊 'A 的名字'", "examples": ["rain", "tail", "snail"], "audioFiles": ["e_close.mp3", "i_short.mp3"] },
+      { "letters": "j", "ipa": "/dʒ/", "tip": "果冻摇晃 j-j-j", "examples": ["jam", "jet", "juice"], "audioFiles": ["j.mp3"] },
+      { "letters": "oa", "ipa": "/əʊ/", "tip": "oa 喊 'O 的名字'", "examples": ["boat", "coat", "soap"], "audioFiles": ["schwa.mp3", "u_short.mp3"] },
+      { "letters": "ie", "ipa": "/aɪ/", "tip": "ie 喊 'I 的名字'", "examples": ["pie", "tie", "lie"], "audioFiles": ["a_open.mp3", "i_short.mp3"] },
+      { "letters": "ee", "ipa": "/iː/", "tip": "ee 喊 'E 的名字'", "examples": ["bee", "see", "tree"], "audioFiles": ["i_long.mp3"] },
+      { "letters": "or", "ipa": "/ɔː/", "tip": "举重 or-or-or", "examples": ["fork", "horn", "corn"], "audioFiles": ["or.mp3"] }
+    ]
+  },
+  {
+    "group": 5,
+    "groupName": "第 5 组",
+    "groupHint": "ng 鼻音 + 长短 oo",
+    "sounds": [
+      { "letters": "z", "ipa": "/z/", "tip": "蜜蜂 zzz", "examples": ["zoo", "zip", "zebra"], "audioFiles": ["z.mp3"] },
+      { "letters": "w", "ipa": "/w/", "tip": "大风 w-w-w", "examples": ["water", "win", "wet"], "audioFiles": ["w.mp3"] },
+      { "letters": "ng", "ipa": "/ŋ/", "tip": "举重员叫 nggg", "examples": ["king", "ring", "song"], "audioFiles": ["ng.mp3"] },
+      { "letters": "v", "ipa": "/v/", "tip": "电锯 vvv", "examples": ["van", "vet", "violin"], "audioFiles": ["v.mp3"] },
+      { "letters": "oo (短)", "ipa": "/ʊ/", "tip": "猴子点头 oo-oo", "examples": ["book", "look", "foot"], "audioFiles": ["u_short.mp3"] },
+      { "letters": "oo (长)", "ipa": "/uː/", "tip": "幽灵 oooo", "examples": ["moon", "zoo", "boot"], "audioFiles": ["u_long.mp3"] }
+    ]
+  },
+  {
+    "group": 6,
+    "groupName": "第 6 组",
+    "groupHint": "辅音组合大集合",
+    "sounds": [
+      { "letters": "y", "ipa": "/j/", "tip": "啃苹果 y-y-y", "examples": ["yes", "yellow", "yo-yo"], "audioFiles": ["y.mp3"] },
+      { "letters": "x", "ipa": "/ks/", "tip": "拍 X 光 ks-ks", "examples": ["box", "fox", "six"], "audioFiles": ["k.mp3", "s.mp3"] },
+      { "letters": "ch", "ipa": "/tʃ/", "tip": "小火车 ch-ch", "examples": ["chip", "chair", "cherry"], "audioFiles": ["ch.mp3"] },
+      { "letters": "sh", "ipa": "/ʃ/", "tip": "嘘安静 shhh", "examples": ["ship", "shop", "fish"], "audioFiles": ["sh.ogg"] },
+      { "letters": "th (浊)", "ipa": "/ð/", "tip": "舌尖咬一下", "examples": ["this", "that", "the"], "audioFiles": ["th_voiced.mp3"] },
+      { "letters": "th (清)", "ipa": "/θ/", "tip": "舌尖吹气", "examples": ["thin", "thumb", "three"], "audioFiles": ["th_voiceless.mp3"] }
+    ]
+  },
+  {
+    "group": 7,
+    "groupName": "第 7 组",
+    "groupHint": "最后 6 个收官",
+    "sounds": [
+      { "letters": "qu", "ipa": "/kw/", "tip": "鸭子叫 qu-qu", "examples": ["queen", "quick", "quiet"], "audioFiles": ["k.mp3", "w.mp3"] },
+      { "letters": "ou", "ipa": "/aʊ/", "tip": "踩到脚 ouch", "examples": ["out", "house", "mouth"], "audioFiles": ["a_open.mp3", "u_short.mp3"] },
+      { "letters": "oi", "ipa": "/ɔɪ/", "tip": "喊 oi 招呼", "examples": ["oil", "coin", "boil"], "audioFiles": ["or.mp3", "i_short.mp3"] },
+      { "letters": "ue", "ipa": "/juː/", "tip": "ue 喊 'U 的名字'", "examples": ["blue", "glue", "true"], "audioFiles": ["y.mp3", "u_long.mp3"] },
+      { "letters": "er", "ipa": "/ɜː/", "tip": "搅拌机 errr", "examples": ["her", "letter", "sister"], "audioFiles": ["er_long.mp3"] },
+      { "letters": "ar", "ipa": "/ɑː/", "tip": "海盗喊 arrr", "examples": ["car", "star", "park"], "audioFiles": ["ar_long.mp3"] }
+    ]
+  }
+]

@@ -18,6 +18,7 @@
     { "path": "pages/chinese/guide", "style": { "navigationStyle": "custom", "navigationBarTitleText": "使用说明" } },
     { "path": "pages/english/index", "style": { "navigationStyle": "custom", "navigationBarTitleText": "英语启蒙" } },
     { "path": "pages/english/letters", "style": { "navigationStyle": "custom", "navigationBarTitleText": "字母认读" } },
+    { "path": "pages/english/phonics", "style": { "navigationStyle": "custom", "navigationBarTitleText": "自然拼读" } },
     { "path": "pages/english/words", "style": { "navigationStyle": "custom", "navigationBarTitleText": "单词练习" } },
     { "path": "pages/english/result", "style": { "navigationStyle": "custom", "navigationBarTitleText": "练习结果" } },
     { "path": "pages/english/mistakes", "style": { "navigationStyle": "custom", "navigationBarTitleText": "错题本" } },
