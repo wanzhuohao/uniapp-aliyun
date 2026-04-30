@@ -1,6 +1,6 @@
 <template>
   <view class="mock-page">
-    <PageHeader title="生字学习" theme="chinese">
+    <PageHeader title="生字学习" theme="chinese" :back-handler="onHeaderBack">
       <text v-if="started && totalQuestions > 0" class="progress-indicator">{{ currentIndex + 1 }}/{{ totalQuestions }}</text>
     </PageHeader>
 
@@ -16,9 +16,9 @@
       <text class="filter-title" style="margin-top: 24rpx;">选择课程</text>
       <view class="unit-tags">
         <view
-          :class="['unit-tag', selectedLessons.length === currentLessons.length && 'active']"
+          :class="['unit-tag', isAllLessonsSelected && 'active']"
           @click="toggleAllLessons"
-        >全选</view>
+        >{{ isAllLessonsSelected ? '全不选' : '全选' }}</view>
         <view v-for="l in currentLessons" :key="l.key"
           :class="['unit-tag', selectedLessons.includes(l.key) && 'active']"
           @click="toggleLesson(l.key)"
@@ -31,7 +31,7 @@
         <text class="desc">· 答错自动进错题本</text>
       </view>
 
-      <view class="start-btn" @click="startRound">开始学习</view>
+      <view :class="['start-btn', !canStart && 'disabled']" @click="startRound">开始学习</view>
     </view>
 
     <view v-if="started && totalQuestions === 0" class="empty-hint">
@@ -99,33 +99,51 @@ import { speak } from '../../utils/common/speech.js'
 import { recordWrong } from '../../utils/chinese/mistakes.js'
 import { recordPractice } from '../../utils/chinese/practiceLog.js'
 import { getQuestions } from '../../utils/chinese/questionLoader.js'
-import { getCurrentUnit, setCurrentUnit } from '../../utils/chinese/stateStore.js'
+import { getCurrentUnit, setCurrentUnit, getChinesePrefs, setChinesePrefs } from '../../utils/chinese/stateStore.js'
 import { UNIT_CONFIG, UNIT_KEYS, getLessonKeys } from '../../utils/chinese/unitConfig.js'
 import PageHeader from '../../components/PageHeader.vue'
 
+const PAGE_KEY = 'learn'
 const unitConfig = UNIT_CONFIG
 const unitKeys = UNIT_KEYS
 
 const currentUnit = ref(getCurrentUnit())
-const selectedLessons = ref(getLessonKeys(currentUnit.value))
+const savedPrefs = getChinesePrefs(PAGE_KEY)
+const initLessons = (() => {
+  const all = getLessonKeys(currentUnit.value)
+  if (Array.isArray(savedPrefs?.selectedLessons)) {
+    const filtered = savedPrefs.selectedLessons.filter(k => all.includes(k))
+    if (filtered.length) return filtered
+  }
+  return all
+})()
+const selectedLessons = ref(initLessons)
 const currentLessons = computed(() => UNIT_CONFIG[currentUnit.value]?.lessons || [])
+const isAllLessonsSelected = computed(() =>
+  currentLessons.value.length > 0 &&
+  selectedLessons.value.length === currentLessons.value.length
+)
+const canStart = computed(() => selectedLessons.value.length > 0)
 
+function persistPrefs() {
+  setChinesePrefs(PAGE_KEY, { selectedLessons: [...selectedLessons.value] })
+}
 function switchUnit(uk) {
   currentUnit.value = uk
   setCurrentUnit(uk)
   selectedLessons.value = getLessonKeys(uk)
+  persistPrefs()
 }
 function toggleLesson(key) {
   const idx = selectedLessons.value.indexOf(key)
-  if (idx >= 0) {
-    if (selectedLessons.value.length > 1) selectedLessons.value.splice(idx, 1)
-  } else {
-    selectedLessons.value.push(key)
-  }
+  if (idx >= 0) selectedLessons.value.splice(idx, 1)
+  else selectedLessons.value.push(key)
+  persistPrefs()
 }
 function toggleAllLessons() {
   const all = getLessonKeys(currentUnit.value)
-  selectedLessons.value = selectedLessons.value.length === all.length ? [all[0]] : [...all]
+  selectedLessons.value = isAllLessonsSelected.value ? [] : [...all]
+  persistPrefs()
 }
 
 const started = ref(false)
@@ -166,6 +184,7 @@ async function initOutline() {
 }
 
 function startRound() {
+  if (!canStart.value) return
   const source = (getQuestions('pinyin', selectedLessons.value) || [])
     .filter(d => d.radical && d.structure)
   questions.value = source
@@ -174,6 +193,18 @@ function startRound() {
   started.value = true
   resetState()
   nextTick(() => initOutline())
+}
+
+function onHeaderBack() {
+  if (started.value) {
+    uni.showModal({
+      title: '确认退出',
+      content: '退出本轮学习，回到选择页？',
+      success(res) { if (res.confirm) started.value = false },
+    })
+    return true
+  }
+  return false
 }
 
 function resetState() {
@@ -307,6 +338,12 @@ onShow(() => {
   margin-top: 24rpx;
 }
 .start-btn:active { transform: scale(0.97); }
+.start-btn.disabled {
+  background: #C8B9A8;
+  box-shadow: none;
+  pointer-events: none;
+  opacity: 0.7;
+}
 
 .empty-hint {
   display: flex;

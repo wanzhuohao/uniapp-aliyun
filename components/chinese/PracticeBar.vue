@@ -18,6 +18,7 @@ const props = defineProps({
   current: { type: Number, default: 0 },
   total: { type: Number, default: 10 },
 })
+const emit = defineEmits(['cancel'])
 
 function doBack() {
   const pages = getCurrentPages()
@@ -29,12 +30,12 @@ function doBack() {
 }
 
 function goBack() {
-  // 答题中（total > 0）弹确认，避免误触丢失进度
+  // 答题中（total > 0）：弹确认后回到 filter 视图（由父页面接管）
   if (props.total > 0) {
     uni.showModal({
       title: '确认退出',
-      content: '本轮练习还没做完，确定要退出吗？',
-      success(res) { if (res.confirm) doBack() },
+      content: '退出本轮练习，回到选择页？',
+      success(res) { if (res.confirm) emit('cancel') },
     })
   } else {
     doBack()

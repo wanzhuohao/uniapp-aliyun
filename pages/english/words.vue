@@ -18,9 +18,9 @@
       <text class="filter-title">选择主题</text>
       <view class="unit-tags">
         <view
-          :class="['unit-tag', selectedThemes.length === themeKeys.length && 'active']"
+          :class="['unit-tag', isAllThemesSelected && 'active']"
           @click="toggleAllThemes"
-        >全选</view>
+        >{{ isAllThemesSelected ? '全不选' : '全选' }}</view>
         <view v-for="k in themeKeys" :key="k"
           :class="['unit-tag', selectedThemes.includes(k) && 'active']"
           @click="toggleTheme(k)"
@@ -29,11 +29,11 @@
 
       <text class="filter-title" style="margin-top: 24rpx;">选择题型</text>
       <view class="filter-tags">
-        <view :class="['filter-tag', filterType === '' && 'active']" @click="filterType = ''">全部混合</view>
-        <view :class="['filter-tag', filterType === 'img2word' && 'active']" @click="filterType = 'img2word'">看图选词</view>
-        <view :class="['filter-tag', filterType === 'word2img' && 'active']" @click="filterType = 'word2img'">听词选图</view>
+        <view :class="['filter-tag', filterType === '' && 'active']" @click="setFilterType('')">全部混合</view>
+        <view :class="['filter-tag', filterType === 'img2word' && 'active']" @click="setFilterType('img2word')">看图选词</view>
+        <view :class="['filter-tag', filterType === 'word2img' && 'active']" @click="setFilterType('word2img')">听词选图</view>
       </view>
-      <view class="start-btn" @click="startRound">开始练习</view>
+      <view :class="['start-btn', !canStart && 'disabled']" @click="startRound">开始练习</view>
     </view>
 
     <view v-if="started && totalQuestions === 0" class="empty-hint">
@@ -63,12 +63,24 @@ import { recordPractice } from '../../utils/english/practiceLog.js'
 import { THEME_CONFIG, THEME_KEYS } from '../../utils/english/themeConfig.js'
 import { shuffle, sampleWithout } from '../../utils/english/questionHelper.js'
 import { primeSpeech } from '../../utils/common/speech.js'
+import { getEnglishPrefs, setEnglishPrefs } from '../../utils/english/stateStore.js'
 
+const PAGE_KEY = 'words'
 const themeConfig = THEME_CONFIG
 const themeKeys = THEME_KEYS
 
-const selectedThemes = ref([...THEME_KEYS])
-const filterType = ref('')
+const _prefs = getEnglishPrefs(PAGE_KEY)
+const initThemes = (() => {
+  if (Array.isArray(_prefs?.selectedThemes)) {
+    const filtered = _prefs.selectedThemes.filter(k => THEME_KEYS.includes(k))
+    if (filtered.length) return filtered
+  }
+  return [...THEME_KEYS]
+})()
+const selectedThemes = ref(initThemes)
+const filterType = ref(typeof _prefs?.filterType === 'string' ? _prefs.filterType : '')
+const isAllThemesSelected = computed(() => selectedThemes.value.length === themeKeys.length)
+const canStart = computed(() => selectedThemes.value.length > 0)
 const started = ref(false)
 const currentIndex = ref(0)
 const correctCount = ref(0)
@@ -80,16 +92,25 @@ const questions = ref([])
 const totalQuestions = computed(() => questions.value.length)
 const currentQ = computed(() => questions.value[currentIndex.value] || null)
 
+function persistPrefs() {
+  setEnglishPrefs(PAGE_KEY, {
+    selectedThemes: [...selectedThemes.value],
+    filterType: filterType.value,
+  })
+}
 function toggleTheme(k) {
   const idx = selectedThemes.value.indexOf(k)
-  if (idx >= 0) {
-    if (selectedThemes.value.length > 1) selectedThemes.value.splice(idx, 1)
-  } else {
-    selectedThemes.value.push(k)
-  }
+  if (idx >= 0) selectedThemes.value.splice(idx, 1)
+  else selectedThemes.value.push(k)
+  persistPrefs()
 }
 function toggleAllThemes() {
-  selectedThemes.value = selectedThemes.value.length === THEME_KEYS.length ? [THEME_KEYS[0]] : [...THEME_KEYS]
+  selectedThemes.value = isAllThemesSelected.value ? [] : [...THEME_KEYS]
+  persistPrefs()
+}
+function setFilterType(v) {
+  filterType.value = v
+  persistPrefs()
 }
 
 function buildQuestion(item, qType, allWords) {
@@ -104,12 +125,12 @@ function buildQuestion(item, qType, allWords) {
 }
 
 function startRound() {
+  if (!canStart.value) return
   primeSpeech()
   const words = getWordsByTheme(selectedThemes.value)
   const allWords = getAllWords()
-  const picked = sampleWithout(words, Math.min(10, words.length))
   const types = filterType.value ? [filterType.value] : ['img2word', 'word2img']
-  const built = picked.map((item, i) => {
+  const built = words.map((item, i) => {
     const t = types.length === 1 ? types[0] : types[i % types.length]
     return buildQuestion(item, t, allWords)
   })
@@ -152,8 +173,8 @@ function handleAnswer({ isCorrect }) {
 function goBack() {
   uni.showModal({
     title: '确认退出',
-    content: '本轮练习还没做完，确定要退出吗？',
-    success(res) { if (res.confirm) uni.navigateBack() },
+    content: '退出本轮练习，回到选择页？',
+    success(res) { if (res.confirm) started.value = false },
   })
 }
 
@@ -280,6 +301,12 @@ onShow(() => {
   box-shadow: 0 8rpx 24rpx rgba(38,166,154,0.3);
 }
 .start-btn:active { transform: scale(0.97); }
+.start-btn.disabled {
+  background: #B0BEC5;
+  box-shadow: none;
+  pointer-events: none;
+  opacity: 0.7;
+}
 
 .empty-hint {
   display: flex; flex-direction: column; align-items: center;

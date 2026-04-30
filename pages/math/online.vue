@@ -26,7 +26,7 @@
             <view
               :class="['setting-tag', isAllTypesSelected && 'active']"
               @click="toggleAllTypes"
-            >全选</view>
+            >{{ isAllTypesSelected ? '全不选' : '全选' }}</view>
             <view
               v-for="item in typeOptions"
               :key="item.value"
@@ -106,7 +106,7 @@
           <text class="desc">· 结果自动保存到历史记录</text>
         </view>
 
-        <view class="start-btn" @click="startQuiz">开始练习</view>
+        <view :class="['start-btn', !canStart && 'disabled']" @click="startQuiz">开始练习</view>
       </scroll-view>
     </view>
 
@@ -523,7 +523,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onUnmounted } from 'vue'
+import { ref, computed, watch, onUnmounted } from 'vue'
 import PageHeader from '../../components/PageHeader.vue'
 import { generateQuestions, LEVEL_CONFIG, checkAnswer } from '../../utils/math/questionEngine.js'
 import { saveRecord, recordWrong } from '../../utils/math/mathStorage.js'
@@ -554,15 +554,31 @@ const specialOptions = [
 ]
 const countPresets = [20, 50, 100]
 
+// ---- 持久化（math_online_prefs） ----
+const PREFS_KEY = 'math_online_prefs'
+function loadPrefs() {
+  try {
+    const v = uni.getStorageSync(PREFS_KEY)
+    if (v && typeof v === 'object') return v
+  } catch (e) {}
+  return null
+}
+function savePrefs(patch) {
+  const cur = loadPrefs() || {}
+  uni.setStorageSync(PREFS_KEY, { ...cur, ...patch })
+}
+const _prefs = loadPrefs() || {}
+
 // ---- 设置状态 ----
-const selectedLevel = ref(1)
-const selectedTypes  = ref(new Set(['add']))
-const selectedSpecial = ref('')
+const selectedLevel = ref(typeof _prefs.level === 'number' ? _prefs.level : 1)
+// selectedTypes 必须整体替换（new Set(...)）才能触发 watch，禁止 .add/.delete
+const selectedTypes  = ref(new Set(Array.isArray(_prefs.types) ? _prefs.types : ['add']))
+const selectedSpecial = ref(typeof _prefs.special === 'string' ? _prefs.special : '')
 
 function toggleType(val) {
   selectedSpecial.value = ''
   const s = selectedTypes.value
-  if (s.has(val)) { if (s.size > 1) s.delete(val) }
+  if (s.has(val)) s.delete(val)
   else s.add(val)
   selectedTypes.value = new Set(s)
 }
@@ -572,7 +588,7 @@ const isAllTypesSelected = computed(() => selectedTypes.value.size === typeOptio
 function toggleAllTypes() {
   selectedSpecial.value = ''
   if (isAllTypesSelected.value) {
-    selectedTypes.value = new Set([typeOptions[0].value])
+    selectedTypes.value = new Set()
   } else {
     selectedTypes.value = new Set(typeOptions.map(t => t.value))
   }
@@ -589,17 +605,19 @@ function selectSpecial(val) {
   }
 }
 
+const canStart = computed(() => selectedTypes.value.size > 0 || !!selectedSpecial.value)
+
 const selectedType = computed(() => {
   if (selectedSpecial.value) return selectedSpecial.value
   const arr = [...selectedTypes.value]
   return arr.length === typeOptions.length ? 'mix' : arr.length === 1 ? arr[0] : arr
 })
-const selectedCount = ref(100)
-const customCountActive = ref(false)
-const customCountVal    = ref('')
+const selectedCount = ref(typeof _prefs.count === 'number' ? _prefs.count : 100)
+const customCountActive = ref(_prefs.customCountActive === true)
+const customCountVal    = ref(typeof _prefs.customCountVal === 'string' ? _prefs.customCountVal : '')
 const customInputFocus  = ref(false)
-const timerEnabled      = ref(true)
-const timerMinutes      = ref(8)
+const timerEnabled      = ref(typeof _prefs.timerEnabled === 'boolean' ? _prefs.timerEnabled : true)
+const timerMinutes      = ref(typeof _prefs.timerMinutes === 'number' ? _prefs.timerMinutes : 8)
 const timerOptions      = [
   { value: 5, label: '5分钟' },
   { value: 8, label: '8分钟' },
@@ -607,6 +625,25 @@ const timerOptions      = [
   { value: 15, label: '15分钟' },
   { value: 20, label: '20分钟' },
 ]
+
+// 用户切换设置时持久化（输入框频繁触发，加 200ms 节流）
+let _persistTimer = null
+function flushPrefs() {
+  savePrefs({
+    level: selectedLevel.value,
+    types: [...selectedTypes.value],
+    special: selectedSpecial.value,
+    count: selectedCount.value,
+    customCountActive: customCountActive.value,
+    customCountVal: customCountVal.value,
+    timerEnabled: timerEnabled.value,
+    timerMinutes: timerMinutes.value,
+  })
+}
+watch([selectedLevel, selectedTypes, selectedSpecial, selectedCount, customCountActive, customCountVal, timerEnabled, timerMinutes], () => {
+  if (_persistTimer) clearTimeout(_persistTimer)
+  _persistTimer = setTimeout(flushPrefs, 200)
+}, { deep: true })
 
 // ---- 答题状态 ----
 const phase        = ref('setup')   // 'setup' | 'quiz' | 'result'
@@ -668,6 +705,7 @@ function onCustomCountInput(e) {
 
 // ---- 开始练习 ----
 function startQuiz() {
+  if (!canStart.value) return
   let count = selectedCount.value
   if (customCountActive.value) {
     const n = parseInt(customCountVal.value)
@@ -897,12 +935,6 @@ function goHome() {
   uni.reLaunch({ url: '/pages/math/index' })
 }
 
-// ---- 返回 ----
-function goBack() {
-  stopTimer()
-  uni.navigateBack()
-}
-
 function confirmBack() {
   uni.showModal({
     title: '退出练习',
@@ -973,6 +1005,10 @@ function fillAnswer(w) {
 
 onUnmounted(() => {
   stopTimer()
+  if (_persistTimer) {
+    clearTimeout(_persistTimer)
+    flushPrefs()
+  }
 })
 </script>
 
@@ -1159,6 +1195,12 @@ onUnmounted(() => {
   margin: 0 8rpx 40rpx;
 }
 .start-btn:active { transform: scale(0.97); }
+.start-btn.disabled {
+  background: #B0BEC5;
+  box-shadow: none;
+  pointer-events: none;
+  opacity: 0.7;
+}
 
 /* ===== QUIZ ===== */
 .quiz-area {

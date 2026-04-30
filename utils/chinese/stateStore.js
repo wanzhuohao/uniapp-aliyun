@@ -1,4 +1,4 @@
-// 语文全局状态：currentUnit，纯 localStorage
+// 语文全局状态：currentUnit + 各页面 prefs，纯 localStorage
 const STORAGE_KEY = 'chinese_state'
 const DEFAULT_UNIT = '2-4'
 
@@ -21,5 +21,19 @@ export function getCurrentUnit() {
 export function setCurrentUnit(unit) {
   const s = load()
   s.currentUnit = unit
+  save(s)
+}
+
+// 各页面（learn/pinyin/hanzi）的偏好：selectedLessons[]、filterType
+export function getChinesePrefs(pageKey) {
+  const s = load()
+  const prefs = s.prefs && s.prefs[pageKey]
+  return prefs && typeof prefs === 'object' ? prefs : null
+}
+
+export function setChinesePrefs(pageKey, patch) {
+  const s = load()
+  if (!s.prefs) s.prefs = {}
+  s.prefs[pageKey] = { ...(s.prefs[pageKey] || {}), ...patch }
   save(s)
 }

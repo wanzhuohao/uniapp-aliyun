@@ -1,6 +1,6 @@
 <template>
   <view class="pinyin-page">
-    <PracticeBar :current="currentIndex + 1" :total="totalQuestions" />
+    <PracticeBar :current="currentIndex + 1" :total="totalQuestions" @cancel="onCancel" />
 
     <view v-if="!started" class="filter-area">
       <text class="filter-title">选择单元</text>
@@ -14,9 +14,9 @@
       <text class="filter-title" style="margin-top: 24rpx;">选择课程</text>
       <view class="unit-tags">
         <view
-          :class="['unit-tag', selectedLessons.length === currentLessons.length && 'active']"
+          :class="['unit-tag', isAllLessonsSelected && 'active']"
           @click="toggleAllLessons"
-        >全选</view>
+        >{{ isAllLessonsSelected ? '全不选' : '全选' }}</view>
         <view v-for="l in currentLessons" :key="l.key"
           :class="['unit-tag', selectedLessons.includes(l.key) && 'active']"
           @click="toggleLesson(l.key)"
@@ -25,16 +25,16 @@
 
       <text class="filter-title" style="margin-top: 24rpx;">选择题型</text>
       <view class="filter-tags">
-        <view :class="['filter-tag', filterType === '' && 'active']" @click="filterType = ''">全部混合</view>
-        <view :class="['filter-tag', filterType === 'char2pinyin' && 'active']" @click="filterType = 'char2pinyin'">看汉字选拼音</view>
-        <view :class="['filter-tag', filterType === 'pinyin2char' && 'active']" @click="filterType = 'pinyin2char'">看拼音选汉字</view>
+        <view :class="['filter-tag', filterType === '' && 'active']" @click="setFilterType('')">全部混合</view>
+        <view :class="['filter-tag', filterType === 'char2pinyin' && 'active']" @click="setFilterType('char2pinyin')">看汉字选拼音</view>
+        <view :class="['filter-tag', filterType === 'pinyin2char' && 'active']" @click="setFilterType('pinyin2char')">看拼音选汉字</view>
       </view>
-      <view class="start-btn" @click="startRound">开始练习</view>
+      <view :class="['start-btn', !canStart && 'disabled']" @click="startRound">开始练习</view>
     </view>
 
     <view v-if="started && totalQuestions === 0" class="empty-hint">
       <text>本单元暂无拼音题目</text>
-      <view class="back-btn" @click="goBack">返回</view>
+      <view class="back-btn" @click="onCancel">返回</view>
     </view>
 
     <QuestionCard
@@ -53,50 +53,78 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
-import { sampleWithout, shuffle } from '../../utils/chinese/questionHelper.js'
+import { shuffle } from '../../utils/chinese/questionHelper.js'
 import PracticeBar from '../../components/chinese/PracticeBar.vue'
 import QuestionCard from '../../components/chinese/QuestionCard.vue'
 import { getQuestions } from '../../utils/chinese/questionLoader.js'
 import { recordWrong } from '../../utils/chinese/mistakes.js'
 import { recordPractice } from '../../utils/chinese/practiceLog.js'
-import { getCurrentUnit, setCurrentUnit } from '../../utils/chinese/stateStore.js'
+import { getCurrentUnit, setCurrentUnit, getChinesePrefs, setChinesePrefs } from '../../utils/chinese/stateStore.js'
 import { UNIT_CONFIG, UNIT_KEYS, getLessonKeys } from '../../utils/chinese/unitConfig.js'
 
+const PAGE_KEY = 'pinyin'
 const unitConfig = UNIT_CONFIG
 const unitKeys = UNIT_KEYS
 
 const currentUnit = ref(getCurrentUnit())
-const selectedLessons = ref(getLessonKeys(currentUnit.value))
+const savedPrefs = getChinesePrefs(PAGE_KEY)
+const initLessons = (() => {
+  const all = getLessonKeys(currentUnit.value)
+  if (Array.isArray(savedPrefs?.selectedLessons)) {
+    const filtered = savedPrefs.selectedLessons.filter(k => all.includes(k))
+    if (filtered.length) return filtered
+  }
+  return all
+})()
+const selectedLessons = ref(initLessons)
 const currentLessons = computed(() => UNIT_CONFIG[currentUnit.value]?.lessons || [])
+const isAllLessonsSelected = computed(() =>
+  currentLessons.value.length > 0 &&
+  selectedLessons.value.length === currentLessons.value.length
+)
 
-const filterType = ref('')
+const filterType = ref(typeof savedPrefs?.filterType === 'string' ? savedPrefs.filterType : '')
+const canStart = computed(() => selectedLessons.value.length > 0)
 const started = ref(false)
 const currentIndex = ref(0)
 const correctCount = ref(0)
 const roundKey = ref(0)
 const roundFinished = ref(false)
 
+function persistPrefs() {
+  setChinesePrefs(PAGE_KEY, {
+    selectedLessons: [...selectedLessons.value],
+    filterType: filterType.value,
+  })
+}
 function switchUnit(uk) {
   currentUnit.value = uk
   setCurrentUnit(uk)
   selectedLessons.value = getLessonKeys(uk)
+  persistPrefs()
 }
 function toggleLesson(key) {
   const idx = selectedLessons.value.indexOf(key)
-  if (idx >= 0) {
-    if (selectedLessons.value.length > 1) selectedLessons.value.splice(idx, 1)
-  } else {
-    selectedLessons.value.push(key)
-  }
+  if (idx >= 0) selectedLessons.value.splice(idx, 1)
+  else selectedLessons.value.push(key)
+  persistPrefs()
 }
 function toggleAllLessons() {
   const all = getLessonKeys(currentUnit.value)
-  selectedLessons.value = selectedLessons.value.length === all.length ? [all[0]] : [...all]
+  selectedLessons.value = isAllLessonsSelected.value ? [] : [...all]
+  persistPrefs()
+}
+function setFilterType(v) {
+  filterType.value = v
+  persistPrefs()
+}
+function onCancel() {
+  started.value = false
 }
 
 function buildRound(source) {
-  // 单课：按顺序全量出题；多课：随机抽 10
-  const sampled = selectedLessons.value.length > 1 ? sampleWithout(source, 10) : source
+  // 全量出题，不抽样不打乱
+  const sampled = source
   return sampled.map((item, i) => {
     let isTypeA
     if (filterType.value === 'char2pinyin') isTypeA = true
@@ -124,16 +152,13 @@ const totalQuestions = computed(() => questions.value.length)
 const currentQuestion = computed(() => questions.value[currentIndex.value] || null)
 
 function startRound() {
+  if (!canStart.value) return
   const source = getQuestions('pinyin', selectedLessons.value) || []
   const built = buildRound(source)
-  questions.value = selectedLessons.value.length > 1 ? shuffle(built) : built
+  questions.value = built
   currentIndex.value = 0
   correctCount.value = 0
   started.value = true
-}
-
-function goBack() {
-  uni.navigateBack()
 }
 
 function handleAnswer({ correct }) {
@@ -235,6 +260,12 @@ onShow(() => {
   box-shadow: 0 8rpx 24rpx rgba(166,45,51,0.3);
 }
 .start-btn:active { transform: scale(0.97); }
+.start-btn.disabled {
+  background: #C8B9A8;
+  box-shadow: none;
+  pointer-events: none;
+  opacity: 0.7;
+}
 
 .empty-hint {
   display: flex; flex-direction: column; align-items: center;
