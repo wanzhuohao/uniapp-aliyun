@@ -14,7 +14,7 @@
       <text class="filter-title" style="margin-top: 24rpx;">选择课程</text>
       <view class="unit-tags">
         <view
-          :class="['unit-tag', isAllLessonsSelected && 'active']"
+          :class="['unit-tag', 'unit-tag-toggle', isAllLessonsSelected && 'active']"
           @click="toggleAllLessons"
         >{{ isAllLessonsSelected ? '全不选' : '全选' }}</view>
         <view v-for="l in currentLessons" :key="l.key"
@@ -265,6 +265,11 @@ onShow(() => {
   color: #fff;
   border-color: #A62D33;
   font-weight: bold;
+}
+.unit-tag-toggle {
+  min-width: 134rpx;
+  text-align: center;
+  box-sizing: border-box;
 }
 .filter-title {
   font-size: 36rpx;

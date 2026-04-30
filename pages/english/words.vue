@@ -18,7 +18,7 @@
       <text class="filter-title">选择主题</text>
       <view class="unit-tags">
         <view
-          :class="['unit-tag', isAllThemesSelected && 'active']"
+          :class="['unit-tag', 'unit-tag-toggle', isAllThemesSelected && 'active']"
           @click="toggleAllThemes"
         >{{ isAllThemesSelected ? '全不选' : '全选' }}</view>
         <view v-for="k in themeKeys" :key="k"
@@ -268,6 +268,11 @@ onShow(() => {
   border-color: #1E8E82;
   font-weight: bold;
   box-shadow: 0 4rpx 10rpx rgba(38,166,154,0.25);
+}
+.unit-tag-toggle {
+  min-width: 134rpx;
+  text-align: center;
+  box-sizing: border-box;
 }
 .filter-tags {
   display: flex;

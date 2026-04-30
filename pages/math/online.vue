@@ -24,7 +24,7 @@
           <text class="setting-label">题型</text>
           <view class="setting-tags">
             <view
-              :class="['setting-tag', isAllTypesSelected && 'active']"
+              :class="['setting-tag', 'setting-tag-toggle', isAllTypesSelected && 'active']"
               @click="toggleAllTypes"
             >{{ isAllTypesSelected ? '全不选' : '全选' }}</view>
             <view
@@ -1103,6 +1103,11 @@ onUnmounted(() => {
   border-color: transparent;
   font-weight: bold;
   box-shadow: 0 4rpx 12rpx rgba(66,165,245,0.25);
+}
+.setting-tag-toggle {
+  min-width: 134rpx;
+  text-align: center;
+  box-sizing: border-box;
 }
 
 .setting-sublabel {
