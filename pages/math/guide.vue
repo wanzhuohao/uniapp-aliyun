@@ -42,6 +42,14 @@
         </view>
       </view>
 
+      <!-- 数据说明 -->
+      <view class="section">
+        <text class="section-title">数据说明</text>
+        <view class="item">
+          <text class="item-desc">所有数据（历史记录、错题本）都保存在本地浏览器 localStorage，清除浏览器数据会丢失。单设备单用户。</text>
+        </view>
+      </view>
+
       <!-- 更新日志 -->
       <view class="section">
         <text class="section-title">更新日志</text>

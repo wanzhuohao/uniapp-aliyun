@@ -50,7 +50,7 @@
 
     <!-- 说明链接 -->
     <view class="footer-link" @click="goTo('/pages/english/guide')">
-      <text class="fl-text">Guide · 使用说明</text>
+      <text class="fl-text">使用说明</text>
     </view>
   </view>
 </template>

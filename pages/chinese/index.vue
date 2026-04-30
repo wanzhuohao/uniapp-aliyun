@@ -47,7 +47,7 @@
 
     <!-- 说明：轻量链接 -->
     <view class="footer-link" @click="goTo('/pages/chinese/guide')">
-      <text class="fl-text">使用说明 · 更新日志</text>
+      <text class="fl-text">使用说明</text>
     </view>
   </view>
 </template>

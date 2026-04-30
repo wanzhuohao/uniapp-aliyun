@@ -57,7 +57,7 @@
 
     <!-- 使用说明 -->
     <view class="footer-link" @click="goTo('/pages/math/guide')">
-      <text class="fl-text">∙ Guide · 使用说明 ∙</text>
+      <text class="fl-text">使用说明</text>
     </view>
   </view>
 </template>

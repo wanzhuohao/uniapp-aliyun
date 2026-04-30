@@ -8,8 +8,8 @@
       <text class="intro-sub">分 7 组，按顺序学最有效</text>
     </view>
 
-    <!-- 组别 Tab -->
-    <scroll-view class="group-tabs" scroll-x>
+    <!-- 组别 Tab（2 行 × 4 列栅格，7 组占 7 格） -->
+    <view class="group-tabs">
       <view
         v-for="g in phonics"
         :key="g.group"
@@ -19,7 +19,7 @@
         <text class="tab-num">{{ g.group }}</text>
         <text class="tab-name">{{ g.groupName }}</text>
       </view>
-    </scroll-view>
+    </view>
 
     <view v-if="currentGroup" class="group-hint">{{ currentGroup.groupHint }}</view>
 
@@ -38,12 +38,6 @@
 
     <!-- 详情卡 -->
     <view v-if="currentSound" class="detail">
-      <view class="detail-big" @click="playSound(currentSound)">
-        <text class="big-letters">{{ currentSound.letters }}</text>
-        <text class="big-ipa">{{ currentSound.ipa }}</text>
-        <text class="big-hint">🔊 点这里读音</text>
-      </view>
-
       <view class="tip">
         <text class="tip-label">口诀</text>
         <text class="tip-text">{{ currentSound.tip }}</text>
@@ -62,10 +56,6 @@
             <text class="chip-word">{{ word }}</text>
           </view>
         </view>
-      </view>
-
-      <view class="actions">
-        <view class="act-btn primary" @click="playAll">🔊 全部例词</view>
       </view>
 
       <view class="nav-actions">
@@ -89,8 +79,16 @@ const activeIdx = ref(0)
 const currentGroup = computed(() => phonics.value.find(g => g.group === activeGroup.value) || null)
 const currentSound = computed(() => currentGroup.value ? currentGroup.value.sounds[activeIdx.value] : null)
 
+// 播放 generation token，切换发音时递增以中断上一条 playAll 循环
+let playGen = 0
+
+function cancelPlay() {
+  playGen++
+}
+
 function selectGroup(g) {
   primeSpeech()
+  cancelPlay()
   activeGroup.value = g
   activeIdx.value = 0
 }
@@ -98,61 +96,34 @@ function selectGroup(g) {
 function selectSound(i) {
   primeSpeech()
   activeIdx.value = i
-  if (currentSound.value) playSound(currentSound.value)
-}
-
-// 本地 IPA 音素 mp3（Wikimedia Commons CC 录音），按 audioFiles 数组顺序播
-// 双元音/复合音如 /eɪ/ 是 e_close.mp3 + i_short.mp3 拼播
-let phonemeAudio = null
-function playPhonemeFile(file) {
-  return new Promise(resolve => {
-    try {
-      if (phonemeAudio) {
-        phonemeAudio.onended = null
-        phonemeAudio.onerror = null
-        try { phonemeAudio.pause() } catch (e) {}
-      }
-      phonemeAudio = new Audio(`/static/audio/phonics/${file}`)
-      const cur = phonemeAudio
-      const done = () => { if (cur === phonemeAudio) resolve() }
-      phonemeAudio.onended = done
-      phonemeAudio.onerror = done
-      const t = setTimeout(done, 3000)
-      phonemeAudio.onended = () => { clearTimeout(t); done() }
-      const p = phonemeAudio.play()
-      if (p && typeof p.catch === 'function') p.catch(() => done())
-    } catch (e) { resolve() }
-  })
-}
-
-async function playSound(s) {
-  if (!s || !s.audioFiles || !s.audioFiles.length) return
-  for (const f of s.audioFiles) {
-    await playPhonemeFile(f)
-  }
+  playAll()
 }
 
 function playWord(word) {
+  cancelPlay()
   speakEn(word)
 }
 
 async function playAll() {
   if (!currentSound.value) return
+  const gen = ++playGen
   for (const w of currentSound.value.examples) {
+    if (gen !== playGen) return
     await speakEn(w)
+    if (gen !== playGen) return
   }
 }
 
 function prev() {
   if (activeIdx.value > 0) {
     activeIdx.value--
-    if (currentSound.value) playSound(currentSound.value)
+    playAll()
   }
 }
 function next() {
   if (currentGroup.value && activeIdx.value < currentGroup.value.sounds.length - 1) {
     activeIdx.value++
-    if (currentSound.value) playSound(currentSound.value)
+    playAll()
   }
 }
 </script>
@@ -182,21 +153,22 @@ function next() {
   color: #6B8787;
 }
 
-/* 组别 tabs */
+/* 组别 tabs：2 行 × 4 列栅格 */
 .group-tabs {
-  white-space: nowrap;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14rpx;
   padding: 16rpx 32rpx 8rpx;
 }
 .tab {
-  display: inline-flex;
+  display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 14rpx 24rpx;
-  margin-right: 14rpx;
+  justify-content: center;
+  padding: 12rpx 8rpx;
   background: #fff;
   border-radius: 20rpx;
   box-shadow: 0 4rpx 12rpx rgba(31,58,58,0.06);
-  min-width: 110rpx;
   transition: all 0.2s;
 }
 .tab-num {
@@ -246,9 +218,12 @@ function next() {
 }
 .sound-cell:active { transform: scale(0.96); }
 .sound-cell-active {
-  border-color: #26A69A;
-  background: #E0F2F1;
+  border-color: #FF8A65;
+  background: linear-gradient(135deg, #FFF4E6, #FFE0B2);
+  box-shadow: 0 6rpx 18rpx rgba(255,138,101,0.3);
 }
+.sound-cell-active .sound-letters { color: #FF8A65; }
+.sound-cell-active .sound-ipa { color: #7A5B00; }
 .sound-letters {
   font-size: 38rpx;
   font-weight: 900;
@@ -272,35 +247,6 @@ function next() {
   display: flex;
   flex-direction: column;
   gap: 28rpx;
-}
-
-.detail-big {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8rpx;
-  padding: 20rpx 0;
-  background: linear-gradient(135deg, #FFF4E6, #FFE0B2);
-  border-radius: 20rpx;
-}
-.big-letters {
-  font-size: 100rpx;
-  font-weight: 900;
-  color: #FF8A65;
-  font-family: 'Quicksand', 'Comic Sans MS', sans-serif;
-  letter-spacing: 4rpx;
-  line-height: 1.1;
-}
-.big-ipa {
-  font-size: 36rpx;
-  color: #7A5B00;
-  font-family: 'Quicksand', sans-serif;
-}
-.big-hint {
-  font-size: 22rpx;
-  color: #B07A00;
-  margin-top: 4rpx;
-  letter-spacing: 1rpx;
 }
 
 .tip {
@@ -354,24 +300,6 @@ function next() {
   font-weight: bold;
   font-family: 'Quicksand', 'Comic Sans MS', sans-serif;
 }
-
-.actions {
-  display: flex;
-  justify-content: center;
-}
-.act-btn {
-  padding: 18rpx 48rpx;
-  border-radius: 40rpx;
-  font-size: 28rpx;
-  font-weight: bold;
-  letter-spacing: 1rpx;
-}
-.act-btn.primary {
-  background: linear-gradient(135deg, #26A69A, #1E8E82);
-  color: #fff;
-  box-shadow: 0 6rpx 16rpx rgba(38,166,154,0.3);
-}
-.act-btn:active { transform: scale(0.96); }
 
 .nav-actions {
   display: flex;

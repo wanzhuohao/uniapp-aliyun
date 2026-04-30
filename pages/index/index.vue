@@ -7,6 +7,19 @@
       <text class="hero-sub">每天一点点，慢慢就会了</text>
     </view>
 
+    <!-- 语文卡 -->
+    <view class="card card-chinese" @click="goTo('/pages/chinese/index')">
+      <view class="card-deco chinese-deco">
+        <text class="deco-stamp">語</text>
+      </view>
+      <view class="card-main">
+        <text class="card-tag">CHINESE</text>
+        <text class="card-title">语文</text>
+        <text class="card-desc">生字 · 拼音 · 汉字 · 错题本</text>
+      </view>
+      <text class="card-arrow">›</text>
+    </view>
+
     <!-- 数学卡 -->
     <view class="card card-math" @click="goTo('/pages/math/index')">
       <view class="card-deco math-deco">
@@ -20,19 +33,6 @@
         <text class="card-tag">MATH</text>
         <text class="card-title">数学</text>
         <text class="card-desc">在线练习 · 打印出题 · 错题本</text>
-      </view>
-      <text class="card-arrow">›</text>
-    </view>
-
-    <!-- 语文卡 -->
-    <view class="card card-chinese" @click="goTo('/pages/chinese/index')">
-      <view class="card-deco chinese-deco">
-        <text class="deco-stamp">語</text>
-      </view>
-      <view class="card-main">
-        <text class="card-tag">CHINESE</text>
-        <text class="card-title">语文</text>
-        <text class="card-desc">生字 · 拼音 · 汉字 · 错题本</text>
       </view>
       <text class="card-arrow">›</text>
     </view>

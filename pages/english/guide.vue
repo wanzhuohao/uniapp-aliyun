@@ -22,6 +22,11 @@
         </view>
 
         <view class="item">
+          <text class="item-title">自然拼读</text>
+          <text class="item-desc">Jolly Phonics 体系 42 音，分 7 组教学。每个音展示字母组合、音标、口诀和例词，点音卡自动朗读该组例词。</text>
+        </view>
+
+        <view class="item">
           <text class="item-title">错题本</text>
           <text class="item-desc">基于 Leitner 5 级间隔算法，答错降级，答对升级，升到 5 级视为掌握。</text>
           <view class="item-detail">
@@ -33,15 +38,31 @@
         <view class="item">
           <text class="item-title">提示</text>
           <view class="item-detail">
-            <text class="detail-line">发音使用浏览器内置 TTS，不同浏览器音色不同，Chrome 效果较好</text>
+            <text class="detail-line">英文发音走有道词典 mp3（美式女声），无需翻墙</text>
             <text class="detail-line">首次点击朗读按钮后才能正常播放（iOS 限制）</text>
           </view>
+        </view>
+      </view>
+
+      <!-- 数据说明 -->
+      <view class="section">
+        <text class="section-title">数据说明</text>
+        <view class="item">
+          <text class="item-desc">所有数据（错题本、练习日志）都保存在本地浏览器 localStorage，清除浏览器数据会丢失。单设备单用户。</text>
         </view>
       </view>
 
       <!-- 更新日志 -->
       <view class="section">
         <text class="section-title">更新日志</text>
+
+        <view class="log-item">
+          <text class="log-version">v1.1</text>
+          <text class="log-date">2026-04-23</text>
+          <view class="log-changes">
+            <text class="log-line">新增自然拼读模块 · Jolly Phonics 42 音</text>
+          </view>
+        </view>
 
         <view class="log-item">
           <text class="log-version">v1.0</text>
@@ -84,7 +105,7 @@ import PageHeader from '../../components/PageHeader.vue'
   font-size: 36rpx;
   font-weight: bold;
   color: #222;
-  border-left: 8rpx solid #42A5F5;
+  border-left: 8rpx solid #26A69A;
   padding-left: 20rpx;
 }
 .item {
@@ -132,7 +153,7 @@ import PageHeader from '../../components/PageHeader.vue'
 .log-version {
   font-size: 30rpx;
   font-weight: bold;
-  color: #42A5F5;
+  color: #26A69A;
 }
 .log-date {
   font-size: 24rpx;
@@ -150,6 +171,6 @@ import PageHeader from '../../components/PageHeader.vue'
 }
 .log-line::before {
   content: '· ';
-  color: #42A5F5;
+  color: #26A69A;
 }
 </style>
