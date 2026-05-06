@@ -48,7 +48,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { speakEn } from '../../utils/common/speech.js'
 
 const props = defineProps({
@@ -63,6 +63,7 @@ const choiceState = ref('')
 const selectedIdx = ref(-1)
 const answered = computed(() => !!choiceState.value)
 let pendingTimer = null
+let bootTimer = null
 
 const qTypeLabel = computed(() => props.qType === 'img2word' ? '看图选词' : '听词选图')
 
@@ -103,18 +104,23 @@ function speakOption() {
   if (opt) { try { speakEn(opt.label) } catch (e) {} }
 }
 
+function scheduleAutoPlay() {
+  if (bootTimer) clearTimeout(bootTimer)
+  bootTimer = setTimeout(() => { bootTimer = null; playWord() }, 300)
+}
+
 onMounted(() => {
-  // 听词选图：挂载后自动播一次
-  if (props.qType === 'word2img') {
-    setTimeout(() => playWord(), 300)
-  }
+  if (props.qType === 'word2img') scheduleAutoPlay()
 })
 
 watch(() => props.question?.word, (nw) => {
   resetState()
-  if (props.qType === 'word2img' && nw) {
-    setTimeout(() => playWord(), 300)
-  }
+  if (props.qType === 'word2img' && nw) scheduleAutoPlay()
+})
+
+onUnmounted(() => {
+  if (bootTimer) clearTimeout(bootTimer)
+  if (pendingTimer) clearTimeout(pendingTimer)
 })
 </script>
 

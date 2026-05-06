@@ -643,7 +643,7 @@ function flushPrefs() {
 watch([selectedLevel, selectedTypes, selectedSpecial, selectedCount, customCountActive, customCountVal, timerEnabled, timerMinutes], () => {
   if (_persistTimer) clearTimeout(_persistTimer)
   _persistTimer = setTimeout(flushPrefs, 200)
-}, { deep: true })
+})
 
 // ---- 答题状态 ----
 const phase        = ref('setup')   // 'setup' | 'quiz' | 'result'

@@ -1,5 +1,4 @@
 // 中文用浏览器原生 TTS；英文只用有道词典公开 TTS mp3（type=2 美式女声）
-let speaking = false
 let cachedVoices = []
 let primed = false
 let enAudio = null
@@ -46,9 +45,6 @@ function speakWith(text, { lang, rate, pitch, voiceLangPrefix }) {
   if (!cachedVoices.length) loadVoices()
   const v = cachedVoices.find(x => (x.lang || '').toLowerCase().startsWith(voiceLangPrefix))
   if (v) utterance.voice = v
-  speaking = true
-  utterance.onend = () => { speaking = false }
-  utterance.onerror = () => { speaking = false }
   window.speechSynthesis.speak(utterance)
 }
 
@@ -71,7 +67,6 @@ export function speakEn(text) {
       if (settled) return
       settled = true
       if (timer) { clearTimeout(timer); timer = null }
-      speaking = false
       resolve()
     }
     try {
@@ -84,7 +79,6 @@ export function speakEn(text) {
       const url = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(word)}&type=2`
       enAudio = new Audio(url)
       const currentAudio = enAudio
-      speaking = true
       const done = () => {
         if (currentAudio !== enAudio) return
         finish()
@@ -101,8 +95,4 @@ export function speakEn(text) {
       finish()
     }
   })
-}
-
-export function isSpeaking() {
-  return speaking
 }

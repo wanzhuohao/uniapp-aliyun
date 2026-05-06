@@ -32,31 +32,3 @@ export function recordPractice({ type, totalCount, correctCount }) {
   })
   saveAll(all)
 }
-
-export function getRecentLogs(days = 7) {
-  const all = loadAll()
-  const now = new Date()
-  const startTs = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime() - (days - 1) * 24 * 60 * 60 * 1000
-
-  const dailyMap = {}
-  for (const log of all) {
-    const d = new Date(log.date + 'T00:00:00')
-    if (d.getTime() < startTs) continue
-    if (!dailyMap[log.date]) dailyMap[log.date] = { total: 0, correct: 0 }
-    dailyMap[log.date].total += log.totalCount
-    dailyMap[log.date].correct += log.correctCount
-  }
-
-  const result = []
-  for (let i = 0; i < days; i++) {
-    const d = new Date(now.getTime() - (days - 1 - i) * 24 * 60 * 60 * 1000)
-    const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
-    const day = dailyMap[dateStr]
-    result.push({
-      date: dateStr,
-      label: `${d.getMonth() + 1}/${d.getDate()}`,
-      accuracy: day ? Math.round(day.correct / day.total * 100) : null,
-    })
-  }
-  return result
-}

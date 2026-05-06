@@ -16,7 +16,7 @@
 ```
 components/PageHeader.vue   — 公共头部组件（支持 fallback prop 兜底跳转）
 components/chinese/         — 语文模块专用组件
-  PracticeBar / QuestionCard / HanziQuestion / StrokeAnim / TrendChart
+  PracticeBar / QuestionCard / HanziQuestion / TrendChart
 
 pages/index/index.vue       — 总首页（卡片入口：数学 + 语文）
 

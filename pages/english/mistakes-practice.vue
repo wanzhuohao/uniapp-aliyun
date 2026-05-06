@@ -126,7 +126,9 @@ function buildQuiz(records) {
       { label: source.word, emoji: source.emoji, isCorrect: true },
       ...distractors.map(d => ({ label: d.word, emoji: d.emoji, isCorrect: false }))
     ])
-    const qType = r.qType === 'word2img' ? 'word2img' : (Math.random() > 0.5 ? 'img2word' : 'word2img')
+    const qType = r.qType === 'word2img' || r.qType === 'img2word'
+      ? r.qType
+      : (Math.random() > 0.5 ? 'img2word' : 'word2img')
     out.push({ qType, source, options, _wrong: r })
   }
   return out
