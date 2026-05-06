@@ -1,6 +1,7 @@
 <template>
   <view class="pinyin-page">
-    <PracticeBar :current="currentIndex + 1" :total="totalQuestions" @cancel="onCancel" />
+    <PageHeader v-if="!started" title="拼音练习" theme="chinese" />
+    <PracticeBar v-if="started" :current="currentIndex + 1" :total="totalQuestions" @cancel="onCancel" />
 
     <view v-if="!started" class="filter-area">
       <text class="filter-title">选择单元</text>
@@ -54,6 +55,7 @@
 import { ref, computed } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import { shuffle } from '../../utils/chinese/questionHelper.js'
+import PageHeader from '../../components/PageHeader.vue'
 import PracticeBar from '../../components/chinese/PracticeBar.vue'
 import QuestionCard from '../../components/chinese/QuestionCard.vue'
 import { getQuestions } from '../../utils/chinese/questionLoader.js'

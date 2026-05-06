@@ -1,6 +1,7 @@
 <template>
   <view class="hanzi-page">
-    <PracticeBar :current="currentIndex + 1" :total="totalQuestions" @cancel="onCancel" />
+    <PageHeader v-if="!started" title="汉字练习" theme="chinese" />
+    <PracticeBar v-if="started" :current="currentIndex + 1" :total="totalQuestions" @cancel="onCancel" />
 
     <view v-if="!started" class="filter-area">
       <text class="filter-title">选择单元</text>
@@ -56,6 +57,7 @@ import { recordWrong } from '../../utils/chinese/mistakes.js'
 import { recordPractice } from '../../utils/chinese/practiceLog.js'
 import { getCurrentUnit, setCurrentUnit, getChinesePrefs, setChinesePrefs } from '../../utils/chinese/stateStore.js'
 import { UNIT_CONFIG, UNIT_KEYS, getLessonKeys } from '../../utils/chinese/unitConfig.js'
+import PageHeader from '../../components/PageHeader.vue'
 import PracticeBar from '../../components/chinese/PracticeBar.vue'
 import HanziQuestion from '../../components/chinese/HanziQuestion.vue'
 
