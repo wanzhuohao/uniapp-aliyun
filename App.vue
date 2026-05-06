@@ -12,6 +12,12 @@ html, body, #app, uni-app, uni-page, uni-page-body, uni-page-head {
 uni-page-head {
   display: none !important;
 }
+html, body {
+  overflow-x: hidden;
+}
+uni-scroll-view, scroll-view {
+  box-sizing: border-box;
+}
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
 }
