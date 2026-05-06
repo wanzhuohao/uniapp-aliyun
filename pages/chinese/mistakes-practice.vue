@@ -4,6 +4,7 @@
       v-if="mode && !finishedMode"
       :current="currentIndex + 1"
       :total="totalCount"
+      @cancel="exitMode"
     />
     <view v-else class="top-bar">
       <view class="back-btn" @click="goBack">←</view>

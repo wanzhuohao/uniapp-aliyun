@@ -20,17 +20,7 @@ const props = defineProps({
 })
 const emit = defineEmits(['cancel'])
 
-function doBack() {
-  const pages = getCurrentPages()
-  if (pages.length > 1) {
-    uni.navigateBack()
-  } else {
-    uni.reLaunch({ url: '/pages/chinese/index' })
-  }
-}
-
 function goBack() {
-  // 答题中（total > 0）：弹确认后回到 filter 视图（由父页面接管）
   if (props.total > 0) {
     uni.showModal({
       title: '确认退出',
@@ -38,7 +28,7 @@ function goBack() {
       success(res) { if (res.confirm) emit('cancel') },
     })
   } else {
-    doBack()
+    emit('cancel')
   }
 }
 </script>
