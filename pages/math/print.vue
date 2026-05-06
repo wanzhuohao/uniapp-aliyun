@@ -39,7 +39,7 @@
       <!-- Action bar (no-print) -->
       <view class="action-bar no-print">
         <button class="action-btn btn-print" @click="handlePrint">打印试卷</button>
-        <button class="action-btn btn-export" @click="exportAnswerImage">导出答案图片</button>
+        <button class="action-btn btn-export" @click="exportAnswerImage">导出答案</button>
         <button class="action-btn btn-regen" @click="regenerate">重新生成</button>
         <button class="action-btn btn-back" @click="goBack">返回</button>
       </view>
