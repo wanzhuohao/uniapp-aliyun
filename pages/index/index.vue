@@ -15,7 +15,7 @@
       <view class="card-main">
         <text class="card-tag">CHINESE</text>
         <text class="card-title">语文</text>
-        <text class="card-desc">生字 · 拼音 · 汉字 · 错题本</text>
+        <text class="card-desc">生字 · 拼音 · 汉字</text>
       </view>
       <text class="card-arrow">›</text>
     </view>
@@ -32,7 +32,7 @@
       <view class="card-main">
         <text class="card-tag">MATH</text>
         <text class="card-title">数学</text>
-        <text class="card-desc">在线练习 · 打印出题 · 错题本</text>
+        <text class="card-desc">在线练习 · 打印出题</text>
       </view>
       <text class="card-arrow">›</text>
     </view>
