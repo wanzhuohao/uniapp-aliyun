@@ -127,14 +127,14 @@ function buildQuestion(item, qType, allWords) {
 function startRound() {
   if (!canStart.value) return
   primeSpeech()
-  const words = getWordsByTheme(selectedThemes.value)
+  const words = sampleWithout(getWordsByTheme(selectedThemes.value), 10)
   const allWords = getAllWords()
   const types = filterType.value ? [filterType.value] : ['img2word', 'word2img']
   const built = words.map((item, i) => {
     const t = types.length === 1 ? types[0] : types[i % types.length]
     return buildQuestion(item, t, allWords)
   })
-  questions.value = shuffle(built)
+  questions.value = built
   currentIndex.value = 0
   correctCount.value = 0
   recordedWrongIds.clear()
