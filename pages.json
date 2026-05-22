@@ -23,7 +23,10 @@
     { "path": "pages/english/result", "style": { "navigationStyle": "custom", "navigationBarTitleText": "练习结果" } },
     { "path": "pages/english/mistakes", "style": { "navigationStyle": "custom", "navigationBarTitleText": "错题本" } },
     { "path": "pages/english/mistakes-practice", "style": { "navigationStyle": "custom", "navigationBarTitleText": "错题重练" } },
-    { "path": "pages/english/guide", "style": { "navigationStyle": "custom", "navigationBarTitleText": "使用说明" } }
+    { "path": "pages/english/guide", "style": { "navigationStyle": "custom", "navigationBarTitleText": "使用说明" } },
+    { "path": "pages/games/index", "style": { "navigationStyle": "custom", "navigationBarTitleText": "小游戏" } },
+    { "path": "pages/games/idiom-chain", "style": { "navigationStyle": "custom", "navigationBarTitleText": "成语接龙" } },
+    { "path": "pages/games/idiom-chain-guide", "style": { "navigationStyle": "custom", "navigationBarTitleText": "成语接龙 · 规则" } }
   ],
   "globalStyle": {
     "navigationBarTextStyle": "black",

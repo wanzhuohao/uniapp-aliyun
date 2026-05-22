@@ -19,7 +19,7 @@ const props = defineProps({
   theme: {
     type: String,
     default: 'default',
-    validator: v => ['default', 'chinese', 'math', 'english'].includes(v),
+    validator: v => ['default', 'chinese', 'math', 'english', 'game'].includes(v),
   },
 })
 
@@ -54,6 +54,9 @@ function onBack() {
 }
 .page-header.theme-english {
   background: #26A69A;
+}
+.page-header.theme-game {
+  background: #7C4DFF;
 }
 .ph-back {
   font-size: 36rpx;

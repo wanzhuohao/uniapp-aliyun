@@ -51,6 +51,19 @@
       </view>
       <text class="card-arrow">›</text>
     </view>
+
+    <!-- 小游戏卡 -->
+    <view class="card card-games" @click="goTo('/pages/games/index')">
+      <view class="card-deco games-deco">
+        <text class="games-logo">GAME</text>
+      </view>
+      <view class="card-main">
+        <text class="card-tag">GAMES</text>
+        <text class="card-title">小游戏</text>
+        <text class="card-desc">成语接龙 · 边玩边学</text>
+      </view>
+      <text class="card-arrow">›</text>
+    </view>
   </view>
 </template>
 
@@ -238,4 +251,22 @@ function goTo(url) {
   z-index: 1;
 }
 .card-english .card-tag { color: #00786E; }
+
+/* 小游戏：紫色 GAME 徽标 */
+.games-deco {
+  background: linear-gradient(135deg, #7C4DFF 0%, #5E35B1 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.games-logo {
+  font-family: 'Quicksand', 'Comic Sans MS', 'Trebuchet MS', sans-serif;
+  font-size: 44rpx;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: 4rpx;
+  text-shadow: 0 2rpx 6rpx rgba(0,0,0,0.25);
+  transform: rotate(-4deg);
+}
+.card-games .card-tag { color: #7C4DFF; }
 </style>

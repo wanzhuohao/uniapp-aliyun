@@ -2,7 +2,7 @@
 
 ## 项目概述
 
-阿里云 UniApp H5 工具平台，从 `D:\code\uniapp`（支付宝云）独立出来。包含数学练习、语文练习、英语启蒙三大模块。
+阿里云 UniApp H5 工具平台，从 `D:\code\uniapp`（支付宝云）独立出来。包含数学练习、语文练习、英语启蒙 + 小游戏（成语接龙）四大模块。
 
 ## 技术栈
 
@@ -18,7 +18,7 @@ components/PageHeader.vue   — 公共头部组件（支持 fallback prop 兜底
 components/chinese/         — 语文模块专用组件
   PracticeBar / QuestionCard / HanziQuestion / TrendChart
 
-pages/index/index.vue       — 总首页（卡片入口：数学 + 语文）
+pages/index/index.vue       — 总首页（卡片入口：语文 + 数学 + 英语 + 小游戏）
 
 pages/math/                 — 数学练习模块
   index / online / print / history / mistakes / mistakes-practice / guide
@@ -28,6 +28,9 @@ pages/chinese/              — 语文练习模块
 
 pages/english/              — 英语启蒙模块
   index / letters / words / result / mistakes / mistakes-practice / guide
+
+pages/games/                — 小游戏模块
+  index / idiom-chain / idiom-chain-guide
 
 utils/math/                 — 数学工具
   questionEngine.js / mathStorage.js
@@ -45,6 +48,10 @@ utils/english/              — 英语工具（全纯前端 localStorage）
   practiceLog.js            — 练习日志，key: english_practice_logs
   themeConfig.js / questionHelper.js
 
+utils/games/                — 小游戏工具
+  idiomChain.js             — 成语接龙核心：dynamic import 加载词库 + 索引 + 判分 + AI 选词 + 提示
+  idiomStorage.js           — 历史最高分 / 最近一局 localStorage (key: idiom_chain_best / _last)
+
 utils/common/
   toast.js / speech.js (speak 中 / speakEn 英) / theme.js
 
@@ -53,9 +60,13 @@ static/data/
   pinyin.json / strokes.json — 字典数据
   english/letters.json      — 26 字母 + phonics + 例词
   english/words.json        — 英语单词（4 主题 43 词）
+  games/idioms.json         — 成语接龙词库 30294 条（{w, p}, 拼音去声调）
+  games/common-phrases.json — 常见 4 字词语 142 条（AABB / 祝福 / 物候，与成语库去重）
 
 tools/
   extract-questions.mjs     — 从 uniapp 的 seed-questions.js 抽题库 JSON（参数化可复用）
+  fetch-idioms.mjs          — 从 chinese-xinhua idiom.json 精简成 {w,p} 数组（输入 tools/.idiom-raw.json，已 gitignore）
+  build-common-phrases.mjs  — 维护 142 条常见 4 字词清单，build 时与 idioms.json 去重
 ```
 
 ## 构建命令
