@@ -2,8 +2,130 @@
 
 > 项目路径: `D:\code\uniapp-aliyun`
 > 技术栈: UniApp Vue3 + Composition API + uniCloud-aliyun
-> 最后更新: 2026-05-21
+> 最后更新: 2026-05-22
 > 状态: **开发中**
+
+## 2026-05-22 小游戏新增:迷你数独(阶段 3)
+
+接续华容道,数学小游戏第三款完成。三个数学游戏(24 点 / 华容道 / 数独)全部上线。
+
+### 实现
+
+- **核心算法**:`utils/games/sudoku.js`
+  - 4 个难度配置:入门 4×4(2×2 宫)6-8 空 / 简单 6×6(2×3 宫)12-16 空 / 中等 6×6 20-24 空 / 困难 9×9(3×3 宫)35-45 空
+  - `generateFullBoard` DFS + 候选数字打乱,生成随机完整解
+  - `generatePuzzle` 从满解出发,随机位置挖洞,每次挖后用 `countSolutions(limit=2)` 验证唯一解,失败回滚
+  - `findConflicts` 实时校验:行/列/宫扫描,返回当前格的冲突坐标
+  - `isComplete` 全部填且无冲突
+- **性能**(回归测试实测):
+  - 4×4 / 6×6: 各 1ms
+  - 9×9 困难: ~4ms
+  - 远低于设计文档要求(< 500ms)
+- **回归测试**:`tools/test-sudoku.mjs` 31 case 全过
+- **存储**:`utils/games/sudokuStorage.js`(累计得分 + 按难度通关数 + 按难度最短用时 PB + 提示次数)
+- **页面**:`pages/games/sudoku.vue`
+  - 粉色主题(背景 #FCE4EC,主色 #C2185B)
+  - 4 个难度 tab + 顶部三个 stat(用时 / 通关数 / 最佳)
+  - CSS grid 棋盘,粗线宫格边框用 .box-r / .box-b 类
+  - 预填格灰底深色,选中黄底,冲突红字红底
+  - 数字键盘按 size 自适应布局(4: pad-4, 6: pad-6, 9: pad-9)+ 清除键
+  - 提示按钮:必须先选空格,填入正解后该格变预填不可改
+  - 通关弹层 + 破纪录徽标
+- **说明页**:`pages/games/sudoku-guide.vue`(玩法 + 4 档难度 + 推理技巧)
+
+### 改动文件
+
+- 新增 5 个:`utils/games/sudoku.js` / `utils/games/sudokuStorage.js` / `pages/games/sudoku.vue` / `pages/games/sudoku-guide.vue` / `tools/test-sudoku.mjs`
+- 修改 4 个:`pages/games/index.vue`(数独卡激活)/ `pages.json`(2 个新路由)/ `CLAUDE.md`(目录说明)/ `docs/progress.md`(本条)
+
+### 测试说明
+
+`tools/test-sudoku.mjs` 31/31 通过(满解生成 / 唯一解校验 / 4 个难度挖洞性能 / 冲突检出 / 完成判定)。**浏览器尚未实测**,需 HBuilderX 跑到 H5 验证:
+- [ ] 4 档难度切换正常出题
+- [ ] 点空格 → 弹键盘 → 填数,响应正常
+- [ ] 预填格不可点(不能改原题)
+- [ ] 填入冲突数字 → 红色高亮
+- [ ] 全填对 → 通关弹层
+- [ ] 提示按钮填正解后变预填
+- [ ] PB 持久化 + 破纪录徽标
+- [ ] 9×9 生成 loading 态短暂可见(< 100ms)
+
+## 2026-05-22 小游戏新增:数字华容道(阶段 2)
+
+接续 24 点,继续在小游戏模块加华容道。
+
+### 实现
+
+- **核心算法**:`utils/games/slidingPuzzle.js`
+  - 棋盘用一维数组 + 0 标记空格
+  - `shuffle` 从目标状态随机走步打乱(不用逆序数算法,可解性天然保证),加防回头剪枝避免原地打转
+  - `canMove` / `move` / `isSolved` / `neighborsOf` 一组短工具函数
+- **回归测试**:`tools/test-sliding-puzzle.mjs` 23 case 全过
+- **存储**:`utils/games/slidingPuzzleStorage.js` 按难度独立 PB(最少步数 + 最短用时,各自独立比较)
+- **页面**:`pages/games/sliding-puzzle.vue`
+  - 青色主题(背景 #E0F2F1,主色 #00897B)
+  - 3 档难度切换(3×3 入门 / 4×4 经典 / 5×5 挑战),打乱次数 80/200/400
+  - 顶部三个 stat:步数 / 用时 / 最佳(显示当前难度 PB)
+  - 棋盘用 CSS grid,空格透明嵌入阴影区分
+  - 通关弹层显示步数 + 用时,各自独立判定"破纪录"红色徽标
+- **说明页**:`pages/games/sliding-puzzle-guide.vue`(玩法 + 三档难度介绍 + 通关技巧)
+
+### 改动文件
+
+- 新增 5 个:`utils/games/slidingPuzzle.js` / `utils/games/slidingPuzzleStorage.js` / `pages/games/sliding-puzzle.vue` / `pages/games/sliding-puzzle-guide.vue` / `tools/test-sliding-puzzle.mjs`
+- 修改 4 个:`pages/games/index.vue`(华容道卡激活)/ `pages.json`(2 个新路由)/ `CLAUDE.md`(目录说明)/ `docs/progress.md`(本条)
+
+### 测试说明
+
+`tools/test-sliding-puzzle.mjs` 23/23 通过。**浏览器尚未实测**,需 HBuilderX 跑到 H5 验证:
+- [ ] 3 档难度切换,每次出新打乱棋盘
+- [ ] 点相邻数字格能交换,非相邻点击无反应
+- [ ] 步数 / 用时正常累加
+- [ ] 排到目标态弹通关层
+- [ ] 步数 / 用时双重 PB 持久化,破纪录显示徽标
+- [ ] 「查看目标」展示已排好的棋盘
+- [ ] 「重新打乱」重置计时计步
+
+## 2026-05-22 小游戏新增:24 点(阶段 1)
+
+接续上一轮成语接龙,在小游戏模块加 3 张占位卡(24 点/数字华容道/迷你数独),并完成 24 点首版。
+
+### 24 点
+
+- **题库**:`tools/build-24-puzzles.mjs` 离线穷举 (1..13)^4 多重集 1820 组,扣掉 458 个无解,按解数量分桶 → easy 744 / medium 486 / hard 132,输出 `static/data/games/twenty-four.json` (87KB)
+- **核心算法**:`utils/games/twentyFour.js`
+  - `Frac` 分数类:gcd 化简 + 加减乘除 + 严格判等(避开 float 精度问题,8/(3-8/3)=24 这类经典题靠它撑住)
+  - `findSolutions` DFS 枚举所有二叉树表达式,带交换律剪枝
+  - `checkExpression` shunting-yard 转 RPN 求值,校验数字 multiset、括号、运算符
+- **回归测试**:`tools/test-24.mjs`(node 直接跑,17 个 case 全过)
+- **存储**:`utils/games/twentyFourStorage.js`(累计得分 / 按难度通关数 / 当前&最高连胜 / 提示次数)
+- **页面**:`pages/games/twenty-four.vue`
+  - 4 张橙色数字卡(用过灰显)+ 表达式条 + 6 个运算符按钮(+ - × ÷ ( ))
+  - 添加 token 前做合法性预检(数字不能挨数字、) 必须有未闭合 (、运算符前必须是数字或 ))
+  - 通关弹层 + 错误抖动 + 提示后展示参考解
+- **说明页**:`pages/games/twenty-four-guide.vue`(玩法 + 难度档位 + 小技巧)
+
+### 小游戏首页
+
+`pages/games/index.vue` 占位区改成 3 张新卡:24 点(橙)/ 华容道(青)/ 数独(粉),后两者点击 toast「即将上线」。
+
+### 改动文件
+
+- 新增 5 个:`utils/games/twentyFour.js` / `utils/games/twentyFourStorage.js` / `pages/games/twenty-four.vue` / `pages/games/twenty-four-guide.vue` / `tools/build-24-puzzles.mjs` / `tools/test-24.mjs` / `static/data/games/twenty-four.json`
+- 修改 3 个:`pages/games/index.vue`(3 张占位卡 + 路由表)/ `pages.json`(2 个新路由)/ `CLAUDE.md`(目录说明)
+
+### 测试说明
+
+`tools/test-24.mjs` 已 17/17 通过(Frac 精度、findSolutions 经典题、checkExpression 全角运算符&边界拒绝)。**浏览器端尚未实测**,需 HBuilderX 跑到 H5 验证:
+- [ ] 难度切换正常出题
+- [ ] 数字卡点击拼接到表达式条,用过灰显
+- [ ] +/-/×/÷/(/) 按预检规则插入
+- [ ] 退格 / 清空 / 答对弹层 / 答错抖动
+- [ ] 提示按钮展示参考解
+- [ ] 连胜、累计得分持久化
+- [ ] 经典刁钻题 (3,3,8,8) 输入 `8÷(3-8÷3)` 能通过
+
+
 
 ## 2026-05-21 成语接龙体验优化（同日，第二轮）
 

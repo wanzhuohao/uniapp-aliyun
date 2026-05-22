@@ -19,13 +19,68 @@
         <view class="card-main">
           <text class="card-tag">IDIOM CHAIN</text>
           <text class="card-title">成语接龙</text>
-          <text class="card-desc">AI 陪你接，3 万条成语库</text>
+          <text class="card-desc">AI 陪你接,3 万条成语库</text>
         </view>
         <text class="card-arrow">›</text>
       </view>
 
-      <view class="placeholder">
-        <text class="ph-text">更多小游戏正在路上…</text>
+      <!-- 24 点 -->
+      <view class="card card-24" @click="goGame('twentyFour')">
+        <view class="card-deco deco-24">
+          <text class="num n1">3</text>
+          <text class="num n2">8</text>
+          <text class="num n3">8</text>
+          <text class="num n4">3</text>
+          <text class="eq">=24</text>
+        </view>
+        <view class="card-main">
+          <text class="card-tag">24 POINTS</text>
+          <text class="card-title">24 点</text>
+          <text class="card-desc">+-×÷ 凑数字,锻炼心算</text>
+        </view>
+        <text class="card-arrow">›</text>
+      </view>
+
+      <!-- 数字华容道 -->
+      <view class="card card-slide" @click="goGame('slidingPuzzle')">
+        <view class="card-deco deco-slide">
+          <text class="tile t1">1</text>
+          <text class="tile t2">2</text>
+          <text class="tile t3">3</text>
+          <text class="tile t4">4</text>
+          <text class="tile t5">5</text>
+          <text class="tile t6">6</text>
+          <text class="tile t7">7</text>
+          <text class="tile t8">8</text>
+          <view class="tile blank"></view>
+        </view>
+        <view class="card-main">
+          <text class="card-tag">SLIDING PUZZLE</text>
+          <text class="card-title">数字华容道</text>
+          <text class="card-desc">滑块排序,空间规划</text>
+        </view>
+        <text class="card-arrow">›</text>
+      </view>
+
+      <!-- 迷你数独 -->
+      <view class="card card-sudoku" @click="goGame('sudoku')">
+        <view class="card-deco deco-sudoku">
+          <text class="cell s1">5</text>
+          <text class="cell cell-empty s2"></text>
+          <text class="cell s3">2</text>
+          <text class="cell cell-empty s4"></text>
+          <text class="cell s5">9</text>
+          <text class="cell cell-empty s6"></text>
+          <text class="cell s7">1</text>
+          <text class="cell cell-empty s8"></text>
+          <text class="cell s9">6</text>
+        </view>
+        <view class="card-main">
+          <text class="card-tag">SUDOKU</text>
+          <text class="card-title">迷你数独</text>
+          <text class="card-desc">填数字,逻辑推理</text>
+        </view>
+        <text class="card-arrow">›</text>
       </view>
     </view>
   </view>
@@ -34,8 +89,24 @@
 <script setup>
 import PageHeader from '@/components/PageHeader.vue'
 
+// 已上线游戏路由表;未上线的 key 不在表里,点击 toast「即将上线」
+const ROUTES = {
+  twentyFour: '/pages/games/twenty-four',
+  slidingPuzzle: '/pages/games/sliding-puzzle',
+  sudoku: '/pages/games/sudoku',
+}
+
 function goTo(url) {
   uni.navigateTo({ url })
+}
+
+function goGame(key) {
+  const url = ROUTES[key]
+  if (url) {
+    uni.navigateTo({ url })
+  } else {
+    uni.showToast({ title: '即将上线', icon: 'none', duration: 1500 })
+  }
 }
 </script>
 
@@ -151,17 +222,82 @@ function goTo(url) {
   flex-shrink: 0;
 }
 
-.placeholder {
-  margin-top: 48rpx;
-  padding: 48rpx;
-  text-align: center;
-  background: rgba(255,255,255,0.5);
-  border: 2rpx dashed #D6CBF0;
-  border-radius: 24rpx;
+/* ===== 24 点装饰 ===== */
+.deco-24 {
+  position: relative;
+  background: linear-gradient(135deg, #FFE0B2 0%, #FFA726 100%);
 }
-.ph-text {
-  font-size: 24rpx;
-  color: #8B7DAA;
+.deco-24 .num {
+  position: absolute;
+  font-family: 'STKaiti', 'KaiTi', '楷体', serif;
+  font-size: 38rpx;
+  font-weight: 500;
+  color: #5D2E00;
+  text-shadow: 0 1rpx 2rpx rgba(255,255,255,0.6);
+}
+.deco-24 .n1 { top: 14rpx; left: 18rpx; transform: rotate(-6deg); }
+.deco-24 .n2 { top: 14rpx; right: 18rpx; transform: rotate(4deg); }
+.deco-24 .n3 { bottom: 36rpx; left: 18rpx; transform: rotate(3deg); }
+.deco-24 .n4 { bottom: 36rpx; right: 18rpx; transform: rotate(-5deg); }
+.deco-24 .eq {
+  position: absolute;
+  left: 0; right: 0; bottom: 6rpx;
+  text-align: center;
+  font-size: 22rpx;
+  font-weight: bold;
+  color: #BF360C;
   letter-spacing: 2rpx;
 }
+.card-24 .card-tag { color: #E65100; }
+
+/* ===== 数字华容道装饰 ===== */
+.deco-slide {
+  background: linear-gradient(135deg, #B2DFDB 0%, #26A69A 100%);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  padding: 12rpx;
+  gap: 4rpx;
+}
+.deco-slide .tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border-radius: 6rpx;
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #00695C;
+  box-shadow: 0 1rpx 2rpx rgba(0,0,0,0.15);
+}
+.deco-slide .blank {
+  background: transparent;
+  box-shadow: none;
+}
+.card-slide .card-tag { color: #00897B; }
+
+/* ===== 迷你数独装饰 ===== */
+.deco-sudoku {
+  background: linear-gradient(135deg, #F8BBD0 0%, #EC407A 100%);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  padding: 12rpx;
+  gap: 3rpx;
+}
+.deco-sudoku .cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.92);
+  border-radius: 4rpx;
+  font-family: 'STKaiti', 'KaiTi', '楷体', serif;
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #880E4F;
+}
+.deco-sudoku .cell-empty {
+  background: rgba(255,255,255,0.4);
+}
+.card-sudoku .card-tag { color: #C2185B; }
 </style>

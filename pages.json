@@ -26,7 +26,13 @@
     { "path": "pages/english/guide", "style": { "navigationStyle": "custom", "navigationBarTitleText": "使用说明" } },
     { "path": "pages/games/index", "style": { "navigationStyle": "custom", "navigationBarTitleText": "小游戏" } },
     { "path": "pages/games/idiom-chain", "style": { "navigationStyle": "custom", "navigationBarTitleText": "成语接龙" } },
-    { "path": "pages/games/idiom-chain-guide", "style": { "navigationStyle": "custom", "navigationBarTitleText": "成语接龙 · 规则" } }
+    { "path": "pages/games/idiom-chain-guide", "style": { "navigationStyle": "custom", "navigationBarTitleText": "成语接龙 · 规则" } },
+    { "path": "pages/games/twenty-four", "style": { "navigationStyle": "custom", "navigationBarTitleText": "24 点" } },
+    { "path": "pages/games/twenty-four-guide", "style": { "navigationStyle": "custom", "navigationBarTitleText": "24 点 · 规则" } },
+    { "path": "pages/games/sliding-puzzle", "style": { "navigationStyle": "custom", "navigationBarTitleText": "数字华容道" } },
+    { "path": "pages/games/sliding-puzzle-guide", "style": { "navigationStyle": "custom", "navigationBarTitleText": "数字华容道 · 规则" } },
+    { "path": "pages/games/sudoku", "style": { "navigationStyle": "custom", "navigationBarTitleText": "迷你数独" } },
+    { "path": "pages/games/sudoku-guide", "style": { "navigationStyle": "custom", "navigationBarTitleText": "迷你数独 · 规则" } }
   ],
   "globalStyle": {
     "navigationBarTextStyle": "black",

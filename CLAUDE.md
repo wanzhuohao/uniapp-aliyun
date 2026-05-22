@@ -31,6 +31,9 @@ pages/english/              — 英语启蒙模块
 
 pages/games/                — 小游戏模块
   index / idiom-chain / idiom-chain-guide
+  twenty-four / twenty-four-guide  — 24 点
+  sliding-puzzle / sliding-puzzle-guide  — 数字华容道
+  sudoku / sudoku-guide  — 迷你数独
 
 utils/math/                 — 数学工具
   questionEngine.js / mathStorage.js
@@ -51,6 +54,12 @@ utils/english/              — 英语工具（全纯前端 localStorage）
 utils/games/                — 小游戏工具
   idiomChain.js             — 成语接龙核心：dynamic import 加载词库 + 索引 + 判分 + AI 选词 + 提示
   idiomStorage.js           — 历史最高分 / 最近一局 localStorage (key: idiom_chain_best / _last)
+  twentyFour.js             — 24 点核心：Frac 分数运算 + 解枚举 + 表达式校验 + 题库加载
+  twentyFourStorage.js      — 24 点累计统计 (key: twenty_four_stats)
+  slidingPuzzle.js          — 华容道核心：棋盘 + 合法移动 + 随机走步打乱 + 通关判定
+  slidingPuzzleStorage.js   — 华容道按难度独立 PB (key: sliding_puzzle_stats)
+  sudoku.js                 — 数独核心：满解生成 + 唯一解挖洞 + 求解器 + 实时校验
+  sudokuStorage.js          — 数独累计统计 (key: sudoku_stats)
 
 utils/common/
   toast.js / speech.js (speak 中 / speakEn 英) / theme.js
@@ -62,11 +71,16 @@ static/data/
   english/words.json        — 英语单词（4 主题 43 词）
   games/idioms.json         — 成语接龙词库 30294 条（{w, p}, 拼音去声调）
   games/common-phrases.json — 常见 4 字词语 142 条（AABB / 祝福 / 物候，与成语库去重）
+  games/twenty-four.json    — 24 点题库 1362 条（按解数分桶: easy/medium/hard）
 
 tools/
   extract-questions.mjs     — 从 uniapp 的 seed-questions.js 抽题库 JSON（参数化可复用）
   fetch-idioms.mjs          — 从 chinese-xinhua idiom.json 精简成 {w,p} 数组（输入 tools/.idiom-raw.json，已 gitignore）
   build-common-phrases.mjs  — 维护 142 条常见 4 字词清单，build 时与 idioms.json 去重
+  build-24-puzzles.mjs      — 离线生成 24 点题库,枚举 (1..13)^4 多重集按解数分桶
+  test-24.mjs               — 24 点核心算法回归测试 (node 直接跑)
+  test-sliding-puzzle.mjs   — 华容道核心算法回归测试
+  test-sudoku.mjs           — 数独核心算法回归测试 + 性能验证
 ```
 
 ## 构建命令
