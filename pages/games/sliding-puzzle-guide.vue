@@ -62,6 +62,10 @@
           <text class="num">·</text>
           <text class="txt">想不动了点「查看目标」看一眼目标长啥样,再点「重新打乱」重开</text>
         </view>
+        <view class="rule-item">
+          <text class="num">·</text>
+          <text class="txt">实在卡住点「提示」,会高亮下一步该移的数字</text>
+        </view>
       </view>
     </view>
   </view>

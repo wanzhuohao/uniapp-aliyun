@@ -52,6 +52,7 @@
             :class="{
               empty: n === 0,
               movable: n !== 0 && movableSet.has(idx),
+              hint: idx === hintIdx,
               [`size-${size}`]: true
             }"
             @click="onTileClick(idx)"
@@ -63,6 +64,9 @@
 
       <!-- 操作 -->
       <view class="actions">
+        <view class="action action-hint" @click="onHint">
+          <text>提示</text>
+        </view>
         <view class="action action-restart" @click="restart">
           <text>重新打乱</text>
         </view>
@@ -99,8 +103,9 @@
 import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
 import PageHeader from '@/components/PageHeader.vue'
 import {
-  DIFFICULTIES, createSolvedBoard, shuffle, canMove, move, isSolved, neighborsOf
+  DIFFICULTIES, createSolvedBoard, shuffle, canMove, move, isSolved, neighborsOf, nextHint
 } from '@/utils/games/slidingPuzzle.js'
+import { toast } from '@/utils/common/toast.js'
 import { getStats, recordWin } from '@/utils/games/slidingPuzzleStorage.js'
 
 const size = ref(3)
@@ -111,6 +116,7 @@ const elapsed = ref(0)
 const winning = ref(false)
 const lastResult = ref(null)
 const stats = reactive(getStats())
+const hintIdx = ref(-1)
 let timer = null
 
 const pb = computed(() => stats.pb[size.value])
@@ -142,6 +148,7 @@ function restart() {
   elapsed.value = 0
   winning.value = false
   lastResult.value = null
+  hintIdx.value = -1
   startTimer()
 }
 
@@ -152,6 +159,7 @@ function resetToSolved() {
   steps.value = 0
   elapsed.value = 0
   winning.value = false
+  hintIdx.value = -1
 }
 
 function onTileClick(idx) {
@@ -159,11 +167,24 @@ function onTileClick(idx) {
   if (!canMove(board.value, idx, size.value)) return
   board.value = move(board.value, idx, size.value)
   steps.value += 1
+  hintIdx.value = -1
   if (isSolved(board.value)) {
     stopTimer()
     lastResult.value = recordWin(size.value, steps.value, elapsed.value)
     Object.assign(stats, lastResult.value.stats)
     winning.value = true
+  }
+}
+
+function onHint() {
+  if (winning.value) return
+  try {
+    const idx = nextHint(board.value, size.value)
+    if (idx === null) return
+    hintIdx.value = idx
+  } catch (e) {
+    toast.error('算不出来')
+    console.error('[hint] solve failed', e, board.value.slice())
   }
 }
 
@@ -312,6 +333,15 @@ function goGuide() {
   transform: scale(0.92);
   background: linear-gradient(145deg, #26A69A 0%, #00796B 100%);
 }
+.tile.hint {
+  background: linear-gradient(145deg, #FFB74D 0%, #F57C00 100%);
+  box-shadow: 0 0 0 4rpx #FF6F00, 0 0 16rpx 4rpx rgba(255, 152, 0, 0.6);
+  animation: hint-pulse 1.2s ease-in-out infinite;
+}
+@keyframes hint-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}
 
 /* ===== 操作 ===== */
 .actions {
@@ -330,6 +360,7 @@ function goGuide() {
   letter-spacing: 4rpx;
 }
 .action:active { transform: scale(0.97); }
+.action-hint    { background: linear-gradient(135deg, #FFB74D 0%, #F57C00 100%); }
 .action-restart { background: linear-gradient(135deg, #4DB6AC 0%, #00796B 100%); }
 .action-reset   { background: linear-gradient(135deg, #90A4AE 0%, #546E7A 100%); }
 

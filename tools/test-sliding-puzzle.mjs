@@ -2,7 +2,7 @@
 // 用法: node tools/test-sliding-puzzle.mjs
 
 import {
-  createSolvedBoard, canMove, move, shuffle, isSolved, neighborsOf
+  createSolvedBoard, canMove, move, shuffle, isSolved, neighborsOf, solve, nextHint
 } from '../utils/games/slidingPuzzle.js'
 
 let passed = 0
@@ -57,6 +57,44 @@ console.log('\n[isSolved 正确性]')
 assert(isSolved([1, 2, 3, 0]), '2x2 [1,2,3,0] solved')
 assert(!isSolved([0, 1, 2, 3]), '2x2 [0,1,2,3] not solved')
 assert(!isSolved([1, 3, 2, 0]), '2x2 [1,3,2,0] not solved')
+
+console.log('\n[solve 求解器: 打乱→求解→验证还原]')
+for (const size of [3, 4, 5]) {
+  const moveCount = { 3: 80, 4: 200, 5: 400 }[size]
+  const trials = size === 5 ? 8 : 20
+  let maxSteps = 0
+  let totalMs = 0
+  let ok = 0
+  let firstFailBoard = null
+  for (let i = 0; i < trials; i++) {
+    const b0 = shuffle(size, moveCount)
+    try {
+      const t0 = performance.now()
+      const seq = solve(b0, size)
+      totalMs += performance.now() - t0
+      let cur = b0.slice()
+      for (const m of seq) cur = move(cur, m, size)
+      if (isSolved(cur)) ok++
+      maxSteps = Math.max(maxSteps, seq.length)
+    } catch (e) {
+      if (!firstFailBoard) firstFailBoard = { board: b0.slice(), err: e.message }
+    }
+  }
+  if (firstFailBoard) {
+    console.error(`  ✗ size=${size}: ${ok}/${trials}, 首个失败 board=[${firstFailBoard.board}] err=${firstFailBoard.err}`)
+  }
+  assert(ok === trials, `size=${size}: ${trials} 次随机打乱全部解出 (max=${maxSteps} 步, avg=${(totalMs / trials).toFixed(1)}ms)`)
+}
+
+console.log('\n[solve 已通关返回空序列]')
+assert(solve(createSolvedBoard(3), 3).length === 0, 'solved 3x3 → []')
+assert(solve(createSolvedBoard(4), 4).length === 0, 'solved 4x4 → []')
+
+console.log('\n[nextHint 取第一步]')
+const hb3 = shuffle(3, 80)
+const hint = nextHint(hb3, 3)
+assert(hint !== null && canMove(hb3, hint, 3), 'nextHint 返回合法可移格子')
+assert(nextHint(createSolvedBoard(3), 3) === null, '已通关 nextHint=null')
 
 console.log(`\n=== ${passed} passed, ${failed} failed ===`)
 process.exit(failed ? 1 : 0)
