@@ -69,13 +69,14 @@ static/data/
   pinyin.json / strokes.json — 字典数据
   english/letters.json      — 26 字母 + phonics + 例词
   english/words.json        — 英语单词（4 主题 43 词）
-  games/idioms.json         — 成语接龙词库 30294 条（{w, p}, 拼音去声调）
+  games/idioms.json         — 成语接龙词库 40985 条（{w, p}, 拼音去声调；chinese-xinhua 30294 + OCP MongoDB idiom 补充 10691）
   games/common-phrases.json — 常见 4 字词语 142 条（AABB / 祝福 / 物候，与成语库去重）
   games/twenty-four.json    — 24 点题库 1362 条（按解数分桶: easy/medium/hard）
 
 tools/
   extract-questions.mjs     — 从 uniapp 的 seed-questions.js 抽题库 JSON（参数化可复用）
   fetch-idioms.mjs          — 从 chinese-xinhua idiom.json 精简成 {w,p} 数组（输入 tools/.idiom-raw.json，已 gitignore）
+  merge-ocp-idioms.py       — 从 OCP MongoDB idiom collection 补充未收录成语，按 w 去重合并到 idioms.json（参数化、可复用）
   build-common-phrases.mjs  — 维护 142 条常见 4 字词清单，build 时与 idioms.json 去重
   build-24-puzzles.mjs      — 离线生成 24 点题库,枚举 (1..13)^4 多重集按解数分桶
   test-24.mjs               — 24 点核心算法回归测试 (node 直接跑)
