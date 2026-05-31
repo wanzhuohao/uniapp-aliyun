@@ -2,7 +2,7 @@
 
 ## 项目概述
 
-阿里云 UniApp H5 工具平台，从 `D:\code\uniapp`（支付宝云）独立出来。包含数学练习、语文练习、英语启蒙 + 小游戏（成语接龙）四大模块。
+阿里云 UniApp H5 工具平台，从 `uniapp`（支付宝云）独立出来。包含数学练习、语文练习、英语启蒙 + 小游戏（成语接龙/飞机大战）五大模块。
 
 ## 技术栈
 
@@ -17,6 +17,8 @@
 components/PageHeader.vue   — 公共头部组件（支持 fallback prop 兜底跳转）
 components/chinese/         — 语文模块专用组件
   PracticeBar / QuestionCard / HanziQuestion / TrendChart
+components/english/         — 英语模块专用组件
+  WordQuestion
 
 pages/index/index.vue       — 总首页（卡片入口：语文 + 数学 + 英语 + 小游戏）
 
@@ -34,6 +36,7 @@ pages/games/                — 小游戏模块
   twenty-four / twenty-four-guide  — 24 点
   sliding-puzzle / sliding-puzzle-guide  — 数字华容道
   sudoku / sudoku-guide  — 迷你数独
+  plane/ (index.vue, engine.js, skills.js, leaderboard.vue) — 飞机肉鸽（从 uniapp 迁移）
 
 utils/math/                 — 数学工具
   questionEngine.js / mathStorage.js
@@ -49,6 +52,7 @@ utils/english/              — 英语工具（全纯前端 localStorage）
   questionLoader.js         — 读 static/data/english/*.json
   mistakes.js               — Leitner 5 级错题算法，key: english_mistakes
   practiceLog.js            — 练习日志，key: english_practice_logs
+  stateStore.js             — 偏好存储，key: english_state
   themeConfig.js / questionHelper.js
 
 utils/games/                — 小游戏工具
@@ -62,7 +66,7 @@ utils/games/                — 小游戏工具
   sudokuStorage.js          — 数独累计统计 (key: sudoku_stats)
 
 utils/common/
-  toast.js / speech.js (speak 中 / speakEn 英) / theme.js
+  toast.js / speech.js (speak 中 / speakEn 英) / leitner.js / practiceLog.js / prefsStore.js / random.js
 
 static/data/
   questions.json            — 语文题库 400 条（pinyin 200 + stroke 200）

@@ -797,9 +797,12 @@ function selectOp2(qIndex, opIdx, symbol) {
   }
 }
 
-// 百数表辅助 (不规则形状)
+// 百数表辅助 (不规则形状) — 缓存解析结果，避免每次渲染重复 JSON.parse
 function parseChartData(q) {
-  try { return JSON.parse(q.expr) } catch { return { center: 0, rows: 0, cols: 0, cellMap: {}, centerKey: '', hiddenKeys: [] } }
+  if (!q._chartData) {
+    try { q._chartData = JSON.parse(q.expr) } catch { q._chartData = { center: 0, rows: 0, cols: 0, cellMap: {}, centerKey: '', hiddenKeys: [] } }
+  }
+  return q._chartData
 }
 
 function getChartRows(q) { return parseChartData(q).rows || 0 }
@@ -833,9 +836,12 @@ function onChartInput(qIndex, key, e) {
   q.userAnswer = JSON.stringify(data.hiddenKeys.map(k => q._chartAnswers[k] || ''))
 }
 
-// 图形填数辅助 (三角/方形共用)
+// 图形填数辅助 (三角/方形共用) — 缓存解析结果
 function shapeData(q) {
-  try { return JSON.parse(q.expr) } catch { return { target: 0, vals: {}, shown: [], hidden: [] } }
+  if (!q._shapeData) {
+    try { q._shapeData = JSON.parse(q.expr) } catch { q._shapeData = { target: 0, vals: {}, shown: [], hidden: [] } }
+  }
+  return q._shapeData
 }
 
 function shapeIsShown(q, key) {

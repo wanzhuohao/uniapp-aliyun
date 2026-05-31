@@ -51,7 +51,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
-import { sampleWithout, shuffle } from '../../utils/chinese/questionHelper.js'
+import { sampleWithout, shuffle, ALL_STRUCTURES, buildRadicalOptions, buildStructureOptions, buildStrokeCountOptions } from '../../utils/chinese/questionHelper.js'
 import { getQuestions } from '../../utils/chinese/questionLoader.js'
 import { recordWrong } from '../../utils/chinese/mistakes.js'
 import { recordPractice } from '../../utils/chinese/practiceLog.js'
@@ -125,7 +125,6 @@ const questions = ref([])
 const totalQuestions = computed(() => questions.value.length)
 const currentQ = computed(() => questions.value[currentIndex.value] || null)
 
-const ALL_STRUCTURES = ['上下', '左右', '独体', '半包围', '全包围']
 const ALL_RADICALS = ref([])
 
 function handleAnswer({ isCorrect }) {
@@ -175,31 +174,13 @@ function buildQuestion(c, qType) {
     return { qType: 'stroke', char: c.char, unit: c.unit, _id: c._id }
   }
   if (qType === 'radical' && c.radical) {
-    const correct = c.radical
-    const distractors = sampleWithout(ALL_RADICALS.value.filter(r => r !== correct), 3)
-    const options = shuffle([
-      { label: correct, isCorrect: true },
-      ...distractors.map(d => ({ label: d, isCorrect: false }))
-    ])
-    return { qType: 'radical', char: c.char, options, unit: c.unit, _id: c._id, hint: '这个字的部首是？' }
+    return { qType: 'radical', char: c.char, options: buildRadicalOptions(c.radical, ALL_RADICALS.value), unit: c.unit, _id: c._id, hint: '这个字的部首是？' }
   }
   if (qType === 'structure' && c.structure) {
-    const correct = c.structure
-    const distractors = ALL_STRUCTURES.filter(s => s !== correct).slice(0, 3)
-    const options = shuffle([
-      { label: correct, isCorrect: true },
-      ...distractors.map(d => ({ label: d, isCorrect: false }))
-    ])
-    return { qType: 'structure', char: c.char, options, unit: c.unit, _id: c._id, hint: '这个字是什么结构？' }
+    return { qType: 'structure', char: c.char, options: buildStructureOptions(c.structure), unit: c.unit, _id: c._id, hint: '这个字是什么结构？' }
   }
   if (qType === 'strokeCount' && c.strokeCount) {
-    const correct = c.strokeCount
-    const distractors = [correct - 1, correct + 1, correct + 2].filter(n => n > 0 && n !== correct)
-    const options = shuffle([
-      { label: correct + ' 画', isCorrect: true },
-      ...distractors.slice(0, 3).map(d => ({ label: d + ' 画', isCorrect: false }))
-    ])
-    return { qType: 'strokeCount', char: c.char, options, unit: c.unit, _id: c._id, hint: '这个字有几画？' }
+    return { qType: 'strokeCount', char: c.char, options: buildStrokeCountOptions(c.strokeCount), unit: c.unit, _id: c._id, hint: '这个字有几画？' }
   }
   return { qType: 'stroke', char: c.char, unit: c.unit, _id: c._id }
 }

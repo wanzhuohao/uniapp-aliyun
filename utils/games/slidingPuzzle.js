@@ -51,9 +51,9 @@ export function move(board, idx, size) {
 // 加防回头剪枝: 不立即撤销刚才的移动,否则容易原地打转
 export function shuffle(size, moves) {
   let board = createSolvedBoard(size)
+  let emptyIdx = board.indexOf(0)  // 跟踪空格位置，避免每步 indexOf
   let prevMoved = -1  // 上一步被移动的格子的下标
   for (let step = 0; step < moves; step++) {
-    const emptyIdx = board.indexOf(0)
     let candidates = neighborsOf(emptyIdx, size)
     // 防回头: 上一步移到空格位置的那个数字现在就在 prevMoved 的反向上,
     // 拒绝把它再移回去
@@ -63,7 +63,10 @@ export function shuffle(size, moves) {
     }
     const pick = candidates[Math.floor(Math.random() * candidates.length)]
     prevMoved = emptyIdx  // 当前空格位置 -> 下一轮的"移回去会触发回头"位置
-    board = move(board, pick, size)
+    // 直接交换，不调用 move() 避免重复 indexOf
+    board[emptyIdx] = board[pick]
+    board[pick] = 0
+    emptyIdx = pick
   }
   return board
 }

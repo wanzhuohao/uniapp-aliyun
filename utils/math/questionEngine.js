@@ -274,7 +274,7 @@ function genTriangle(level) {
     }
   }
   // fallback
-  return { expr: JSON.stringify({ target: 10, vals: { A: 1, B: 2, C: 3, AB: 7, BC: 5, AC: 6 }, shown: ['A', 'B'], hidden: ['C', 'AB', 'BC', 'AC'] }), answer: JSON.stringify(['3','7','5','6']), type: 'triangle' }
+  return { expr: JSON.stringify({ target: 10, vals: { A: 1, B: 2, C: 3, AB: 7, BC: 5, AC: 6 }, shown: ['A', 'B', 'C'], hidden: ['AB', 'BC', 'AC'] }), answer: JSON.stringify(['7','5','6']), type: 'triangle' }
 }
 
 // 方形填数: 8个位置(4顶点A/B/C/D + 4中点AB/BC/CD/DA)，每边3数之和=target
@@ -320,7 +320,7 @@ function genSquare(level) {
     }
   }
   // fallback
-  return { expr: JSON.stringify({ target: 10, vals: { A: 1, B: 2, C: 3, D: 4, AB: 7, BC: 5, CD: 3, DA: 5 }, shown: ['A', 'B', 'C'], hidden: ['D', 'AB', 'BC', 'CD', 'DA'] }), answer: JSON.stringify(['4','7','5','3','5']), type: 'square' }
+  return { expr: JSON.stringify({ target: 10, vals: { A: 1, B: 2, C: 3, D: 4, AB: 7, BC: 5, CD: 3, DA: 5 }, shown: ['A', 'B', 'C', 'D'], hidden: ['AB', 'BC', 'CD', 'DA'] }), answer: JSON.stringify(['7','5','3','5']), type: 'square' }
 }
 
 // 三角自由填: 6 个位置全空，给出 6 个数字作为数字池，用户自己摆放

@@ -288,6 +288,7 @@ function measureStage() {
 }
 
 function startEngine() {
+  if (!mounted) return;
   if (!measureStage()) {
     setTimeout(startEngine, 50);
     return;
@@ -317,6 +318,7 @@ function startEngine() {
 }
 
 onMounted(async () => {
+  mounted = true;
   await nextTick();
   setTimeout(startEngine, 50);
 
@@ -331,6 +333,8 @@ onMounted(async () => {
 });
 
 onBeforeUnmount(() => {
+  mounted = false;
+  if (resizeTimer) clearTimeout(resizeTimer);
   if (engine) engine.stop();
   // #ifdef H5
   window.removeEventListener('keydown', onKeyDown);
@@ -343,10 +347,11 @@ onBeforeUnmount(() => {
 });
 
 let resizeTimer = null;
+let mounted = false;
 function onWindowResize() {
   if (resizeTimer) clearTimeout(resizeTimer);
   resizeTimer = setTimeout(() => {
-    if (!engine || !measureStage()) return;
+    if (!mounted || !engine || !measureStage()) return;
     engine.resize(stageRect.width, stageRect.height);
   }, 120);
 }
@@ -387,6 +392,11 @@ async function onSubmitScore() {
   submitResult.value = null;
   try {
     const info = overInfo.value || reviveInfo.value;
+    if (!info) {
+      uni.showToast({ title: '游戏数据异常', icon: 'none' });
+      submitting.value = false;
+      return;
+    }
     const res = await submitScore({
       kills: info.kills,
       level: info.level,

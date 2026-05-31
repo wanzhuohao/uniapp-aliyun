@@ -163,8 +163,8 @@ function startRound() {
   started.value = true
 }
 
-function handleAnswer({ correct }) {
-  if (correct) {
+function handleAnswer({ isCorrect }) {
+  if (isCorrect) {
     correctCount.value++
   } else {
     const item = currentQuestion.value?._source

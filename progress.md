@@ -1,13 +1,41 @@
 # 云工具箱（uniapp-aliyun）开发进度
 
-> 项目路径: `D:\code\uniapp-aliyun`
+> 项目路径: `C:\claude code\uniapp-aliyun`
 > 技术栈: UniApp Vue3 + Composition API + uniCloud-aliyun
-> 最后更新: 2026-05-26
+> 最后更新: 2026-05-31
 > 状态: **开发中**
 
 ## 待办
 
 - 无
+
+## 2026-05-31 全量代码审查修复
+
+- practiceLog.js: getRecentLogs 除零修复 — day.total === 0 时返回 null 而非 NaN
+- questionEngine.js: genTriangle fallback 数据修正 — shown 从 2 项改为 3 项
+- questionEngine.js: genSquare fallback 数据修正 — shown 从 3 项改为 4 项
+- questionHelper.js: buildStrokeCountOptions 干扰项不足修复 — correct=1/2 时扩展候选池
+- order-update 云函数（uniapp）: id 判断增加 null 覆盖
+
+## 2026-05-31 代码审查 Bug 修复
+
+- engine.js: spawnBullet 上限检查移入循环内，粒子上限循环修正，升级队列防止丢失
+- engine.js: pushStats 脏检查，数据未变时不触发 Vue 响应式
+- plane/index.vue: doSubmit 空指针防护 + 递归 setTimeout 卸载保护
+- idiom-chain.vue: onUnmounted 清理 aiTimer
+- twenty-four.vue: onUnmounted 清理 shakeTimer
+- learn.vue: HanziWriter 实例销毁 + onUnmounted 清理
+- QuestionCard.vue: TTS replace 改为全局正则匹配 + emit 字段统一为 isCorrect
+- pinyin.vue / mistakes-practice.vue: 解构字段从 correct 改为 isCorrect
+- online.vue: JSON.parse 结果缓存到 q._chartData / q._shapeData
+- slidingPuzzle.js: shuffle 跟踪 emptyIdx 消除冗余 indexOf
+- questionHelper.js: 提取干扰项生成共享函数（hanzi.vue + mistakes-practice.vue）
+
+## 2026-05-31 接收飞机大战迁移
+
+- 从 uniapp（支付宝云）完整迁移到本项目 pages/games/plane/
+- 包含 engine.js, index.vue, skills.js, leaderboard.vue, api.js
+- CLAUDE.md 目录结构同步更新
 
 ## 2026-05-26 成语接龙词库扩充：合并 OCP MongoDB
 

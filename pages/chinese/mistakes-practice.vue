@@ -89,9 +89,7 @@ import QuestionCard from '../../components/chinese/QuestionCard.vue'
 import HanziQuestion from '../../components/chinese/HanziQuestion.vue'
 import { getDueList, getAllWrongList, recordCorrect, recordWrongAgain } from '../../utils/chinese/mistakes.js'
 import { getQuestions } from '../../utils/chinese/questionLoader.js'
-import { shuffle, sampleWithout } from '../../utils/chinese/questionHelper.js'
-
-const ALL_STRUCTURES = ['上下', '左右', '独体', '半包围', '全包围']
+import { shuffle, sampleWithout, ALL_STRUCTURES, buildRadicalOptions, buildStructureOptions, buildStrokeCountOptions } from '../../utils/chinese/questionHelper.js'
 
 const practiceAll = ref(false)
 const mode = ref('')
@@ -230,26 +228,13 @@ function prepareHanziMode() {
 
     const q = { qType, char: item.char, unit: item.unit, _wrong: w }
     if (qType === 'radical' && item.radical) {
-      const distractors = sampleWithout(allRadicals.filter(r => r !== item.radical), 3)
-      q.options = shuffle([
-        { label: item.radical, isCorrect: true },
-        ...distractors.map(d => ({ label: d, isCorrect: false }))
-      ])
+      q.options = buildRadicalOptions(item.radical, allRadicals)
       q.hint = '这个字的部首是？'
     } else if (qType === 'structure' && item.structure) {
-      const distractors = ALL_STRUCTURES.filter(s => s !== item.structure).slice(0, 3)
-      q.options = shuffle([
-        { label: item.structure, isCorrect: true },
-        ...distractors.map(d => ({ label: d, isCorrect: false }))
-      ])
+      q.options = buildStructureOptions(item.structure)
       q.hint = '这个字是什么结构？'
     } else if (qType === 'strokeCount' && item.strokeCount) {
-      const correct = item.strokeCount
-      const distractors = [correct - 1, correct + 1, correct + 2].filter(n => n > 0 && n !== correct)
-      q.options = shuffle([
-        { label: correct + ' 画', isCorrect: true },
-        ...distractors.slice(0, 3).map(d => ({ label: d + ' 画', isCorrect: false }))
-      ])
+      q.options = buildStrokeCountOptions(item.strokeCount)
       q.hint = '这个字有几画？'
     } else {
       q.qType = 'stroke'
@@ -261,11 +246,11 @@ function prepareHanziMode() {
   if (queue.length === 0) finishMode()
 }
 
-function handlePinyinAnswer({ correct }) {
+function handlePinyinAnswer({ isCorrect }) {
   const q = currentPinyinQ.value
   if (!q) return
   const w = q._wrong
-  if (correct) {
+  if (isCorrect) {
     correctCount.value++
     const r = recordCorrect(w._id, w.box, w.correctCount || 0)
     if (r.mastered) masteredThisRound.value++

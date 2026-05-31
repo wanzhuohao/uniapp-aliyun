@@ -112,7 +112,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick } from 'vue'
+import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import PageHeader from '@/components/PageHeader.vue'
 import { loadIdioms, pickOpening, judge, aiPick, hint, SCORE, REASON } from '@/utils/games/idiomChain.js'
 import { getBest, setBest, saveLast } from '@/utils/games/idiomStorage.js'
@@ -121,6 +121,7 @@ const HINT_COST = SCORE.HINT_COST
 
 const loading = ref(true)
 const aiThinking = ref(false)
+let aiTimer = null
 const inputText = ref('')
 const warn = ref('')
 const score = ref(0)
@@ -161,6 +162,10 @@ onMounted(async () => {
   }
 })
 
+onUnmounted(() => {
+  if (aiTimer) clearTimeout(aiTimer)
+})
+
 function aiOpen() {
   const opening = pickOpening(used)
   if (!opening) return
@@ -191,7 +196,7 @@ function submit() {
   // AI 0.5s 后接 —— 模拟思考节奏，期间显示"AI 思考中"
   aiThinking.value = true
   scrollToBottom()
-  setTimeout(() => {
+  aiTimer = setTimeout(() => {
     aiThinking.value = false
     aiTurn()
     if (!gameOver.value) refocusInput()

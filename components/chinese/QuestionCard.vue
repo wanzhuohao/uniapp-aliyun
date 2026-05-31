@@ -52,7 +52,7 @@ function handleSpeak() {
     const correctOpt = props.options?.find(o => o.isCorrect)
     speak(correctOpt ? correctOpt.label : props.question)
   } else {
-    speak(props.question.replace('=', '等于').replace('+', '加').replace('-', '减').replace('?', '几'))
+    speak(props.question.replace(/=/g, '等于').replace(/\+/g, '加').replace(/-/g, '减').replace(/\?/g, '几'))
   }
 }
 
@@ -65,7 +65,7 @@ function handleClick(opt) {
   const delay = isCorrect ? 800 : 1500
 
   setTimeout(() => {
-    emit('answer', { correct: isCorrect, selected: opt.value })
+    emit('answer', { isCorrect, selected: opt.value })
     answered.value = false
     selectedValue.value = null
   }, delay)

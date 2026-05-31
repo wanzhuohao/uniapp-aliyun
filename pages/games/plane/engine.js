@@ -174,12 +174,12 @@ export function createEngine(opts) {
   }
 
   function spawnBullet() {
-    if (bullets.length >= BULLET_CAP) return;
     const count = player.bulletCount;
     const spread = 14;
     const u = unit();
     const bulletR = u * 0.28;
     for (let i = 0; i < count; i++) {
+      if (bullets.length >= BULLET_CAP) break;
       const ang = count === 1
         ? -Math.PI / 2
         : -Math.PI / 2 + ((i / (count - 1)) - 0.5) * (spread * count) * Math.PI / 180;
@@ -215,7 +215,7 @@ export function createEngine(opts) {
     const create = Math.min(want, Math.max(0, room));
     const overflow = want - create;
     if (overflow > 0) particles.splice(0, overflow);
-    for (let i = 0; i < want; i++) {
+    for (let i = 0; i < create; i++) {
       const a = Math.random() * Math.PI * 2;
       const s = 80 + Math.random() * 140;
       particles.push({
@@ -260,14 +260,28 @@ export function createEngine(opts) {
     flash = 200;
   }
 
+  const upgradeQueue = [];
+
   function gainXp(amount) {
     xp += amount * player.xpRate;
     while (xp >= xpNeed) {
       xp -= xpNeed;
       level++;
       xpNeed = Math.floor(xpNeed * 1.5 + 2);
-      triggerUpgrade();
+      const choices = pickSkills(skillLevels, 3);
+      if (choices.length) upgradeQueue.push(choices);
     }
+    // 逐个展示升级选项，避免后者覆盖前者
+    if (upgradeQueue.length > 0 && !paused) {
+      showNextUpgrade();
+    }
+  }
+
+  function showNextUpgrade() {
+    if (upgradeQueue.length === 0) return;
+    const choices = upgradeQueue.shift();
+    paused = true;
+    onUpgrade && onUpgrade(choices);
   }
 
   function triggerUpgrade() {
@@ -286,9 +300,14 @@ export function createEngine(opts) {
     if (!skill || !skill.apply) return;
     skill.apply(player);
     skillLevels[skill.id] = (skillLevels[skill.id] || 0) + 1;
-    paused = false;
     addFloatText(player.x, player.y - 30, skill.name, skill.color);
     pushStats();
+    // 队列中还有升级选项则继续展示，否则恢复游戏
+    if (upgradeQueue.length > 0) {
+      showNextUpgrade();
+    } else {
+      paused = false;
+    }
   }
 
   function applyBoxReward(reward) {
@@ -612,14 +631,23 @@ export function createEngine(opts) {
     }
   }
 
+  let lastStats = {};
   function pushStats() {
-    onStats && onStats({
+    const stats = {
       hp: player.hp,
       maxHp: player.maxHp,
       shield: player.shield,
       xp, xpNeed, level, kills,
       time: Math.floor(elapsed / 1000)
-    });
+    };
+    // 只在数据变化时触发回调，避免每帧 60fps 触发 Vue 响应式
+    if (stats.hp !== lastStats.hp || stats.maxHp !== lastStats.maxHp ||
+        stats.shield !== lastStats.shield || stats.xp !== lastStats.xp ||
+        stats.xpNeed !== lastStats.xpNeed || stats.level !== lastStats.level ||
+        stats.kills !== lastStats.kills || stats.time !== lastStats.time) {
+      lastStats = stats;
+      onStats && onStats(stats);
+    }
   }
 
   function getRenderState() {
@@ -686,6 +714,7 @@ export function createEngine(opts) {
       magnetRange: 0
     });
     Object.keys(skillLevels).forEach(k => delete skillLevels[k]);
+    upgradeQueue.length = 0;
     xp = 0; level = 1; xpNeed = 6; kills = 0; elapsed = 0;
     spawnTimer = 0; spawnInterval = 1000;
     nextBossAt = 120000;

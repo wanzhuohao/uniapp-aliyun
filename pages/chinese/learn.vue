@@ -92,7 +92,7 @@
 </template>
 
 <script setup>
-import { ref, computed, nextTick } from 'vue'
+import { ref, computed, nextTick, onUnmounted } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import HanziWriter from 'hanzi-writer'
 import { speak } from '../../utils/common/speech.js'
@@ -161,9 +161,17 @@ const questions = ref([])
 const totalQuestions = computed(() => questions.value.length)
 const currentQ = computed(() => questions.value[currentIndex.value] || null)
 
+function destroyWriter() {
+  if (writerInstance) {
+    try { writerInstance.cancelQuiz && writerInstance.cancelQuiz() } catch (e) {}
+    try { writerInstance._cancelAnimationFrame && writerInstance._cancelAnimationFrame() } catch (e) {}
+    writerInstance = null
+  }
+}
+
 async function initOutline() {
+  destroyWriter()
   outlineReady.value = false
-  writerInstance = null
   await nextTick()
   const el = document.getElementById(outlineId.value)
   if (!el || !currentQ.value) return
@@ -182,6 +190,10 @@ async function initOutline() {
     })
   } catch (e) { outlineReady.value = false }
 }
+
+onUnmounted(() => {
+  destroyWriter()
+})
 
 function startRound() {
   if (!canStart.value) return

@@ -110,7 +110,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
 import PageHeader from '@/components/PageHeader.vue'
 import {
   DIFFICULTIES, loadPuzzles, pickPuzzle, findOneSolution,
@@ -129,6 +129,7 @@ const feedback = ref(null)      // { ok, text }
 const stats = reactive(getStats())
 const showSolution = ref(null)  // 提示后展示的 sample
 const shaking = ref(false)
+let shakeTimer = null
 const winning = ref(false)
 const lastGain = ref(0)
 
@@ -154,6 +155,10 @@ onMounted(async () => {
   } catch (e) {
     feedback.value = { ok: false, text: '题库加载失败: ' + e.message }
   }
+})
+
+onUnmounted(() => {
+  if (shakeTimer) clearTimeout(shakeTimer)
 })
 
 function switchDifficulty(key) {
@@ -219,7 +224,8 @@ function clearExpr() {
 
 function shake() {
   shaking.value = true
-  setTimeout(() => { shaking.value = false }, 320)
+  if (shakeTimer) clearTimeout(shakeTimer)
+  shakeTimer = setTimeout(() => { shaking.value = false }, 320)
 }
 
 function exprString() {

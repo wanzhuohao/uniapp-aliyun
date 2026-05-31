@@ -56,7 +56,7 @@ export function createPracticeLog({ storageKey }) {
       result.push({
         date: dateStr,
         label: `${d.getMonth() + 1}/${d.getDate()}`,
-        accuracy: day ? Math.round(day.correct / day.total * 100) : null,
+        accuracy: day && day.total > 0 ? Math.round(day.correct / day.total * 100) : null,
       })
     }
     return result
