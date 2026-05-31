@@ -755,8 +755,3 @@ Wikimedia Commons 的 IPA 标准录音对英语启蒙不够友好：
 3. 删除当前 wikimedia 拉的 `static/audio/phonics/*.mp3`，重新生成
 4. phonics.json 的 audioFiles 字段格式可能要改（如果是单文件就不用拼播了）
 
-## 待办（TODO）
-
-- [x] ~~**页面资源懒加载审查**~~ (2026-04-24 完成)：42 音 mp3 方案已放弃（见当日记录），实际审查结论——`phonics.json` / `questions.json` / 英语 letters+words.json 均为页面级 import，UniApp+Vite 路由级代码分割自动懒加载；`hanzi-writer` 按字符走 jsdelivr CDN 懒取。唯一清理项：删除 `static/data/pinyin.json` (65KB) + `strokes.json` (50KB) 两个从 uniapp 迁移时带过来的字典孤儿文件（questions.json 已内联相同字段），省 115KB 打包体积
-- [ ] phonics 拼读小测：听音选字母组合 / 看字母拼词
-- [ ] phonics 错题本接入
