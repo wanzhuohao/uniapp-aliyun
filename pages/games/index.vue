@@ -82,6 +82,22 @@
         </view>
         <text class="card-arrow">›</text>
       </view>
+
+      <!-- 飞机大战 -->
+      <view class="card card-plane" @click="goGame('plane')">
+        <view class="card-deco deco-plane">
+          <view class="plane-icon">
+            <view class="plane-body"></view>
+            <view class="plane-wing"></view>
+          </view>
+        </view>
+        <view class="card-main">
+          <text class="card-tag">PLANE WAR</text>
+          <text class="card-title">飞机大战</text>
+          <text class="card-desc">升级强化,击败敌机</text>
+        </view>
+        <text class="card-arrow">›</text>
+      </view>
     </view>
   </view>
 </template>
@@ -94,6 +110,7 @@ const ROUTES = {
   twentyFour: '/pages/games/twenty-four',
   slidingPuzzle: '/pages/games/sliding-puzzle',
   sudoku: '/pages/games/sudoku',
+  plane: '/pages/games/plane/index',
 }
 
 function goTo(url) {
@@ -300,4 +317,54 @@ function goGame(key) {
   background: rgba(255,255,255,0.4);
 }
 .card-sudoku .card-tag { color: #C2185B; }
+
+/* ===== 飞机大战装饰 ===== */
+.deco-plane {
+  background: linear-gradient(135deg, #1A0E3D 0%, #0B1840 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.deco-plane::before {
+  content: '';
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: rgba(255,255,255,0.6);
+  border-radius: 50%;
+  top: 20%;
+  left: 25%;
+  box-shadow:
+    20px 15px 0 rgba(255,255,255,0.4),
+    45px 8px 0 rgba(255,255,255,0.5),
+    10px 40px 0 rgba(255,255,255,0.3),
+    55px 35px 0 rgba(255,255,255,0.6),
+    35px 50px 0 rgba(255,255,255,0.4);
+}
+.plane-icon {
+  position: relative;
+  width: 60rpx;
+  height: 80rpx;
+}
+.plane-body {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 24rpx;
+  height: 60rpx;
+  margin-left: -12rpx;
+  background: linear-gradient(180deg, #7FE7FF 0%, #1689B8 100%);
+  clip-path: polygon(50% 0%, 100% 70%, 50% 90%, 0% 70%);
+}
+.plane-wing {
+  position: absolute;
+  top: 40%;
+  left: 0;
+  width: 100%;
+  height: 20rpx;
+  background: #2A5C8A;
+  clip-path: polygon(0% 50%, 30% 0%, 70% 0%, 100% 50%, 70% 80%, 30% 80%);
+}
+.card-plane .card-tag { color: #7C4DFF; }
 </style>

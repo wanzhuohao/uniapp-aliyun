@@ -32,7 +32,9 @@
     { "path": "pages/games/sliding-puzzle", "style": { "navigationStyle": "custom", "navigationBarTitleText": "数字华容道" } },
     { "path": "pages/games/sliding-puzzle-guide", "style": { "navigationStyle": "custom", "navigationBarTitleText": "数字华容道 · 规则" } },
     { "path": "pages/games/sudoku", "style": { "navigationStyle": "custom", "navigationBarTitleText": "迷你数独" } },
-    { "path": "pages/games/sudoku-guide", "style": { "navigationStyle": "custom", "navigationBarTitleText": "迷你数独 · 规则" } }
+    { "path": "pages/games/sudoku-guide", "style": { "navigationStyle": "custom", "navigationBarTitleText": "迷你数独 · 规则" } },
+    { "path": "pages/games/plane/index", "style": { "navigationStyle": "custom", "navigationBarTitleText": "飞机大战" } },
+    { "path": "pages/games/plane/leaderboard", "style": { "navigationStyle": "custom", "navigationBarTitleText": "排行榜" } }
   ],
   "globalStyle": {
     "navigationBarTextStyle": "black",
