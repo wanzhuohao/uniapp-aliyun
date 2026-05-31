@@ -2,8 +2,48 @@
 
 > 项目路径: `D:\code\uniapp-aliyun`
 > 技术栈: UniApp Vue3 + Composition API + uniCloud-aliyun
-> 最后更新: 2026-05-22
+> 最后更新: 2026-05-26
 > 状态: **开发中**
+
+## 2026-05-26 成语接龙词库扩充：合并 OCP MongoDB
+
+### 数据扩充
+
+- 词库从 chinese-xinhua 30294 条扩到 **40985 条**（+10691），数据来源：OCP 准上线 MongoDB `auto_ocp_platform_pre.idiom`（39790 条）
+- 字段映射：`idiom` → `w`，`alphabet`（带声调空格分隔）→ `p`（stripTone 去声调）
+- 按 `w` 去重，现有词条优先保留；跳过 37 条脏数据（1 条非汉字 + 36 条拼音音节数≠字数）
+
+### 工具
+
+- `tools/merge-ocp-idioms.py` — 参数化可复用脚本，支持 `--dry-run` / `--env` / `--collection` / `--output`
+- 复用 `D:\code\tools\mongo_query.py` 的 ocp_media env 连接配置
+- 后续 OCP mongo 有新增可直接重跑做增量合并（按 w 去重）
+
+### 文档
+
+- 更新 CLAUDE.md：词库条数说明 + 新工具说明
+
+## 2026-05-25 数字华容道新增「提示」功能
+
+### 算法层
+
+- `utils/games/slidingPuzzle.js` 加 `solve(board, size)` 和 `nextHint(board, size)`
+- 策略:分块逐行/列锁定 + 行/列末两格三元状态 BFS + 最后 2×2 BFS
+  - 普通格子用 BFS 路径推进的 `moveValueTo`(不是贪心列/行优先,避免被 locked 区域切割)
+  - 行末/列末两格用 `solveCornerBFS`:state=(空格 pos, v1 pos, v2 pos),状态空间 ≤ N⁶ ≤ 15625,瞬间出最优
+    - 替代了脆弱的 corner-trick(总是被 buffer 选择和棋盘切割问题困扰)
+  - 最后 2×2 用普通 BFS 求解,N≤2 状态 24 个
+- 性能:3×3 avg 6ms / 4×4 avg 32ms / 5×5 avg 143ms(20-8 次随机测试)
+- 关键性能修复:BFS queue 用 head pointer 替代 `queue.shift()` (O(n)→O(1))
+- 回归测试:`tools/test-sliding-puzzle.mjs` 加 solve 求解器 + nextHint 用例,30 case 全过
+
+### UI 层
+
+- `pages/games/sliding-puzzle.vue`:操作行加「提示」按钮(橙色)
+  - 点击调 `nextHint(board, size)`,把下一步该移的格子 idx 存到 `hintIdx`
+  - 棋盘 tile 加 `.hint` class:橙色背景 + 1.2s 脉冲动画 + 外发光
+  - 用户实际移动 / 重新打乱 / 查看目标 时自动清除高亮
+- `pages/games/sliding-puzzle-guide.vue`:通关技巧段加一行「实在卡住点提示」
 
 ## 2026-05-22 小游戏新增:迷你数独(阶段 3)
 

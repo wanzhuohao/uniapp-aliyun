@@ -9,6 +9,22 @@
         <text class="hero-sub">边玩边学，词字句话样样有</text>
       </view>
 
+      <!-- 飞机大战 -->
+      <view class="card card-plane" @click="goGame('plane')">
+        <view class="card-deco deco-plane">
+          <view class="plane-icon">
+            <view class="plane-body"></view>
+            <view class="plane-wing"></view>
+          </view>
+        </view>
+        <view class="card-main">
+          <text class="card-tag">PLANE WAR</text>
+          <text class="card-title">飞机大战</text>
+          <text class="card-desc">升级强化,击败敌机</text>
+        </view>
+        <text class="card-arrow">›</text>
+      </view>
+
       <view class="card card-idiom" @click="goTo('/pages/games/idiom-chain')">
         <view class="card-deco">
           <text class="deco-char c1">成</text>
@@ -83,21 +99,6 @@
         <text class="card-arrow">›</text>
       </view>
 
-      <!-- 飞机大战 -->
-      <view class="card card-plane" @click="goGame('plane')">
-        <view class="card-deco deco-plane">
-          <view class="plane-icon">
-            <view class="plane-body"></view>
-            <view class="plane-wing"></view>
-          </view>
-        </view>
-        <view class="card-main">
-          <text class="card-tag">PLANE WAR</text>
-          <text class="card-title">飞机大战</text>
-          <text class="card-desc">升级强化,击败敌机</text>
-        </view>
-        <text class="card-arrow">›</text>
-      </view>
     </view>
   </view>
 </template>
