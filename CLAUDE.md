@@ -126,3 +126,8 @@ headless Chromium 的 bot 特征（`navigator.webdriver`、UA、无鼠标轨迹�
 ## 进度文档
 
 `docs/progress.md`
+
+## 飞书设计文档
+
+- 学习小天地 H5：当前功能完整复刻详细设计
+  https://scnb08iioxm7.feishu.cn/docx/FP86dvubao8VtOxRvjJc5dN2nje

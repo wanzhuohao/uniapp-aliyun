@@ -2,12 +2,32 @@
 
 > 项目路径: `C:\claude code\uniapp-aliyun`
 > 技术栈: UniApp Vue3 + Composition API + uniCloud-aliyun
-> 最后更新: 2026-05-31
+> 最后更新: 2026-09-11
 > 状态: **开发中**
 
 ## 待办
 
-- 无
+- HBuilderX 编译验证（附件接入后未编译过）
+- P1 备份恢复：浏览器级下载事件确认 + 隔离配置导出-校验-导入-回滚-比对全链路验收
+- P1 语音真机兼容：Chrome/Android/iOS/微信浏览器实测音频可听、自动播放限制、连续点击抢占、离页停止
+- P1 发布记录：每次发行 H5 同步登记公网地址/发布时间/源码基线/HBuilderX版本/主资源名/托管环境
+
+## 2026-09-11 P1 验收状态同步（公网冒烟测试与剩余验收项）
+
+- 飞书文档 rev 21 更新三个 P1 章节：备份/恢复/下载、语音与真机兼容、发布记录
+- P1 备份：dataBackup.js 事务流程完整（owner/generation/fence/transaction/committed/rollback），Node 测试 13/13 通过；浏览器级下载链路待验收
+- P1 语音：speak/speakEn 已实现（有道 MP3 + SpeechSynthesis），真机兼容待验收
+- P1 发布记录：首次公网冒烟测试 2026-09-11，39 个页面路由均能渲染；发布元信息清单已写入飞书文档
+- 验证：12/12 测试套件全通过
+
+## 2026-09-11 接入附件源码（引入全局学习会话门禁+年级上下文+综合卷/数据中心整套架构）
+
+- 新增 29 个文件：pages/learning/{dashboard,paper,data-center}.vue + components/learning/{PaperQuestion,GradeBadge}.vue + utils/common/ 10 个新模块（learningSession/dataBackup/storageRegistry/gradeContext/gradeMigration/paperEngine/paperSources/safeStorage/diagnostics/learningStats）+ tools/ 9 个测试脚本
+- 低风险合并 49 个文件：submissionFrozen 输入冻结、随机源抽离、grade 参数兼容等小副改动
+- 主架构引入 3 个文件：main.js（installLearningSessionGate）+ mathStorage.js（按年级分桶+合并迁移+buildOnlineSubmissionTarget 等 3 新导出）+ pages/index/index.vue（年级选择面板+learning 三入口）
+- 题库数据零改动：questions.json 仍 400 条、twenty-four.json 仍 1362 条
+- 保留：CLAUDE.md/progress.md/.gitignore/JQL查询.jql；附件 AGENTS.md 与 progress.md 存档到 docs/temp/
+- 验证：leitner 3/3、chinese-lifecycle、sudoku-lifecycle、speech、direct-capabilities 24/24、global-grade 16/16、learning-session、check-storage-registry 全通过
 
 ## 2026-05-31 全量代码审查修复
 
