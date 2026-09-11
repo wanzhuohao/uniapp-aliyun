@@ -22,7 +22,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, watch, onBeforeUnmount } from 'vue'
 import { speak } from '../../utils/common/speech.js'
 
 const props = defineProps({
@@ -37,6 +37,18 @@ const emit = defineEmits(['answer'])
 
 const answered = ref(false)
 const selectedValue = ref(null)
+let pendingTimer = null
+let answerGeneration = 0
+
+function cancelPendingAnswer() {
+  answerGeneration++
+  if (pendingTimer) {
+    clearTimeout(pendingTimer)
+    pendingTimer = null
+  }
+  answered.value = false
+  selectedValue.value = null
+}
 
 function optionClass(opt) {
   if (!answered.value) return ''
@@ -63,13 +75,19 @@ function handleClick(opt) {
 
   const isCorrect = opt.isCorrect
   const delay = isCorrect ? 800 : 1500
+  const generation = ++answerGeneration
 
-  setTimeout(() => {
+  pendingTimer = setTimeout(() => {
+    pendingTimer = null
+    if (generation !== answerGeneration) return
     emit('answer', { isCorrect, selected: opt.value })
     answered.value = false
     selectedValue.value = null
   }, delay)
 }
+
+watch(() => [props.index, props.question, props.options], cancelPendingAnswer)
+onBeforeUnmount(cancelPendingAnswer)
 </script>
 
 <style scoped>

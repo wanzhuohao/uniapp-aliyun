@@ -1,5 +1,6 @@
 <template>
-  <view class="result-page">
+  <view v-if="courseReady" class="result-page">
+    <GradeBadge class="result-grade" :label="gradeLabel" />
     <!-- 顶部小字 -->
     <text class="top-note">{{ topNote }}</text>
 
@@ -36,10 +37,17 @@
       <text>· 學 而 時 習 之 ·</text>
     </view>
   </view>
+  <GradeBadge v-else :label="gradeLabel" />
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted, ref } from 'vue'
+import GradeBadge from '../../components/learning/GradeBadge.vue'
+import { awaitLearningSession } from '../../utils/common/learningSession.js'
+import { getLearningGradeLabel, openCourseGradeSession } from '../../utils/common/gradeContext.js'
+
+const gradeLabel = ref('')
+const courseReady = ref(false)
 
 const query = (() => {
   const pages = getCurrentPages()
@@ -72,6 +80,16 @@ function playAgain() {
 function goHome() {
   uni.navigateBack({ delta: 2 })
 }
+
+onMounted(async () => {
+  try {
+    await awaitLearningSession()
+    gradeLabel.value = getLearningGradeLabel(openCourseGradeSession())
+    courseReady.value = true
+  } catch {
+    gradeLabel.value = ''
+  }
+})
 </script>
 
 <style scoped>
@@ -85,6 +103,7 @@ function goHome() {
   font-family: 'STKaiti', 'KaiTi', '楷体', serif;
   position: relative;
 }
+.result-grade { position: absolute; top: 24rpx; right: 28rpx; background: #a62d33; }
 
 .top-note {
   font-size: 24rpx;

@@ -2,6 +2,26 @@
 let cachedVoices = []
 let primed = false
 let enAudio = null
+let enFinish = null
+
+function cleanupEnAudio(audio) {
+  if (!audio) return
+  audio.onended = null
+  audio.onerror = null
+  try { audio.pause() } catch (e) {}
+  try { audio.removeAttribute('src'); audio.load() } catch (e) {}
+}
+
+export function stopEnSpeech() {
+  if (enFinish) {
+    enFinish()
+    return
+  }
+  if (enAudio) {
+    cleanupEnAudio(enAudio)
+    enAudio = null
+  }
+}
 
 function loadVoices() {
   if (typeof window === 'undefined' || !window.speechSynthesis) return
@@ -60,25 +80,27 @@ export function speakEn(text) {
   if (!text || typeof window === 'undefined') return Promise.resolve()
   const word = String(text).trim()
   if (!word) return Promise.resolve()
+  stopEnSpeech()
   return new Promise((resolve) => {
     let settled = false
     let timer = null
+    let currentAudio = null
     const finish = () => {
       if (settled) return
       settled = true
       if (timer) { clearTimeout(timer); timer = null }
+      if (currentAudio === enAudio) {
+        cleanupEnAudio(currentAudio)
+        enAudio = null
+      }
+      if (enFinish === finish) enFinish = null
       resolve()
     }
     try {
-      if (enAudio) {
-        enAudio.onended = null
-        enAudio.onerror = null
-        try { enAudio.pause() } catch (e) {}
-        try { enAudio.removeAttribute('src'); enAudio.load() } catch (e) {}
-      }
       const url = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(word)}&type=2`
       enAudio = new Audio(url)
-      const currentAudio = enAudio
+      currentAudio = enAudio
+      enFinish = finish
       const done = () => {
         if (currentAudio !== enAudio) return
         finish()

@@ -101,23 +101,31 @@ import { recordPractice } from '../../utils/chinese/practiceLog.js'
 import { getQuestions } from '../../utils/chinese/questionLoader.js'
 import { getCurrentUnit, setCurrentUnit, getChinesePrefs, setChinesePrefs } from '../../utils/chinese/stateStore.js'
 import { UNIT_CONFIG, UNIT_KEYS, getLessonKeys } from '../../utils/chinese/unitConfig.js'
+import { awaitLearningSession } from '../../utils/common/learningSession.js'
+import { openCourseGradeSession } from '../../utils/common/gradeContext.js'
 import PageHeader from '../../components/PageHeader.vue'
 
 const PAGE_KEY = 'learn'
 const unitConfig = UNIT_CONFIG
 const unitKeys = UNIT_KEYS
 
-const currentUnit = ref(getCurrentUnit())
-const savedPrefs = getChinesePrefs(PAGE_KEY)
-const initLessons = (() => {
+const currentUnit = ref(UNIT_KEYS[0])
+const selectedLessons = ref(getLessonKeys(currentUnit.value))
+let preferencesHydrated = false
+let sessionGrade
+
+function hydratePreferences() {
+  currentUnit.value = getCurrentUnit(sessionGrade)
+  const savedPrefs = getChinesePrefs(sessionGrade, PAGE_KEY)
   const all = getLessonKeys(currentUnit.value)
   if (Array.isArray(savedPrefs?.selectedLessons)) {
     const filtered = savedPrefs.selectedLessons.filter(k => all.includes(k))
-    if (filtered.length) return filtered
+    selectedLessons.value = filtered.length ? filtered : all
+  } else {
+    selectedLessons.value = all
   }
-  return all
-})()
-const selectedLessons = ref(initLessons)
+  preferencesHydrated = true
+}
 const currentLessons = computed(() => UNIT_CONFIG[currentUnit.value]?.lessons || [])
 const isAllLessonsSelected = computed(() =>
   currentLessons.value.length > 0 &&
@@ -126,11 +134,11 @@ const isAllLessonsSelected = computed(() =>
 const canStart = computed(() => selectedLessons.value.length > 0)
 
 function persistPrefs() {
-  setChinesePrefs(PAGE_KEY, { selectedLessons: [...selectedLessons.value] })
+  setChinesePrefs(sessionGrade, PAGE_KEY, { selectedLessons: [...selectedLessons.value] })
 }
 function switchUnit(uk) {
   currentUnit.value = uk
-  setCurrentUnit(uk)
+  setCurrentUnit(sessionGrade, uk)
   selectedLessons.value = getLessonKeys(uk)
   persistPrefs()
 }
@@ -152,6 +160,15 @@ const correctCount = ref(0)
 const roundFinished = ref(false)
 const showAnswer = ref(false)
 const showIframe = ref(false)
+const recordedWrongIds = new Set()
+
+function showStorageFailure() {
+  uni.showModal({
+    title: '学习记录未保存',
+    content: '本机存储空间不足或不可用。请清理空间后重试当前题。',
+    showCancel: false,
+  })
+}
 
 const outlineId = ref('mock-' + Date.now())
 const outlineReady = ref(false)
@@ -197,11 +214,12 @@ onUnmounted(() => {
 
 function startRound() {
   if (!canStart.value) return
-  const source = (getQuestions('pinyin', selectedLessons.value) || [])
+  const source = (getQuestions(sessionGrade, 'pinyin', selectedLessons.value) || [])
     .filter(d => d.radical && d.structure)
   questions.value = source
   currentIndex.value = 0
   correctCount.value = 0
+  recordedWrongIds.clear()
   started.value = true
   resetState()
   nextTick(() => initOutline())
@@ -238,32 +256,42 @@ function replayAnim() {
 }
 
 function judgeSelf(isCorrect) {
-  if (isCorrect) {
-    correctCount.value++
-  } else {
-    const q = currentQ.value
-    if (q._id) {
-      recordWrong({ type: 'hanzi', char: q.char, unit: q.unit, question_id: q._id })
+  const nextCorrectCount = correctCount.value + (isCorrect ? 1 : 0)
+  const q = currentQ.value
+  if (!isCorrect && q?._id && !recordedWrongIds.has(q._id)) {
+    const saved = recordWrong({ grade: sessionGrade, type: 'hanzi', char: q.char, unit: q.unit, question_id: q._id })
+    if (!saved) {
+      showStorageFailure()
+      return
     }
+    recordedWrongIds.add(q._id)
   }
-  advanceQuestion()
+  if (!advanceQuestion(nextCorrectCount)) return
+  correctCount.value = nextCorrectCount
 }
 
-function advanceQuestion() {
+function advanceQuestion(resultCorrectCount) {
   if (currentIndex.value < totalQuestions.value - 1) {
     currentIndex.value++
     resetState()
     nextTick(() => initOutline())
+    return true
   } else {
-    roundFinished.value = true
-    recordPractice({
+    const saved = recordPractice({
+      grade: sessionGrade,
       type: 'hanzi',
       totalCount: totalQuestions.value,
-      correctCount: correctCount.value
+      correctCount: resultCorrectCount
     })
+    if (!saved) {
+      showStorageFailure()
+      return false
+    }
+    roundFinished.value = true
     uni.navigateTo({
-      url: `/pages/chinese/result?module=learn&correct=${correctCount.value}&total=${totalQuestions.value}`
+      url: `/pages/chinese/result?module=learn&correct=${resultCorrectCount}&total=${totalQuestions.value}`
     })
+    return true
   }
 }
 
@@ -271,7 +299,10 @@ function speakChar() {
   if (currentQ.value) speak(currentQ.value.char)
 }
 
-onShow(() => {
+onShow(async () => {
+  await awaitLearningSession()
+  if (!sessionGrade) sessionGrade = openCourseGradeSession()
+  if (!preferencesHydrated) hydratePreferences()
   if (roundFinished.value) {
     started.value = false
     roundFinished.value = false

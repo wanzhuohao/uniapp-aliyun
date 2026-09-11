@@ -24,7 +24,7 @@ export function createEngine(opts) {
     r: unit() * 1.1,
     hp: 3,
     maxHp: 3,
-    speed: width / 30 * 20,
+    speed: unit() * 20,
     fireInterval: 320,
     fireTimer: 0,
     bulletCount: 1,

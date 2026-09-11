@@ -43,6 +43,11 @@
         <text class="sub-name">错题本</text>
         <text class="sub-desc">间隔重练</text>
       </view>
+      <view class="sub-card" @click="goTo('/pages/math/focus')">
+        <text class="sub-icon">◎</text>
+        <text class="sub-name">专注模式</text>
+        <text class="sub-desc">一屏一题</text>
+      </view>
     </view>
 
     <!-- 历史记录宽卡 -->

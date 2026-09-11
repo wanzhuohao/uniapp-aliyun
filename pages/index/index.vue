@@ -7,6 +7,22 @@
       <text class="hero-sub">每天一点点，慢慢就会了</text>
     </view>
 
+    <view class="grade-panel">
+      <view class="grade-head"><text class="grade-title">当前年级</text><text class="grade-current">{{ selectedGradeLabel }}</text></view>
+      <view class="grade-grid">
+        <button v-for="item in gradeOptions" :key="item.value" :disabled="item.disabled" :class="['grade-option', selectedGrade === item.value && 'active']" @click="chooseGrade(item)">
+          <text>{{ item.label }}</text><text v-if="item.note" class="grade-note">{{ item.note }}</text>
+        </button>
+      </view>
+      <view v-if="gradeError" class="grade-error"><text>{{ gradeError }}</text><button @click="repairGrade">修复为一年级下册</button></view>
+    </view>
+
+    <view class="quick-grid">
+      <view class="quick-card" @click="goTo('/pages/learning/dashboard')"><text class="quick-title">学习看板</text><text class="quick-desc">今日目标 · 七日反馈</text></view>
+      <view class="quick-card" @click="goTo('/pages/learning/paper')"><text class="quick-title">综合练习卷</text><text class="quick-desc">语数英规则组卷</text></view>
+      <view class="quick-card" @click="goTo('/pages/learning/data-center')"><text class="quick-title">数据中心</text><text class="quick-desc">备份 · 恢复 · 诊断</text></view>
+    </view>
+
     <!-- 语文卡 -->
     <view class="card card-chinese" @click="goTo('/pages/chinese/index')">
       <view class="card-deco chinese-deco">
@@ -68,9 +84,55 @@
 </template>
 
 <script setup>
+import { computed, onMounted, ref } from 'vue'
+import { awaitLearningSession } from '../../utils/common/learningSession.js'
+import {
+  LEARNING_GRADE_OPTIONS,
+  getLearningGradeLabel,
+  initializeLearningGrade,
+  repairLearningGrade,
+} from '../../utils/common/gradeContext.js'
+
+const gradeOptions = LEARNING_GRADE_OPTIONS
+const selectedGrade = ref('')
+const gradeError = ref('')
+const selectedGradeLabel = computed(() => selectedGrade.value ? getLearningGradeLabel(selectedGrade.value) : '需要修复')
+
+async function loadGrade() {
+  await awaitLearningSession()
+  try {
+    selectedGrade.value = initializeLearningGrade()
+    gradeError.value = ''
+  } catch {
+    selectedGrade.value = ''
+    gradeError.value = '当前年级信息不可用，课程已暂停。已有学习数据不会被清除。'
+  }
+}
+
+function chooseGrade(item) {
+  if (item.disabled) return
+  if (gradeError.value) repairGrade()
+}
+
+function repairGrade() {
+  try {
+    selectedGrade.value = repairLearningGrade()
+    gradeError.value = ''
+    uni.showToast({ title: '年级已修复', icon: 'success' })
+  } catch {
+    uni.showToast({ title: '修复失败，请刷新后重试', icon: 'none' })
+  }
+}
+
 function goTo(url) {
+  if (!selectedGrade.value && !url.includes('/games/') && !url.includes('/learning/data-center')) {
+    uni.showToast({ title: '请先修复当前年级', icon: 'none' })
+    return
+  }
   uni.navigateTo({ url })
 }
+
+onMounted(loadGrade)
 </script>
 
 <style scoped>
@@ -107,6 +169,17 @@ function goTo(url) {
   letter-spacing: 2rpx;
   margin-top: 8rpx;
 }
+.grade-panel { background:#fff; border-radius:24rpx; padding:24rpx; margin-bottom:24rpx; box-shadow:0 6rpx 24rpx rgba(31,31,31,.06); }
+.grade-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:18rpx; }
+.grade-title { font-size:30rpx; font-weight:700; color:#2a2520; }
+.grade-current { color:#2a7ab8; font-size:24rpx; }
+.grade-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12rpx; }
+.grade-option { margin:0; padding:12rpx 6rpx; min-height:76rpx; border:none; border-radius:14rpx; font-size:23rpx; display:flex; flex-direction:column; align-items:center; justify-content:center; background:#f2f1ee; color:#766b5c; }
+.grade-option.active { background:#e3f2fd; color:#1e5a8e; box-shadow:inset 0 0 0 2rpx #42a5f5; }
+.grade-option[disabled] { opacity:.55; }
+.grade-note { display:block; margin-top:4rpx; font-size:18rpx; }
+.grade-error { margin-top:18rpx; padding:16rpx; border-radius:12rpx; background:#fff3e0; color:#8a5a00; font-size:22rpx; }
+.grade-error button { margin-top:12rpx; font-size:23rpx; }
 
 /* 卡片通用 */
 .card {
@@ -269,4 +342,9 @@ function goTo(url) {
   transform: rotate(-4deg);
 }
 .card-games .card-tag { color: #7C4DFF; }
+.quick-grid { display:grid; grid-template-columns:1fr 1fr; gap:18rpx; margin-bottom:24rpx; }
+.quick-card { padding:24rpx; background:#fff; border-radius:20rpx; box-shadow:0 4rpx 16rpx rgba(0,0,0,.05); display:flex; flex-direction:column; gap:8rpx; }
+.quick-card:last-child { grid-column:1 / -1; }
+.quick-title { font-size:28rpx; font-weight:bold; color:#2a2520; }
+.quick-desc { font-size:22rpx; color:#8b7d65; }
 </style>

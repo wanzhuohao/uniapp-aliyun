@@ -4,7 +4,10 @@
 // - 累计得分
 // - 用过的提示数
 
-const KEY_STATS = 'twenty_four_stats'
+import { STORAGE_KEYS } from '../common/storageRegistry.js'
+import { isLearningStorageGateError, learningStorageApi } from '../common/learningSession.js'
+
+const KEY_STATS = STORAGE_KEYS.twentyFourStats
 
 const DEFAULT_STATS = {
   totalScore: 0,
@@ -17,18 +20,24 @@ const DEFAULT_STATS = {
 
 export function getStats() {
   try {
-    const s = uni.getStorageSync(KEY_STATS)
+    const s = learningStorageApi.getStorageSync(KEY_STATS)
     if (!s || typeof s !== 'object') return { ...DEFAULT_STATS }
     return {
       ...DEFAULT_STATS,
       ...s,
       byDifficulty: { ...DEFAULT_STATS.byDifficulty, ...(s.byDifficulty || {}) }
     }
-  } catch { return { ...DEFAULT_STATS } }
+  } catch (error) {
+    if (isLearningStorageGateError(error)) throw error
+    return { ...DEFAULT_STATS }
+  }
 }
 
 function save(stats) {
-  try { uni.setStorageSync(KEY_STATS, stats) } catch {}
+  try { learningStorageApi.setStorageSync(KEY_STATS, stats); return true } catch (error) {
+    if (isLearningStorageGateError(error)) throw error
+    return false
+  }
 }
 
 // 通关 +分,连胜累计
@@ -60,5 +69,8 @@ export function recordHint() {
 }
 
 export function resetStats() {
-  try { uni.removeStorageSync(KEY_STATS) } catch {}
+  try { learningStorageApi.removeStorageSync(KEY_STATS); return true } catch (error) {
+    if (isLearningStorageGateError(error)) throw error
+    return false
+  }
 }

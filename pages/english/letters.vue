@@ -38,12 +38,14 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import PageHeader from '../../components/PageHeader.vue'
 import { getLetters } from '../../utils/english/questionLoader.js'
-import { speakEn, primeSpeech } from '../../utils/common/speech.js'
+import { speakEn, primeSpeech, stopEnSpeech } from '../../utils/common/speech.js'
+import { awaitLearningSession } from '../../utils/common/learningSession.js'
+import { openCourseGradeSession } from '../../utils/common/gradeContext.js'
 
-const letters = ref(getLetters())
+const letters = ref([])
 const activeIdx = ref(0)
 const current = computed(() => letters.value[activeIdx.value] || null)
 
@@ -72,9 +74,13 @@ function next() {
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
+  await awaitLearningSession()
+  letters.value = getLetters(openCourseGradeSession())
   // 首次挂载不自动朗读，避免 iOS 拦截
 })
+
+onUnmounted(stopEnSpeech)
 </script>
 
 <style scoped>

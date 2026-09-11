@@ -65,6 +65,15 @@ let writerInstance = null
 let loadToken = 0
 let pendingTimer = null
 
+function destroyWriter() {
+  loadToken++
+  if (writerInstance) {
+    try { writerInstance.cancelQuiz() } catch (e) {}
+    try { writerInstance.cancelAnimation() } catch (e) {}
+  }
+  writerInstance = null
+}
+
 function resetState() {
   choiceState.value = ''
   selectedOpt.value = -1
@@ -77,6 +86,7 @@ function qTypeLabel(t) {
 }
 
 async function initOutline() {
+  destroyWriter()
   outlineReady.value = false
   strokeDone.value = false
   await nextTick()
@@ -165,8 +175,8 @@ onMounted(() => {
 watch(
   () => props.question?.char,
   (newChar) => {
+    destroyWriter()
     resetState()
-    writerInstance = null
     if (props.question?.qType === 'stroke' && newChar) {
       initOutline()
     }
@@ -174,8 +184,7 @@ watch(
 )
 
 onBeforeUnmount(() => {
-  loadToken++
-  writerInstance = null
+  destroyWriter()
   if (pendingTimer) {
     clearTimeout(pendingTimer)
     pendingTimer = null

@@ -164,6 +164,7 @@
                   class="q-input q-input-inline"
                   type="number"
                   :value="q.userAnswer"
+                  :disabled="submissionFrozen"
                   :focus="i === currentFocus"
                   placeholder="?"
                   @input="onInput(i, $event)"
@@ -231,6 +232,7 @@
                     <text v-if="isChartCenter(q, r-1, c-1)">{{ getChartVal(q, r-1, c-1) }}</text>
                     <input v-else class="hc-input" type="number"
                       :value="chartAnswer(q, `${r-1},${c-1}`)"
+                      :disabled="submissionFrozen"
                       placeholder="?"
                       @input="onChartInput(i, `${r-1},${c-1}`, $event)" />
                   </view>
@@ -248,26 +250,26 @@
               <view class="tri-layout">
                 <view class="tri-row tri-row-1">
                   <view class="shape-circle">
-                    <input class="shape-input" type="number" :value="shapeAnswer(q, 'A')" placeholder="?" @input="onShapeInput(i, 'A', $event)" />
+                    <input class="shape-input" type="number" :value="shapeAnswer(q, 'A')" :disabled="submissionFrozen" placeholder="?" @input="onShapeInput(i, 'A', $event)" />
                   </view>
                 </view>
                 <view class="tri-row tri-row-2">
                   <view class="shape-circle">
-                    <input class="shape-input" type="number" :value="shapeAnswer(q, 'AB')" placeholder="?" @input="onShapeInput(i, 'AB', $event)" />
+                    <input class="shape-input" type="number" :value="shapeAnswer(q, 'AB')" :disabled="submissionFrozen" placeholder="?" @input="onShapeInput(i, 'AB', $event)" />
                   </view>
                   <view class="shape-circle">
-                    <input class="shape-input" type="number" :value="shapeAnswer(q, 'AC')" placeholder="?" @input="onShapeInput(i, 'AC', $event)" />
+                    <input class="shape-input" type="number" :value="shapeAnswer(q, 'AC')" :disabled="submissionFrozen" placeholder="?" @input="onShapeInput(i, 'AC', $event)" />
                   </view>
                 </view>
                 <view class="tri-row tri-row-3">
                   <view class="shape-circle">
-                    <input class="shape-input" type="number" :value="shapeAnswer(q, 'B')" placeholder="?" @input="onShapeInput(i, 'B', $event)" />
+                    <input class="shape-input" type="number" :value="shapeAnswer(q, 'B')" :disabled="submissionFrozen" placeholder="?" @input="onShapeInput(i, 'B', $event)" />
                   </view>
                   <view class="shape-circle">
-                    <input class="shape-input" type="number" :value="shapeAnswer(q, 'BC')" placeholder="?" @input="onShapeInput(i, 'BC', $event)" />
+                    <input class="shape-input" type="number" :value="shapeAnswer(q, 'BC')" :disabled="submissionFrozen" placeholder="?" @input="onShapeInput(i, 'BC', $event)" />
                   </view>
                   <view class="shape-circle">
-                    <input class="shape-input" type="number" :value="shapeAnswer(q, 'C')" placeholder="?" @input="onShapeInput(i, 'C', $event)" />
+                    <input class="shape-input" type="number" :value="shapeAnswer(q, 'C')" :disabled="submissionFrozen" placeholder="?" @input="onShapeInput(i, 'C', $event)" />
                   </view>
                 </view>
               </view>
@@ -283,33 +285,33 @@
                 <view class="tri-row tri-row-1">
                   <view :class="['shape-circle', shapeIsShown(q, 'A') && 'shape-given']">
                     <text v-if="shapeIsShown(q, 'A')">{{ shapeData(q).vals.A }}</text>
-                    <input v-else class="shape-input" type="number" :value="shapeAnswer(q, 'A')" placeholder="?" @input="onShapeInput(i, 'A', $event)" />
+                    <input v-else class="shape-input" type="number" :value="shapeAnswer(q, 'A')" :disabled="submissionFrozen" placeholder="?" @input="onShapeInput(i, 'A', $event)" />
                   </view>
                 </view>
                 <!-- 第2行: AB  AC -->
                 <view class="tri-row tri-row-2">
                   <view :class="['shape-circle', shapeIsShown(q, 'AB') && 'shape-given']">
                     <text v-if="shapeIsShown(q, 'AB')">{{ shapeData(q).vals.AB }}</text>
-                    <input v-else class="shape-input" type="number" :value="shapeAnswer(q, 'AB')" placeholder="?" @input="onShapeInput(i, 'AB', $event)" />
+                    <input v-else class="shape-input" type="number" :value="shapeAnswer(q, 'AB')" :disabled="submissionFrozen" placeholder="?" @input="onShapeInput(i, 'AB', $event)" />
                   </view>
                   <view :class="['shape-circle', shapeIsShown(q, 'AC') && 'shape-given']">
                     <text v-if="shapeIsShown(q, 'AC')">{{ shapeData(q).vals.AC }}</text>
-                    <input v-else class="shape-input" type="number" :value="shapeAnswer(q, 'AC')" placeholder="?" @input="onShapeInput(i, 'AC', $event)" />
+                    <input v-else class="shape-input" type="number" :value="shapeAnswer(q, 'AC')" :disabled="submissionFrozen" placeholder="?" @input="onShapeInput(i, 'AC', $event)" />
                   </view>
                 </view>
                 <!-- 第3行: B  BC  C -->
                 <view class="tri-row tri-row-3">
                   <view :class="['shape-circle', shapeIsShown(q, 'B') && 'shape-given']">
                     <text v-if="shapeIsShown(q, 'B')">{{ shapeData(q).vals.B }}</text>
-                    <input v-else class="shape-input" type="number" :value="shapeAnswer(q, 'B')" placeholder="?" @input="onShapeInput(i, 'B', $event)" />
+                    <input v-else class="shape-input" type="number" :value="shapeAnswer(q, 'B')" :disabled="submissionFrozen" placeholder="?" @input="onShapeInput(i, 'B', $event)" />
                   </view>
                   <view :class="['shape-circle', shapeIsShown(q, 'BC') && 'shape-given']">
                     <text v-if="shapeIsShown(q, 'BC')">{{ shapeData(q).vals.BC }}</text>
-                    <input v-else class="shape-input" type="number" :value="shapeAnswer(q, 'BC')" placeholder="?" @input="onShapeInput(i, 'BC', $event)" />
+                    <input v-else class="shape-input" type="number" :value="shapeAnswer(q, 'BC')" :disabled="submissionFrozen" placeholder="?" @input="onShapeInput(i, 'BC', $event)" />
                   </view>
                   <view :class="['shape-circle', shapeIsShown(q, 'C') && 'shape-given']">
                     <text v-if="shapeIsShown(q, 'C')">{{ shapeData(q).vals.C }}</text>
-                    <input v-else class="shape-input" type="number" :value="shapeAnswer(q, 'C')" placeholder="?" @input="onShapeInput(i, 'C', $event)" />
+                    <input v-else class="shape-input" type="number" :value="shapeAnswer(q, 'C')" :disabled="submissionFrozen" placeholder="?" @input="onShapeInput(i, 'C', $event)" />
                   </view>
                 </view>
               </view>
@@ -325,42 +327,42 @@
                 <view class="sq-row">
                   <view :class="['shape-circle', shapeIsShown(q, 'A') && 'shape-given']">
                     <text v-if="shapeIsShown(q, 'A')">{{ shapeData(q).vals.A }}</text>
-                    <input v-else class="shape-input" type="number" :value="shapeAnswer(q, 'A')" placeholder="?" @input="onShapeInput(i, 'A', $event)" />
+                    <input v-else class="shape-input" type="number" :value="shapeAnswer(q, 'A')" :disabled="submissionFrozen" placeholder="?" @input="onShapeInput(i, 'A', $event)" />
                   </view>
                   <view :class="['shape-circle', shapeIsShown(q, 'AB') && 'shape-given']">
                     <text v-if="shapeIsShown(q, 'AB')">{{ shapeData(q).vals.AB }}</text>
-                    <input v-else class="shape-input" type="number" :value="shapeAnswer(q, 'AB')" placeholder="?" @input="onShapeInput(i, 'AB', $event)" />
+                    <input v-else class="shape-input" type="number" :value="shapeAnswer(q, 'AB')" :disabled="submissionFrozen" placeholder="?" @input="onShapeInput(i, 'AB', $event)" />
                   </view>
                   <view :class="['shape-circle', shapeIsShown(q, 'B') && 'shape-given']">
                     <text v-if="shapeIsShown(q, 'B')">{{ shapeData(q).vals.B }}</text>
-                    <input v-else class="shape-input" type="number" :value="shapeAnswer(q, 'B')" placeholder="?" @input="onShapeInput(i, 'B', $event)" />
+                    <input v-else class="shape-input" type="number" :value="shapeAnswer(q, 'B')" :disabled="submissionFrozen" placeholder="?" @input="onShapeInput(i, 'B', $event)" />
                   </view>
                 </view>
                 <!-- 第2行: DA  (空)  BC -->
                 <view class="sq-row">
                   <view :class="['shape-circle', shapeIsShown(q, 'DA') && 'shape-given']">
                     <text v-if="shapeIsShown(q, 'DA')">{{ shapeData(q).vals.DA }}</text>
-                    <input v-else class="shape-input" type="number" :value="shapeAnswer(q, 'DA')" placeholder="?" @input="onShapeInput(i, 'DA', $event)" />
+                    <input v-else class="shape-input" type="number" :value="shapeAnswer(q, 'DA')" :disabled="submissionFrozen" placeholder="?" @input="onShapeInput(i, 'DA', $event)" />
                   </view>
                   <view class="shape-empty" />
                   <view :class="['shape-circle', shapeIsShown(q, 'BC') && 'shape-given']">
                     <text v-if="shapeIsShown(q, 'BC')">{{ shapeData(q).vals.BC }}</text>
-                    <input v-else class="shape-input" type="number" :value="shapeAnswer(q, 'BC')" placeholder="?" @input="onShapeInput(i, 'BC', $event)" />
+                    <input v-else class="shape-input" type="number" :value="shapeAnswer(q, 'BC')" :disabled="submissionFrozen" placeholder="?" @input="onShapeInput(i, 'BC', $event)" />
                   </view>
                 </view>
                 <!-- 第3行: D  CD  C -->
                 <view class="sq-row">
                   <view :class="['shape-circle', shapeIsShown(q, 'D') && 'shape-given']">
                     <text v-if="shapeIsShown(q, 'D')">{{ shapeData(q).vals.D }}</text>
-                    <input v-else class="shape-input" type="number" :value="shapeAnswer(q, 'D')" placeholder="?" @input="onShapeInput(i, 'D', $event)" />
+                    <input v-else class="shape-input" type="number" :value="shapeAnswer(q, 'D')" :disabled="submissionFrozen" placeholder="?" @input="onShapeInput(i, 'D', $event)" />
                   </view>
                   <view :class="['shape-circle', shapeIsShown(q, 'CD') && 'shape-given']">
                     <text v-if="shapeIsShown(q, 'CD')">{{ shapeData(q).vals.CD }}</text>
-                    <input v-else class="shape-input" type="number" :value="shapeAnswer(q, 'CD')" placeholder="?" @input="onShapeInput(i, 'CD', $event)" />
+                    <input v-else class="shape-input" type="number" :value="shapeAnswer(q, 'CD')" :disabled="submissionFrozen" placeholder="?" @input="onShapeInput(i, 'CD', $event)" />
                   </view>
                   <view :class="['shape-circle', shapeIsShown(q, 'C') && 'shape-given']">
                     <text v-if="shapeIsShown(q, 'C')">{{ shapeData(q).vals.C }}</text>
-                    <input v-else class="shape-input" type="number" :value="shapeAnswer(q, 'C')" placeholder="?" @input="onShapeInput(i, 'C', $event)" />
+                    <input v-else class="shape-input" type="number" :value="shapeAnswer(q, 'C')" :disabled="submissionFrozen" placeholder="?" @input="onShapeInput(i, 'C', $event)" />
                   </view>
                 </view>
               </view>
@@ -374,6 +376,7 @@
               class="q-input"
               type="number"
               :value="q.userAnswer"
+              :disabled="submissionFrozen"
               :focus="i === currentFocus"
               placeholder="?"
               @input="onInput(i, $event)"
@@ -385,7 +388,7 @@
 
       <!-- 提交按钮 -->
       <view class="submit-bar">
-        <view class="submit-btn" @click="submitAll">交卷</view>
+        <view :class="['submit-btn', busy && 'disabled']" @click="submitAll">{{ busy ? '正在安全交卷…' : '交卷' }}</view>
       </view>
     </view>
 
@@ -523,11 +526,18 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onUnmounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import PageHeader from '../../components/PageHeader.vue'
 import { generateQuestions, LEVEL_CONFIG, checkAnswer } from '../../utils/math/questionEngine.js'
-import { saveRecord, recordWrong } from '../../utils/math/mathStorage.js'
+import { buildOnlineSubmissionTarget, createOnlineSubmissionIntent } from '../../utils/math/mathStorage.js'
 import { toast } from '../../utils/common/toast.js'
+import { safeSetStorage } from '../../utils/common/safeStorage.js'
+import { STORAGE_KEYS } from '../../utils/common/storageRegistry.js'
+import { awaitLearningSession, getLearningSession, isLearningStorageGateError, learningStorageApi } from '../../utils/common/learningSession.js'
+import { assertCurrentLearningGrade, openCourseGradeSession } from '../../utils/common/gradeContext.js'
+import { projectLearningValue, selectLearningGrade, updateLearningGradeBucket } from '../../utils/common/gradeMigration.js'
+import { applyRegisteredSnapshotTransaction } from '../../utils/common/dataBackup.js'
+import { createPaperInstanceId } from '../../utils/common/paperEngine.js'
 
 // ---- 配置选项 ----
 const levelOptions = [
@@ -555,19 +565,23 @@ const specialOptions = [
 const countPresets = [20, 50, 100]
 
 // ---- 持久化（math_online_prefs） ----
-const PREFS_KEY = 'math_online_prefs'
+const PREFS_KEY = STORAGE_KEYS.mathOnlinePrefs
 function loadPrefs() {
   try {
-    const v = uni.getStorageSync(PREFS_KEY)
-    if (v && typeof v === 'object') return v
-  } catch (e) {}
+    return selectLearningGrade(PREFS_KEY, learningStorageApi.getStorageSync(PREFS_KEY) || {}, sessionGrade)
+  } catch (e) {
+    if (isLearningStorageGateError(e)) throw e
+  }
   return null
 }
 function savePrefs(patch) {
-  const cur = loadPrefs() || {}
-  uni.setStorageSync(PREFS_KEY, { ...cur, ...patch })
+  const raw = learningStorageApi.getStorageSync(PREFS_KEY) || {}
+  const target = updateLearningGradeBucket(PREFS_KEY, projectLearningValue(PREFS_KEY, raw), sessionGrade, current => ({ ...(current || {}), ...patch }))
+  assertCurrentLearningGrade(sessionGrade)
+  safeSetStorage(PREFS_KEY, target)
 }
-const _prefs = loadPrefs() || {}
+const _prefs = {}
+let sessionGrade, session, onlineInstanceId, frozenIntent
 
 // ---- 设置状态 ----
 const selectedLevel = ref(typeof _prefs.level === 'number' ? _prefs.level : 1)
@@ -640,14 +654,35 @@ function flushPrefs() {
     timerMinutes: timerMinutes.value,
   })
 }
+let prefsHydrated = false
 watch([selectedLevel, selectedTypes, selectedSpecial, selectedCount, customCountActive, customCountVal, timerEnabled, timerMinutes], () => {
+  if (!prefsHydrated) return
   if (_persistTimer) clearTimeout(_persistTimer)
   _persistTimer = setTimeout(flushPrefs, 200)
 })
 
+onMounted(async () => {
+  await awaitLearningSession()
+  sessionGrade = openCourseGradeSession()
+  session = getLearningSession()
+  const prefs = loadPrefs() || {}
+  selectedLevel.value = typeof prefs.level === 'number' ? prefs.level : selectedLevel.value
+  selectedTypes.value = new Set(Array.isArray(prefs.types) ? prefs.types : [...selectedTypes.value])
+  selectedSpecial.value = typeof prefs.special === 'string' ? prefs.special : selectedSpecial.value
+  selectedCount.value = typeof prefs.count === 'number' ? prefs.count : selectedCount.value
+  customCountActive.value = prefs.customCountActive === true
+  customCountVal.value = typeof prefs.customCountVal === 'string' ? prefs.customCountVal : customCountVal.value
+  timerEnabled.value = typeof prefs.timerEnabled === 'boolean' ? prefs.timerEnabled : timerEnabled.value
+  timerMinutes.value = typeof prefs.timerMinutes === 'number' ? prefs.timerMinutes : timerMinutes.value
+  prefsHydrated = true
+})
+
 // ---- 答题状态 ----
 const phase        = ref('setup')   // 'setup' | 'quiz' | 'result'
+const busy         = ref(false)
 const questions    = ref([])
+const resultQuestions = ref([])
+const submissionFrozen = ref(false)
 const currentFocus = ref(0)
 const scrollTarget = ref('')
 
@@ -665,19 +700,21 @@ const answeredCount = computed(() =>
   questions.value.filter(q => q.userAnswer !== '' && q.userAnswer !== undefined).length
 )
 
+const scoredQuestions = computed(() => phase.value === 'result' ? resultQuestions.value : questions.value)
+
 const correctCount = computed(() =>
-  questions.value.filter(q => checkAnswer(q)).length
+  scoredQuestions.value.filter(q => phase.value === 'result' ? q.isCorrect : checkAnswer(q)).length
 )
 
 const accuracy = computed(() => {
-  if (!questions.value.length) return 0
-  return Math.round(correctCount.value / questions.value.length * 100)
+  if (!scoredQuestions.value.length) return 0
+  return Math.round(correctCount.value / scoredQuestions.value.length * 100)
 })
 
 const wrongList = computed(() =>
-  questions.value
+  scoredQuestions.value
     .map((q, i) => ({ ...q, index: i }))
-    .filter(q => !checkAnswer(q))
+    .filter(q => phase.value === 'result' ? !q.isCorrect : !checkAnswer(q))
 )
 
 // ---- 题量设置 ----
@@ -716,7 +753,12 @@ function startQuiz() {
     count = n
   }
 
+  onlineInstanceId = createPaperInstanceId()
+  frozenIntent = null
+  submissionFrozen.value = false
+  resultQuestions.value = []
   const raw = generateQuestions({
+    grade: sessionGrade,
     level: selectedLevel.value,
     count,
     questionType: selectedType.value,
@@ -783,6 +825,7 @@ function getOp2(q, idx) {
 
 // 选择双边填运算符
 function selectOp2(qIndex, opIdx, symbol) {
+  if (submissionFrozen.value) return
   const q = questions.value[qIndex]
   if (!q._op2Answers) q._op2Answers = ['', '']
   q._op2Answers[opIdx] = symbol
@@ -829,6 +872,7 @@ function chartAnswer(q, key) {
 }
 
 function onChartInput(qIndex, key, e) {
+  if (submissionFrozen.value) return
   const q = questions.value[qIndex]
   if (!q._chartAnswers) q._chartAnswers = {}
   q._chartAnswers[key] = e.detail.value
@@ -854,6 +898,7 @@ function shapeAnswer(q, key) {
 }
 
 function onShapeInput(qIndex, key, e) {
+  if (submissionFrozen.value) return
   const q = questions.value[qIndex]
   if (!q._shapeAnswers) q._shapeAnswers = {}
   q._shapeAnswers[key] = e.detail.value
@@ -862,10 +907,12 @@ function onShapeInput(qIndex, key, e) {
 }
 
 function onInput(index, e) {
+  if (submissionFrozen.value) return
   questions.value[index].userAnswer = e.detail.value
 }
 
 function onConfirm(index) {
+  if (submissionFrozen.value) return
   const total = questions.value.length
   if (index < total - 1) {
     currentFocus.value = index + 1
@@ -874,6 +921,7 @@ function onConfirm(index) {
 }
 
 function selectCompare(index, symbol) {
+  if (submissionFrozen.value) return
   questions.value[index].userAnswer = symbol
   // 自动前进到下一题
   const total = questions.value.length
@@ -884,24 +932,38 @@ function selectCompare(index, symbol) {
 }
 
 // ---- 交卷 ----
-function submitAll() {
-  uni.showModal({
-    title: '确认交卷',
-    content: `已答 ${answeredCount.value}/${questions.value.length} 题，确定交卷？`,
-    success(res) {
-      if (res.confirm) doSubmit()
-    },
-  })
+async function submitAll() {
+  if (busy.value) return
+  busy.value = true
+  try {
+    const confirmed = await new Promise(resolve => uni.showModal({
+      title: '确认交卷',
+      content: `已答 ${answeredCount.value}/${questions.value.length} 题，确定交卷？`,
+      success: result => resolve(result.confirm),
+      fail: () => resolve(false),
+    }))
+    if (!confirmed) return
+    await doSubmit()
+  } catch (error) {
+    const committed = error?.committed === true
+    uni.showModal({
+      title: committed ? '练习记录已保存' : '练习记录未保存',
+      content: committed
+        ? '记录已保存，但存储状态需要恢复。请按页面提示完成恢复，恢复前不要重复交卷。'
+        : `${error?.message || '本机存储不可用'}。请勿刷新，可关闭其他学习标签页或清理空间后重试同一次交卷。`,
+      showCancel: false,
+    })
+  } finally {
+    busy.value = false
+  }
 }
 
-function doSubmit() {
-  stopTimer()
-  finalTime.value = elapsed.value
-
-  // 保存历史记录
-  try {
-    saveRecord({
-      type: 'online',
+async function doSubmit() {
+  assertCurrentLearningGrade(sessionGrade)
+  if (!frozenIntent) {
+    stopTimer()
+    finalTime.value = elapsed.value
+    const record = {
       level: selectedLevel.value,
       questionType: selectedType.value,
       total: questions.value.length,
@@ -914,18 +976,29 @@ function doSubmit() {
         userAnswer: q.userAnswer,
         isCorrect: checkAnswer(q),
       })),
-    })
-  } catch (e) {
-    console.error('保存记录失败', e)
-  }
-
-  // 错题写入错题本
-  for (const q of questions.value) {
-    if (!checkAnswer(q)) {
-      recordWrong({ expr: q.expr, answer: q.answer, type: q.type || 'add' })
     }
+    submissionFrozen.value = true
+    frozenIntent = await createOnlineSubmissionIntent({
+      grade: sessionGrade,
+      onlineInstanceId,
+      record,
+    })
   }
-
+  const result = await session.runPaperMutation(context => applyRegisteredSnapshotTransaction(
+    context,
+    original => buildOnlineSubmissionTarget(original, frozenIntent),
+    'paper',
+    { sessionGrade },
+  ))
+  if (!result?.ok) {
+    if (result?.committed) {
+      const error = new Error(result.code || 'CONTROL_PLANE_CLEANUP_FAILED')
+      error.committed = true
+      throw error
+    }
+    throw new Error(result?.code || 'PAPER_SUBMISSION_INCONSISTENT')
+  }
+  resultQuestions.value = frozenIntent.record.questions.map(question => ({ ...question }))
   phase.value = 'result'
 }
 
@@ -934,6 +1007,10 @@ function restart() {
   phase.value = 'setup'
   questions.value = []
   elapsed.value = 0
+  frozenIntent = null
+  submissionFrozen.value = false
+  resultQuestions.value = []
+  onlineInstanceId = null
 }
 
 function goHome() {
@@ -951,6 +1028,10 @@ function confirmBack() {
         phase.value = 'setup'
         questions.value = []
         elapsed.value = 0
+        frozenIntent = null
+        submissionFrozen.value = false
+        resultQuestions.value = []
+        onlineInstanceId = null
       }
     },
   })

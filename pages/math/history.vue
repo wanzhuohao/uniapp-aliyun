@@ -179,6 +179,10 @@ import { onShow } from '@dcloudio/uni-app'
 import PageHeader from '../../components/PageHeader.vue'
 import { getHistory } from '../../utils/math/mathStorage.js'
 import { LEVEL_CONFIG } from '../../utils/math/questionEngine.js'
+import { awaitLearningSession } from '../../utils/common/learningSession.js'
+import { openCourseGradeSession } from '../../utils/common/gradeContext.js'
+
+let sessionGrade
 
 const tabs = [
   { label: '全部', value: 'all' },
@@ -276,8 +280,10 @@ function formatDate(isoString) {
   return `${M}/${D} ${HH}:${mm}`
 }
 
-onShow(() => {
-  records.value = getHistory()
+onShow(async () => {
+  await awaitLearningSession()
+  if (!sessionGrade) sessionGrade = openCourseGradeSession()
+  records.value = getHistory(sessionGrade)
 })
 </script>
 

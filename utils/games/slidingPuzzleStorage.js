@@ -1,7 +1,10 @@
 // 数字华容道本地存储
 // 每个难度独立的 PB(最少步数 + 最短用时)+ 总通关次数
 
-const KEY = 'sliding_puzzle_stats'
+import { STORAGE_KEYS } from '../common/storageRegistry.js'
+import { isLearningStorageGateError, learningStorageApi } from '../common/learningSession.js'
+
+const KEY = STORAGE_KEYS.slidingPuzzleStats
 
 // stats: {
 //   totalWins: number,
@@ -14,18 +17,24 @@ const DEFAULT_STATS = {
 
 export function getStats() {
   try {
-    const s = uni.getStorageSync(KEY)
+    const s = learningStorageApi.getStorageSync(KEY)
     if (!s || typeof s !== 'object') return JSON.parse(JSON.stringify(DEFAULT_STATS))
     return {
       ...DEFAULT_STATS,
       ...s,
       pb: { ...DEFAULT_STATS.pb, ...(s.pb || {}) }
     }
-  } catch { return JSON.parse(JSON.stringify(DEFAULT_STATS)) }
+  } catch (error) {
+    if (isLearningStorageGateError(error)) throw error
+    return JSON.parse(JSON.stringify(DEFAULT_STATS))
+  }
 }
 
 function save(stats) {
-  try { uni.setStorageSync(KEY, stats) } catch {}
+  try { learningStorageApi.setStorageSync(KEY, stats); return true } catch (error) {
+    if (isLearningStorageGateError(error)) throw error
+    return false
+  }
 }
 
 // 通关:更新 PB(步数/时间各自独立比较),累计 +1

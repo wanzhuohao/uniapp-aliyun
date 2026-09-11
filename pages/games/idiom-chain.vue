@@ -116,6 +116,7 @@ import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import PageHeader from '@/components/PageHeader.vue'
 import { loadIdioms, pickOpening, judge, aiPick, hint, SCORE, REASON } from '@/utils/games/idiomChain.js'
 import { getBest, setBest, saveLast } from '@/utils/games/idiomStorage.js'
+import { awaitLearningSession } from '@/utils/common/learningSession.js'
 
 const HINT_COST = SCORE.HINT_COST
 
@@ -150,6 +151,7 @@ async function scrollToBottom() {
 }
 
 onMounted(async () => {
+  await awaitLearningSession()
   best.value = getBest()
   try {
     await loadIdioms()

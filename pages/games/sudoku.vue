@@ -109,6 +109,7 @@ import {
   DIFFICULTIES, generatePuzzle, findConflicts, isComplete
 } from '@/utils/games/sudoku.js'
 import { getStats, recordWin, recordHint } from '@/utils/games/sudokuStorage.js'
+import { awaitLearningSession } from '@/utils/common/learningSession.js'
 
 const difficulty = ref('starter')
 const loading = ref(false)
@@ -121,8 +122,16 @@ const startedAt = ref(0)
 const winning = ref(false)
 const lastResult = ref(null)
 const lastGain = ref(0)
-const stats = reactive(getStats())
+const stats = reactive({
+  totalScore: 0,
+  totalWins: 0,
+  hintsUsed: 0,
+  byDifficulty: { starter: 0, easy: 0, medium: 0, hard: 0 },
+  pb: { starter: null, easy: null, medium: null, hard: null },
+})
 let timer = null
+let restartGeneration = 0
+let disposed = false
 
 const cfg = computed(() => DIFFICULTIES.find(d => d.key === difficulty.value))
 const pb = computed(() => stats.pb[difficulty.value])
@@ -149,11 +158,15 @@ const conflictSet = computed(() => {
   return s
 })
 
-onMounted(() => {
+onMounted(async () => {
+  await awaitLearningSession()
+  Object.assign(stats, getStats())
   restart()
 })
 
 onUnmounted(() => {
+  disposed = true
+  restartGeneration++
   stopTimer()
 })
 
@@ -189,13 +202,16 @@ function switchDifficulty(key) {
 }
 
 async function restart() {
+  const generation = ++restartGeneration
+  const difficultyKey = difficulty.value
   loading.value = true
   winning.value = false
   selected.value = null
   lastResult.value = null
   // 用 setTimeout 让 loading 态先显示出来再开始计算
   await new Promise(r => setTimeout(r, 50))
-  const r = generatePuzzle(difficulty.value)
+  if (disposed || generation !== restartGeneration) return
+  const r = generatePuzzle(difficultyKey)
   current.value = r
   board.value = r.puzzle.map(row => row.slice())
   fixed.value = r.puzzle.map(row => row.map(n => n !== 0))

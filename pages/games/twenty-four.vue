@@ -119,6 +119,7 @@ import {
 import {
   getStats, recordWin, breakStreak, recordHint
 } from '@/utils/games/twentyFourStorage.js'
+import { awaitLearningSession } from '@/utils/common/learningSession.js'
 
 const OPS = ['+', '-', '×', '÷', '(', ')']
 
@@ -126,7 +127,14 @@ const difficulty = ref('easy')
 const puzzle = ref(null)        // { nums, solutionCount, sample }
 const tokens = ref([])          // [{type:'num'|'op', value, idx?}]
 const feedback = ref(null)      // { ok, text }
-const stats = reactive(getStats())
+const stats = reactive({
+  totalScore: 0,
+  totalWins: 0,
+  byDifficulty: { easy: 0, medium: 0, hard: 0 },
+  hintsUsed: 0,
+  currentStreak: 0,
+  bestStreak: 0,
+})
 const showSolution = ref(null)  // 提示后展示的 sample
 const shaking = ref(false)
 let shakeTimer = null
@@ -150,6 +158,8 @@ const canSubmit = computed(() => {
 
 onMounted(async () => {
   try {
+    await awaitLearningSession()
+    Object.assign(stats, getStats())
     await loadPuzzles()
     nextPuzzle()
   } catch (e) {

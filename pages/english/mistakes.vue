@@ -70,6 +70,10 @@ import { ref, computed } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import PageHeader from '../../components/PageHeader.vue'
 import { getAllWrongList, getDueList, getWrongStats } from '../../utils/english/mistakes.js'
+import { awaitLearningSession } from '../../utils/common/learningSession.js'
+import { openCourseGradeSession } from '../../utils/common/gradeContext.js'
+
+let sessionGrade
 
 const stats = ref({ total: 0, unmasteredCount: 0, masteredCount: 0, dueCount: 0 })
 const allList = ref([])
@@ -81,16 +85,20 @@ const displayList = computed(() => {
 })
 
 function refresh() {
-  stats.value = getWrongStats()
-  allList.value = getAllWrongList()
-  dueList.value = getDueList()
+  stats.value = getWrongStats(sessionGrade)
+  allList.value = getAllWrongList(sessionGrade)
+  dueList.value = getDueList(sessionGrade)
 }
 
 function startPractice() {
   uni.navigateTo({ url: '/pages/english/mistakes-practice' })
 }
 
-onShow(() => { refresh() })
+onShow(async () => {
+  await awaitLearningSession()
+  if (!sessionGrade) sessionGrade = openCourseGradeSession()
+  refresh()
+})
 </script>
 
 <style scoped>

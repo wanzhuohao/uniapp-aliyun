@@ -107,6 +107,7 @@ import {
 } from '@/utils/games/slidingPuzzle.js'
 import { toast } from '@/utils/common/toast.js'
 import { getStats, recordWin } from '@/utils/games/slidingPuzzleStorage.js'
+import { awaitLearningSession } from '@/utils/common/learningSession.js'
 
 const size = ref(3)
 const board = ref(createSolvedBoard(3))
@@ -115,7 +116,10 @@ const startedAt = ref(0)
 const elapsed = ref(0)
 const winning = ref(false)
 const lastResult = ref(null)
-const stats = reactive(getStats())
+const stats = reactive({
+  totalWins: 0,
+  pb: { 3: null, 4: null, 5: null },
+})
 const hintIdx = ref(-1)
 let timer = null
 
@@ -126,7 +130,9 @@ const movableSet = computed(() => {
   return new Set(neighborsOf(emptyIdx, size.value))
 })
 
-onMounted(() => {
+onMounted(async () => {
+  await awaitLearningSession()
+  Object.assign(stats, getStats())
   restart()
 })
 

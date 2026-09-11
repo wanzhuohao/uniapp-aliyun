@@ -67,12 +67,14 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import PageHeader from '../../components/PageHeader.vue'
-import { speakEn, primeSpeech } from '../../utils/common/speech.js'
+import { speakEn, primeSpeech, stopEnSpeech } from '../../utils/common/speech.js'
 import phonicsData from '../../static/data/english/phonics.json'
+import { awaitLearningSession } from '../../utils/common/learningSession.js'
+import { openCourseGradeSession } from '../../utils/common/gradeContext.js'
 
-const phonics = ref(phonicsData)
+const phonics = ref([])
 const activeGroup = ref(1)
 const activeIdx = ref(0)
 
@@ -84,6 +86,7 @@ let playGen = 0
 
 function cancelPlay() {
   playGen++
+  stopEnSpeech()
 }
 
 function selectGroup(g) {
@@ -126,6 +129,14 @@ function next() {
     playAll()
   }
 }
+
+onMounted(async () => {
+  await awaitLearningSession()
+  openCourseGradeSession()
+  phonics.value = phonicsData
+})
+
+onUnmounted(cancelPlay)
 </script>
 
 <style scoped>

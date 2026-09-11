@@ -80,6 +80,10 @@ import { ref, computed } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import PageHeader from '../../components/PageHeader.vue'
 import { getWrongStats, getAllWrong, getDueList } from '../../utils/math/mathStorage.js'
+import { awaitLearningSession } from '../../utils/common/learningSession.js'
+import { openCourseGradeSession } from '../../utils/common/gradeContext.js'
+
+let sessionGrade
 
 const stats = ref({ total: 0, unmasteredCount: 0, masteredCount: 0, dueCount: 0, top5: [] })
 const allList = ref([])
@@ -123,9 +127,9 @@ function formatExprShort(item) {
 }
 
 function loadData() {
-  stats.value = getWrongStats()
-  allList.value = getAllWrong()
-  dueList.value = getDueList()
+  stats.value = getWrongStats(sessionGrade)
+  allList.value = getAllWrong(sessionGrade)
+  dueList.value = getDueList(sessionGrade)
 }
 
 function goPractice() {
@@ -134,7 +138,9 @@ function goPractice() {
   })
 }
 
-onShow(() => {
+onShow(async () => {
+  await awaitLearningSession()
+  if (!sessionGrade) sessionGrade = openCourseGradeSession()
   loadData()
 })
 </script>

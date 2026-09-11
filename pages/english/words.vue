@@ -43,7 +43,7 @@
 
     <WordQuestion
       v-if="started && currentQ"
-      :key="roundKey + '-' + currentIndex"
+      :key="roundKey + '-' + currentIndex + '-' + answerAttemptKey"
       :question="currentQ.source"
       :options="currentQ.options"
       :qType="currentQ.qType"
@@ -64,36 +64,53 @@ import { THEME_CONFIG, THEME_KEYS } from '../../utils/english/themeConfig.js'
 import { shuffle, sampleWithout } from '../../utils/english/questionHelper.js'
 import { primeSpeech } from '../../utils/common/speech.js'
 import { getEnglishPrefs, setEnglishPrefs } from '../../utils/english/stateStore.js'
+import { awaitLearningSession } from '../../utils/common/learningSession.js'
+import { openCourseGradeSession } from '../../utils/common/gradeContext.js'
 
 const PAGE_KEY = 'words'
 const themeConfig = THEME_CONFIG
 const themeKeys = THEME_KEYS
 
-const _prefs = getEnglishPrefs(PAGE_KEY)
-const initThemes = (() => {
-  if (Array.isArray(_prefs?.selectedThemes)) {
-    const filtered = _prefs.selectedThemes.filter(k => THEME_KEYS.includes(k))
-    if (filtered.length) return filtered
+const selectedThemes = ref([...THEME_KEYS])
+const filterType = ref('')
+let preferencesHydrated = false
+let sessionGrade
+
+function hydratePreferences() {
+  const prefs = getEnglishPrefs(sessionGrade, PAGE_KEY)
+  if (Array.isArray(prefs?.selectedThemes)) {
+    const filtered = prefs.selectedThemes.filter(k => THEME_KEYS.includes(k))
+    selectedThemes.value = filtered.length ? filtered : [...THEME_KEYS]
+  } else {
+    selectedThemes.value = [...THEME_KEYS]
   }
-  return [...THEME_KEYS]
-})()
-const selectedThemes = ref(initThemes)
-const filterType = ref(typeof _prefs?.filterType === 'string' ? _prefs.filterType : '')
+  filterType.value = typeof prefs?.filterType === 'string' ? prefs.filterType : ''
+  preferencesHydrated = true
+}
 const isAllThemesSelected = computed(() => selectedThemes.value.length === themeKeys.length)
 const canStart = computed(() => selectedThemes.value.length > 0)
 const started = ref(false)
 const currentIndex = ref(0)
 const correctCount = ref(0)
 const roundKey = ref(0)
+const answerAttemptKey = ref(0)
 const roundFinished = ref(false)
 const recordedWrongIds = new Set()
+
+function showStorageFailure() {
+  uni.showModal({
+    title: '学习记录未保存',
+    content: '本机存储空间不足或不可用。请清理空间后重试当前题。',
+    showCancel: false,
+  })
+}
 
 const questions = ref([])
 const totalQuestions = computed(() => questions.value.length)
 const currentQ = computed(() => questions.value[currentIndex.value] || null)
 
 function persistPrefs() {
-  setEnglishPrefs(PAGE_KEY, {
+  setEnglishPrefs(sessionGrade, PAGE_KEY, {
     selectedThemes: [...selectedThemes.value],
     filterType: filterType.value,
   })
@@ -127,8 +144,8 @@ function buildQuestion(item, qType, allWords) {
 function startRound() {
   if (!canStart.value) return
   primeSpeech()
-  const words = sampleWithout(getWordsByTheme(selectedThemes.value), 10)
-  const allWords = getAllWords()
+  const words = sampleWithout(getWordsByTheme(sessionGrade, selectedThemes.value), 10)
+  const allWords = getAllWords(sessionGrade)
   const types = filterType.value ? [filterType.value] : ['img2word', 'word2img']
   const built = words.map((item, i) => {
     const t = types.length === 1 ? types[0] : types[i % types.length]
@@ -137,18 +154,17 @@ function startRound() {
   questions.value = built
   currentIndex.value = 0
   correctCount.value = 0
+  answerAttemptKey.value = 0
   recordedWrongIds.clear()
   started.value = true
 }
 
 function handleAnswer({ isCorrect }) {
-  if (isCorrect) {
-    correctCount.value++
-  } else {
-    const item = currentQ.value?.source
-    if (item?._id && !recordedWrongIds.has(item._id)) {
-      recordedWrongIds.add(item._id)
-      recordWrong({
+  const nextCorrectCount = correctCount.value + (isCorrect ? 1 : 0)
+  const item = currentQ.value?.source
+  if (!isCorrect && item?._id && !recordedWrongIds.has(item._id)) {
+    const saved = recordWrong({
+        grade: sessionGrade,
         type: 'word',
         word: item.word,
         theme: item.theme,
@@ -157,15 +173,27 @@ function handleAnswer({ isCorrect }) {
         question_id: item._id,
         qType: currentQ.value.qType,
       })
+    if (!saved) {
+      answerAttemptKey.value++
+      showStorageFailure()
+      return
     }
+    recordedWrongIds.add(item._id)
   }
   if (currentIndex.value < totalQuestions.value - 1) {
+    correctCount.value = nextCorrectCount
     currentIndex.value++
   } else {
+    const saved = recordPractice({ grade: sessionGrade, type: 'word', totalCount: totalQuestions.value, correctCount: nextCorrectCount })
+    if (!saved) {
+      answerAttemptKey.value++
+      showStorageFailure()
+      return
+    }
+    correctCount.value = nextCorrectCount
     roundFinished.value = true
-    recordPractice({ type: 'word', totalCount: totalQuestions.value, correctCount: correctCount.value })
     uni.navigateTo({
-      url: `/pages/english/result?module=word&correct=${correctCount.value}&total=${totalQuestions.value}`
+      url: `/pages/english/result?module=word&correct=${nextCorrectCount}&total=${totalQuestions.value}`
     })
   }
 }
@@ -178,7 +206,10 @@ function goBack() {
   })
 }
 
-onShow(() => {
+onShow(async () => {
+  await awaitLearningSession()
+  if (!sessionGrade) sessionGrade = openCourseGradeSession()
+  if (!preferencesHydrated) hydratePreferences()
   if (roundFinished.value) {
     started.value = false
     roundFinished.value = false

@@ -63,45 +63,63 @@ import { recordWrong } from '../../utils/chinese/mistakes.js'
 import { recordPractice } from '../../utils/chinese/practiceLog.js'
 import { getCurrentUnit, setCurrentUnit, getChinesePrefs, setChinesePrefs } from '../../utils/chinese/stateStore.js'
 import { UNIT_CONFIG, UNIT_KEYS, getLessonKeys } from '../../utils/chinese/unitConfig.js'
+import { awaitLearningSession } from '../../utils/common/learningSession.js'
+import { openCourseGradeSession } from '../../utils/common/gradeContext.js'
 
 const PAGE_KEY = 'pinyin'
 const unitConfig = UNIT_CONFIG
 const unitKeys = UNIT_KEYS
 
-const currentUnit = ref(getCurrentUnit())
-const savedPrefs = getChinesePrefs(PAGE_KEY)
-const initLessons = (() => {
+const currentUnit = ref(UNIT_KEYS[0])
+const selectedLessons = ref(getLessonKeys(currentUnit.value))
+const filterType = ref('')
+let preferencesHydrated = false
+let sessionGrade
+
+function hydratePreferences() {
+  currentUnit.value = getCurrentUnit(sessionGrade)
+  const savedPrefs = getChinesePrefs(sessionGrade, PAGE_KEY)
   const all = getLessonKeys(currentUnit.value)
   if (Array.isArray(savedPrefs?.selectedLessons)) {
     const filtered = savedPrefs.selectedLessons.filter(k => all.includes(k))
-    if (filtered.length) return filtered
+    selectedLessons.value = filtered.length ? filtered : all
+  } else {
+    selectedLessons.value = all
   }
-  return all
-})()
-const selectedLessons = ref(initLessons)
+  filterType.value = typeof savedPrefs?.filterType === 'string' ? savedPrefs.filterType : ''
+  preferencesHydrated = true
+}
 const currentLessons = computed(() => UNIT_CONFIG[currentUnit.value]?.lessons || [])
 const isAllLessonsSelected = computed(() =>
   currentLessons.value.length > 0 &&
   selectedLessons.value.length === currentLessons.value.length
 )
 
-const filterType = ref(typeof savedPrefs?.filterType === 'string' ? savedPrefs.filterType : '')
 const canStart = computed(() => selectedLessons.value.length > 0)
 const started = ref(false)
 const currentIndex = ref(0)
 const correctCount = ref(0)
 const roundKey = ref(0)
 const roundFinished = ref(false)
+const recordedWrongIds = new Set()
+
+function showStorageFailure() {
+  uni.showModal({
+    title: '学习记录未保存',
+    content: '本机存储空间不足或不可用。请清理空间后重试当前题。',
+    showCancel: false,
+  })
+}
 
 function persistPrefs() {
-  setChinesePrefs(PAGE_KEY, {
+  setChinesePrefs(sessionGrade, PAGE_KEY, {
     selectedLessons: [...selectedLessons.value],
     filterType: filterType.value,
   })
 }
 function switchUnit(uk) {
   currentUnit.value = uk
-  setCurrentUnit(uk)
+  setCurrentUnit(sessionGrade, uk)
   selectedLessons.value = getLessonKeys(uk)
   persistPrefs()
 }
@@ -155,36 +173,48 @@ const currentQuestion = computed(() => questions.value[currentIndex.value] || nu
 
 function startRound() {
   if (!canStart.value) return
-  const source = getQuestions('pinyin', selectedLessons.value) || []
+  const source = getQuestions(sessionGrade, 'pinyin', selectedLessons.value) || []
   const built = buildRound(source)
   questions.value = built
   currentIndex.value = 0
   correctCount.value = 0
+  recordedWrongIds.clear()
   started.value = true
 }
 
 function handleAnswer({ isCorrect }) {
-  if (isCorrect) {
-    correctCount.value++
-  } else {
-    const item = currentQuestion.value?._source
-    if (item?._id) {
-      recordWrong({ type: 'pinyin', char: item.char, unit: item.unit, question_id: item._id })
+  const nextCorrectCount = correctCount.value + (isCorrect ? 1 : 0)
+  const item = currentQuestion.value?._source
+  if (!isCorrect && item?._id && !recordedWrongIds.has(item._id)) {
+    const saved = recordWrong({ grade: sessionGrade, type: 'pinyin', char: item.char, unit: item.unit, question_id: item._id })
+    if (!saved) {
+      showStorageFailure()
+      return
     }
+    recordedWrongIds.add(item._id)
   }
 
   if (currentIndex.value < totalQuestions.value - 1) {
+    correctCount.value = nextCorrectCount
     currentIndex.value++
   } else {
+    const saved = recordPractice({ grade: sessionGrade, type: 'pinyin', totalCount: totalQuestions.value, correctCount: nextCorrectCount })
+    if (!saved) {
+      showStorageFailure()
+      return
+    }
+    correctCount.value = nextCorrectCount
     roundFinished.value = true
-    recordPractice({ type: 'pinyin', totalCount: totalQuestions.value, correctCount: correctCount.value })
     uni.navigateTo({
-      url: `/pages/chinese/result?module=pinyin&correct=${correctCount.value}&total=${totalQuestions.value}`
+      url: `/pages/chinese/result?module=pinyin&correct=${nextCorrectCount}&total=${totalQuestions.value}`
     })
   }
 }
 
-onShow(() => {
+onShow(async () => {
+  await awaitLearningSession()
+  if (!sessionGrade) sessionGrade = openCourseGradeSession()
+  if (!preferencesHydrated) hydratePreferences()
   if (roundFinished.value) {
     started.value = false
     roundFinished.value = false

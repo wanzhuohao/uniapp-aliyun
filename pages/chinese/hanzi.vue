@@ -42,6 +42,7 @@
 
     <HanziQuestion
       v-if="started && currentQ"
+      :key="answerAttemptKey + '-' + currentIndex"
       :question="currentQ"
       @answer="handleAnswer"
     />
@@ -57,6 +58,8 @@ import { recordWrong } from '../../utils/chinese/mistakes.js'
 import { recordPractice } from '../../utils/chinese/practiceLog.js'
 import { getCurrentUnit, setCurrentUnit, getChinesePrefs, setChinesePrefs } from '../../utils/chinese/stateStore.js'
 import { UNIT_CONFIG, UNIT_KEYS, getLessonKeys } from '../../utils/chinese/unitConfig.js'
+import { awaitLearningSession } from '../../utils/common/learningSession.js'
+import { openCourseGradeSession } from '../../utils/common/gradeContext.js'
 import PageHeader from '../../components/PageHeader.vue'
 import PracticeBar from '../../components/chinese/PracticeBar.vue'
 import HanziQuestion from '../../components/chinese/HanziQuestion.vue'
@@ -65,40 +68,56 @@ const PAGE_KEY = 'hanzi'
 const unitConfig = UNIT_CONFIG
 const unitKeys = UNIT_KEYS
 
-const currentUnit = ref(getCurrentUnit())
-const savedPrefs = getChinesePrefs(PAGE_KEY)
-const initLessons = (() => {
+const currentUnit = ref(UNIT_KEYS[0])
+const selectedLessons = ref(getLessonKeys(currentUnit.value))
+const filterType = ref('')
+let preferencesHydrated = false
+let sessionGrade
+
+function hydratePreferences() {
+  currentUnit.value = getCurrentUnit(sessionGrade)
+  const savedPrefs = getChinesePrefs(sessionGrade, PAGE_KEY)
   const all = getLessonKeys(currentUnit.value)
   if (Array.isArray(savedPrefs?.selectedLessons)) {
     const filtered = savedPrefs.selectedLessons.filter(k => all.includes(k))
-    if (filtered.length) return filtered
+    selectedLessons.value = filtered.length ? filtered : all
+  } else {
+    selectedLessons.value = all
   }
-  return all
-})()
-const selectedLessons = ref(initLessons)
+  filterType.value = typeof savedPrefs?.filterType === 'string' ? savedPrefs.filterType : ''
+  preferencesHydrated = true
+}
 const currentLessons = computed(() => UNIT_CONFIG[currentUnit.value]?.lessons || [])
 const isAllLessonsSelected = computed(() =>
   currentLessons.value.length > 0 &&
   selectedLessons.value.length === currentLessons.value.length
 )
 
-const filterType = ref(typeof savedPrefs?.filterType === 'string' ? savedPrefs.filterType : '')
 const canStart = computed(() => selectedLessons.value.length > 0)
 const started = ref(false)
 const currentIndex = ref(0)
 const correctCount = ref(0)
+const answerAttemptKey = ref(0)
 const recordedWrongIds = new Set()
 const roundFinished = ref(false)
 
+function showStorageFailure() {
+  uni.showModal({
+    title: '学习记录未保存',
+    content: '本机存储空间不足或不可用。请清理空间后重试当前题。',
+    showCancel: false,
+  })
+}
+
 function persistPrefs() {
-  setChinesePrefs(PAGE_KEY, {
+  setChinesePrefs(sessionGrade, PAGE_KEY, {
     selectedLessons: [...selectedLessons.value],
     filterType: filterType.value,
   })
 }
 function switchUnit(uk) {
   currentUnit.value = uk
-  setCurrentUnit(uk)
+  setCurrentUnit(sessionGrade, uk)
   selectedLessons.value = getLessonKeys(uk)
   persistPrefs()
 }
@@ -128,19 +147,22 @@ const currentQ = computed(() => questions.value[currentIndex.value] || null)
 const ALL_RADICALS = ref([])
 
 function handleAnswer({ isCorrect }) {
-  if (isCorrect) {
-    correctCount.value++
-  } else {
-    const q = currentQ.value
-    if (q?._id && !recordedWrongIds.has(q._id)) {
-      recordedWrongIds.add(q._id)
-      recordWrong({
-        type: 'hanzi', char: q.char, unit: q.unit,
+  const nextCorrectCount = correctCount.value + (isCorrect ? 1 : 0)
+  const q = currentQ.value
+  if (!isCorrect && q?._id && !recordedWrongIds.has(q._id)) {
+    const saved = recordWrong({
+        grade: sessionGrade, type: 'hanzi', char: q.char, unit: q.unit,
         question_id: q._id, qType: q.qType
       })
+    if (!saved) {
+      answerAttemptKey.value++
+      showStorageFailure()
+      return
     }
+    recordedWrongIds.add(q._id)
   }
-  advanceQuestion()
+  if (!advanceQuestion(nextCorrectCount)) return
+  correctCount.value = nextCorrectCount
 }
 
 function buildRound(charData, strokeData) {
@@ -188,29 +210,40 @@ function buildQuestion(c, qType) {
 function startRound() {
   if (!canStart.value) return
   const lessons = selectedLessons.value
-  const pinyinSource = getQuestions('pinyin', lessons) || []
-  const strokeSource = getQuestions('stroke', lessons) || []
+  const pinyinSource = getQuestions(sessionGrade, 'pinyin', lessons) || []
+  const strokeSource = getQuestions(sessionGrade, 'stroke', lessons) || []
   const built = buildRound(pinyinSource, strokeSource)
   questions.value = built
   currentIndex.value = 0
   correctCount.value = 0
+  answerAttemptKey.value = 0
   recordedWrongIds.clear()
   started.value = true
 }
 
-function advanceQuestion() {
+function advanceQuestion(resultCorrectCount) {
   if (currentIndex.value < totalQuestions.value - 1) {
     currentIndex.value++
+    return true
   } else {
+    const saved = recordPractice({ grade: sessionGrade, type: 'hanzi', totalCount: totalQuestions.value, correctCount: resultCorrectCount })
+    if (!saved) {
+      answerAttemptKey.value++
+      showStorageFailure()
+      return false
+    }
     roundFinished.value = true
-    recordPractice({ type: 'hanzi', totalCount: totalQuestions.value, correctCount: correctCount.value })
     uni.navigateTo({
-      url: `/pages/chinese/result?module=hanzi&correct=${correctCount.value}&total=${totalQuestions.value}`
+      url: `/pages/chinese/result?module=hanzi&correct=${resultCorrectCount}&total=${totalQuestions.value}`
     })
+    return true
   }
 }
 
-onShow(() => {
+onShow(async () => {
+  await awaitLearningSession()
+  if (!sessionGrade) sessionGrade = openCourseGradeSession()
+  if (!preferencesHydrated) hydratePreferences()
   if (roundFinished.value) {
     started.value = false
     roundFinished.value = false

@@ -1,7 +1,11 @@
 {
   "pages": [
     { "path": "pages/index/index", "style": { "navigationStyle": "custom", "navigationBarTitleText": "学习小天地" } },
+    { "path": "pages/learning/dashboard", "style": { "navigationStyle": "custom", "navigationBarTitleText": "学习看板" } },
+    { "path": "pages/learning/data-center", "style": { "navigationStyle": "custom", "navigationBarTitleText": "数据中心" } },
+    { "path": "pages/learning/paper", "style": { "navigationStyle": "custom", "navigationBarTitleText": "综合练习卷" } },
     { "path": "pages/math/index", "style": { "navigationStyle": "custom", "navigationBarTitleText": "数学" } },
+    { "path": "pages/math/focus", "style": { "navigationStyle": "custom", "navigationBarTitleText": "数学专注" } },
     { "path": "pages/math/online", "style": { "navigationStyle": "custom", "navigationBarTitleText": "在线练习" } },
     { "path": "pages/math/print", "style": { "navigationStyle": "custom", "navigationBarTitleText": "打印出题" } },
     { "path": "pages/math/history", "style": { "navigationStyle": "custom", "navigationBarTitleText": "历史记录" } },

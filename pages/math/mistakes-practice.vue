@@ -4,6 +4,7 @@
     <view class="top-bar">
       <view class="back-btn" @click="confirmBack">←</view>
       <text class="progress-text">{{ answeredCount }}/{{ questions.length }}</text>
+      <GradeBadge :label="gradeLabel" />
     </view>
 
     <!-- 空状态 -->
@@ -186,6 +187,9 @@
 import { ref, computed } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { getDueList, getAllWrong, recordCorrect, recordWrongAgain } from '../../utils/math/mathStorage.js'
+import { awaitLearningSession } from '../../utils/common/learningSession.js'
+import { getLearningGradeLabel, openCourseGradeSession } from '../../utils/common/gradeContext.js'
+import GradeBadge from '../../components/learning/GradeBadge.vue'
 
 const questions = ref([])
 const submitted = ref(false)
@@ -193,6 +197,8 @@ const finished = ref(false)
 const correctCount = ref(0)
 const masteredCount = ref(0)
 const currentMode = ref('due')
+const gradeLabel = ref('')
+let sessionGrade
 
 const answeredCount = computed(() =>
   questions.value.filter(q => q.userAnswer !== '' && q.userAnswer !== undefined).length
@@ -200,7 +206,7 @@ const answeredCount = computed(() =>
 
 function loadByMode(mode) {
   currentMode.value = mode
-  const list = mode === 'due' ? getDueList() : getAllWrong().filter(r => !r.mastered)
+  const list = mode === 'due' ? getDueList(sessionGrade) : getAllWrong(sessionGrade).filter(r => !r.mastered)
   questions.value = list.map(item => ({
     ...item,
     userAnswer: '',
@@ -216,7 +222,10 @@ function switchToAll() {
   loadByMode('all')
 }
 
-onLoad((options) => {
+onLoad(async (options) => {
+  await awaitLearningSession()
+  sessionGrade = openCourseGradeSession()
+  gradeLabel.value = getLearningGradeLabel(sessionGrade)
   loadByMode(options.mode || 'due')
 })
 
@@ -301,10 +310,10 @@ function doSubmit() {
     q.isRight = String(q.userAnswer) === String(q.answer)
     if (q.isRight) {
       correctCount.value++
-      const r = recordCorrect(q.id)
+      const r = recordCorrect(sessionGrade, q.id)
       if (r.mastered) masteredCount.value++
     } else {
-      recordWrongAgain(q.id)
+      recordWrongAgain(sessionGrade, q.id)
     }
   }
 }

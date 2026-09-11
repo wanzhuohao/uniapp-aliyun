@@ -2,11 +2,18 @@
   <view :class="['page-header', 'theme-' + theme]">
     <view v-if="showBack" class="ph-back" @click="onBack">←</view>
     <text class="ph-title">{{ title }}</text>
+    <GradeBadge v-if="showGrade && theme !== 'game'" :label="gradeLabel" />
     <slot />
   </view>
 </template>
 
 <script setup>
+import { onMounted, ref } from 'vue'
+import GradeBadge from './learning/GradeBadge.vue'
+import { awaitLearningSession } from '../utils/common/learningSession.js'
+import { getLearningGradeLabel, openCourseGradeSession } from '../utils/common/gradeContext.js'
+
+const gradeLabel = ref('')
 const props = defineProps({
   title: { type: String, default: '' },
   showBack: { type: Boolean, default: true },
@@ -16,11 +23,22 @@ const props = defineProps({
   homeOnBack: { type: Boolean, default: false },
   // 自定义返回处理：返回 true 表示已被父页面消费，组件不再做 navigateBack
   backHandler: { type: Function, default: null },
+  showGrade: { type: Boolean, default: true },
   theme: {
     type: String,
     default: 'default',
     validator: v => ['default', 'chinese', 'math', 'english', 'game'].includes(v),
   },
+})
+
+onMounted(async () => {
+  if (!props.showGrade || props.theme === 'game') return
+  try {
+    await awaitLearningSession()
+    gradeLabel.value = getLearningGradeLabel(openCourseGradeSession())
+  } catch {
+    gradeLabel.value = ''
+  }
 })
 
 function onBack() {

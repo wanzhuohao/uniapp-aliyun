@@ -1,0 +1,8 @@
+feat: 接入附件源码 - 引入全局学习会话门禁+年级上下文+综合卷/数据中心整套架构
+
+- 新增 29 个文件：pages/learning/{dashboard,paper,data-center}.vue + components/learning/{PaperQuestion,GradeBadge}.vue + utils/common/ 10 个新模块（learningSession/dataBackup/storageRegistry/gradeContext/gradeMigration/paperEngine/paperSources/safeStorage/diagnostics/learningStats）+ tools/ 9 个测试脚本
+- 低风险合并 49 个文件：submissionFrozen 输入冻结、随机源抽离、grade 参数兼容等小副改动
+- 主架构引入 3 个文件：main.js（installLearningSessionGate）+ mathStorage.js（按年级分桶+合并迁移+buildOnlineSubmissionTarget 等 3 新导出）+ pages/index/index.vue（年级选择面板+learning 三入口）
+- 题库数据零改动：questions.json 仍 400 条、twenty-four.json 仍 1362 条
+- 保留：CLAUDE.md/progress.md/.gitignore/JQL查询.jql；附件 AGENTS.md 与 progress.md 存档到 docs/temp/
+- 验证：leitner 3/3、chinese-lifecycle、sudoku-lifecycle、speech、direct-capabilities 24/24、global-grade 16/16、learning-session、check-storage-registry 全通过

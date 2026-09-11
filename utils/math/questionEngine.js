@@ -1,11 +1,15 @@
+import { assertAvailableLearningGrade } from '../common/gradeContext.js'
+
 const LEVEL_CONFIG = {
   1: { name: '20以内', max: 20 },
   2: { name: '100以内(整十)', max: 100, step: 10 },
   3: { name: '100以内', max: 100 },
 }
 
+let randomSource = Math.random
+
 function rand(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min
+  return Math.floor(randomSource() * (max - min + 1)) + min
 }
 
 function randTens(max) {
@@ -46,13 +50,13 @@ function genCompare(level) {
   const cfg = LEVEL_CONFIG[level]
   // 随机决定两边是纯数字还是算式
   function genSide() {
-    if (Math.random() > 0.4) {
+    if (randomSource() > 0.4) {
       // 纯数字
       const n = rand(1, cfg.max)
       return { text: String(n), value: n }
     }
     // 简单算式
-    const isAdd = Math.random() > 0.5
+    const isAdd = randomSource() > 0.5
     if (isAdd) {
       const a = rand(1, cfg.max - 1)
       const b = rand(1, cfg.max - a)
@@ -75,12 +79,12 @@ function genCompare(level) {
 // 填空: a + __ = c or __ - b = c, blank is positive integer
 function genFillBlank(level) {
   const cfg = LEVEL_CONFIG[level]
-  const isAdd = Math.random() > 0.5
+  const isAdd = randomSource() > 0.5
   let a, b
   if (isAdd) {
     a = rand(1, cfg.max - 1)
     b = rand(1, cfg.max - a)
-    if (Math.random() > 0.5) {
+    if (randomSource() > 0.5) {
       return { expr: `__ + ${b} = ${a + b}`, answer: String(a), type: 'fill' }
     } else {
       return { expr: `${a} + __ = ${a + b}`, answer: String(b), type: 'fill' }
@@ -88,7 +92,7 @@ function genFillBlank(level) {
   } else {
     a = rand(2, cfg.max)
     b = rand(1, a - 1)
-    if (Math.random() > 0.5) {
+    if (randomSource() > 0.5) {
       return { expr: `__ - ${b} = ${a - b}`, answer: String(a), type: 'fill' }
     } else {
       return { expr: `${a} - __ = ${a - b}`, answer: String(b), type: 'fill' }
@@ -101,7 +105,7 @@ function genChain(level) {
   const cfg = LEVEL_CONFIG[level]
   const max = cfg.max
   for (let attempt = 0; attempt < 20; attempt++) {
-    const isAdd = Math.random() > 0.5
+    const isAdd = randomSource() > 0.5
     if (isAdd) {
       const a = rand(1, Math.floor(max / 3))
       const b = rand(1, Math.floor((max - a) / 2))
@@ -120,12 +124,10 @@ function genChain(level) {
   return { expr: `${a} + ${b} + ${c}`, answer: String(a + b + c) }
 }
 
-// 填运算符: 单边 a ○ b = c，或双边 a ○ b = c ○ d
-function genFillOp(level) {
+// 填运算符: 单边 a ○ b = c
+function genFillOpSingle(level) {
   const cfg = LEVEL_CONFIG[level]
-  // 约40%概率出双边题
-  if (Math.random() < 0.4) return genFillOpDouble(level)
-  const isAdd = Math.random() > 0.5
+  const isAdd = randomSource() > 0.5
   let a, b, c
   if (isAdd) {
     a = rand(1, cfg.max - 1)
@@ -139,6 +141,11 @@ function genFillOp(level) {
   return { expr: `${a} ○ ${b} = ${c}`, answer: isAdd ? '+' : '-', type: 'fillOp' }
 }
 
+// 在线练习保留原有约40%双边题行为；综合卷通过具体别名单独生成两类题。
+function genFillOp(level) {
+  return randomSource() < 0.4 ? genFillOpDouble(level) : genFillOpSingle(level)
+}
+
 // 双边填运算符: a ○ b = c ○ d，两边都要填
 function genFillOpDouble(level) {
   const cfg = LEVEL_CONFIG[level]
@@ -146,7 +153,7 @@ function genFillOpDouble(level) {
     // 先确定目标值
     const target = rand(2, cfg.max - 1)
     // 左边: a op1 b = target
-    const leftAdd = Math.random() > 0.5
+    const leftAdd = randomSource() > 0.5
     let a, b
     if (leftAdd) {
       a = rand(1, target - 1)
@@ -157,7 +164,7 @@ function genFillOpDouble(level) {
       if (b <= 0 || a > cfg.max) continue
     }
     // 右边: c op2 d = target
-    const rightAdd = Math.random() > 0.5
+    const rightAdd = randomSource() > 0.5
     let c, d
     if (rightAdd) {
       c = rand(1, target - 1)
@@ -196,8 +203,8 @@ function genHundredChart(level) {
   let attempts = 0
   while (cells.length < cellCount && attempts < 100) {
     attempts++
-    const base = cells[Math.floor(Math.random() * cells.length)]
-    const dir = dirs[Math.floor(Math.random() * dirs.length)]
+    const base = cells[Math.floor(randomSource() * cells.length)]
+    const dir = dirs[Math.floor(randomSource() * dirs.length)]
     const nr = base.r + dir.r, nc = base.c + dir.c
     const key = `${nr},${nc}`
     if (cellSet.has(key)) continue
@@ -265,7 +272,7 @@ function genTriangle(level) {
       ['C', 'AB', 'BC'],
       ['C', 'AB', 'AC'],
     ]
-    const shown = validShown[Math.floor(Math.random() * validShown.length)]
+    const shown = validShown[Math.floor(randomSource() * validShown.length)]
     const hidden = Object.keys(vals).filter(k => !shown.includes(k))
     return {
       expr: JSON.stringify({ target, vals, shown, hidden }),
@@ -311,7 +318,7 @@ function genSquare(level) {
       ['A', 'C', 'D', 'AB'],  ['A', 'C', 'D', 'BC'],
       ['B', 'C', 'D', 'AB'],  ['B', 'C', 'D', 'DA'],
     ]
-    const shown = validShown[Math.floor(Math.random() * validShown.length)]
+    const shown = validShown[Math.floor(randomSource() * validShown.length)]
     const hidden = Object.keys(vals).filter(k => !shown.includes(k))
     return {
       expr: JSON.stringify({ target, vals, shown, hidden }),
@@ -364,7 +371,7 @@ function genTriangleFree(level) {
 function shuffleArr(arr) {
   const a = [...arr]
   for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
+    const j = Math.floor(randomSource() * (i + 1))
     ;[a[i], a[j]] = [a[j], a[i]]
   }
   return a
@@ -372,11 +379,12 @@ function shuffleArr(arr) {
 
 // 图形填数: 随机三角形或方形（唯一解）
 function genShapeFill(level) {
-  return Math.random() > 0.5 ? genTriangle(level) : genSquare(level)
+  return randomSource() > 0.5 ? genTriangle(level) : genSquare(level)
 }
 
 // 判题：triangle-free 动态校验，其他题型字符串比对
 export function checkAnswer(q) {
+  assertAvailableLearningGrade(q?.grade)
   if (q.type === 'triangle-free') {
     return checkTriangleFree(q)
   }
@@ -404,7 +412,12 @@ function checkTriangleFree(q) {
   return (A + AB + B === t) && (B + BC + C === t) && (A + AC + C === t)
 }
 
-const TYPE_GENERATORS = { add: genAdd, sub: genSub, compare: genCompare, fill: genFillBlank, chain: genChain, fillOp: genFillOp, hundredChart: genHundredChart, shapeFill: genShapeFill, triangleFree: genTriangleFree }
+const TYPE_GENERATORS = {
+  add: genAdd, sub: genSub, compare: genCompare, fill: genFillBlank, chain: genChain,
+  fillOp: genFillOp, fillOpSingle: genFillOpSingle, fillOpDouble: genFillOpDouble,
+  hundredChart: genHundredChart, shapeFill: genShapeFill,
+  triangle: genTriangle, square: genSquare, triangleFree: genTriangleFree,
+}
 const MIX_TYPES = ['add', 'add', 'sub', 'sub', 'compare', 'fill', 'chain', 'fillOp', 'hundredChart', 'shapeFill']
 const PRINT_TYPES = ['add', 'add', 'sub', 'sub', 'chain']
 const PRINT_NO_CHAIN_TYPES = ['add', 'sub']
@@ -412,7 +425,12 @@ const PRINT_NO_CHAIN_TYPES = ['add', 'sub']
 // Main export: generate questions
 // questionType: string | string[] — 'add'/'sub'/'compare'/'fill'/'chain'/'mix'/'print' 或数组如 ['add','sub']
 // level: number | string | number[] — 1/2/3/'mix' 或数组如 [1,2]
-export function generateQuestions({ level, count, questionType = 'mix' }) {
+export function generateQuestions({ grade, level, count, questionType = 'mix', rng = Math.random }) {
+  assertAvailableLearningGrade(grade)
+  if (typeof rng !== 'function') throw new TypeError('rng 必须是函数')
+  const previousRandomSource = randomSource
+  randomSource = rng
+  try {
   // 支持数组形式的 level
   let levels
   if (Array.isArray(level)) levels = level
@@ -431,18 +449,21 @@ export function generateQuestions({ level, count, questionType = 'mix' }) {
   else typePool = [questionType]
 
   for (let i = 0; i < count; i++) {
-    const lv = levels[Math.floor(Math.random() * levels.length)]
+    const lv = levels[Math.floor(randomSource() * levels.length)]
     let q = null
     for (let retry = 0; retry < 10; retry++) {
-      const type = typePool[Math.floor(Math.random() * typePool.length)]
+      const type = typePool[Math.floor(randomSource() * typePool.length)]
       const gen = TYPE_GENERATORS[type]
       q = gen(lv)
       if (!q.type) q.type = type
       if (!seen.has(q.expr)) { seen.add(q.expr); break }
     }
-    questions.push(q)
+    questions.push({ ...q, grade })
   }
-  return questions
+    return questions
+  } finally {
+    randomSource = previousRandomSource
+  }
 }
 
 export { LEVEL_CONFIG }

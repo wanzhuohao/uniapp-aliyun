@@ -101,6 +101,8 @@ import PageHeader from '../../components/PageHeader.vue'
 import { generateQuestions, LEVEL_CONFIG } from '../../utils/math/questionEngine.js'
 import { saveRecord } from '../../utils/math/mathStorage.js'
 import { toast } from '../../utils/common/toast.js'
+import { awaitLearningSession } from '../../utils/common/learningSession.js'
+import { openCourseGradeSession } from '../../utils/common/gradeContext.js'
 
 // ─── State ────────────────────────────────────────────────────────────────────
 
@@ -108,6 +110,7 @@ const selectedLevel = ref(1)
 const includeChain = ref(false)
 const questions = ref([])
 const showAnswerSheet = ref(false)
+let sessionGrade
 
 // ─── Mobile scaling ───────────────────────────────────────────────────────────
 // A4 sheet 固定 210mm ≈ 794px 宽，窄屏上缩放显示，保证预览=打印
@@ -145,7 +148,9 @@ function updateSheetScale() {
   })
 }
 
-onMounted(() => {
+onMounted(async () => {
+  await awaitLearningSession()
+  sessionGrade = openCourseGradeSession()
   updateSheetScale()
   window.addEventListener('resize', updateSheetScale)
 })
@@ -182,6 +187,7 @@ function formatDate(date) {
 
 function generateSheet() {
   questions.value = generateQuestions({
+    grade: sessionGrade,
     level: selectedLevel.value,
     count: 100,
     questionType: includeChain.value ? 'print' : 'print-no-chain',
@@ -207,6 +213,7 @@ function isMobile() {
 
 async function handlePrint() {
   saveRecord({
+    grade: sessionGrade,
     type: 'print',
     level: selectedLevel.value,
     total: questions.value.length,

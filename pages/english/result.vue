@@ -1,5 +1,6 @@
 <template>
-  <view class="result-page">
+  <view v-if="courseReady" class="result-page">
+    <GradeBadge class="result-grade" :label="gradeLabel" />
     <!-- 装饰气球 -->
     <view class="balloon balloon-1">🎈</view>
     <view class="balloon balloon-2">🎈</view>
@@ -32,10 +33,17 @@
       </view>
     </view>
   </view>
+  <GradeBadge v-else :label="gradeLabel" />
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted, ref } from 'vue'
+import GradeBadge from '../../components/learning/GradeBadge.vue'
+import { awaitLearningSession } from '../../utils/common/learningSession.js'
+import { getLearningGradeLabel, openCourseGradeSession } from '../../utils/common/gradeContext.js'
+
+const gradeLabel = ref('')
+const courseReady = ref(false)
 
 const query = (() => {
   const pages = getCurrentPages()
@@ -67,6 +75,16 @@ function playAgain() {
 function goHome() {
   uni.navigateBack({ delta: 2 })
 }
+
+onMounted(async () => {
+  try {
+    await awaitLearningSession()
+    gradeLabel.value = getLearningGradeLabel(openCourseGradeSession())
+    courseReady.value = true
+  } catch {
+    gradeLabel.value = ''
+  }
+})
 </script>
 
 <style scoped>
@@ -80,6 +98,7 @@ function goHome() {
   position: relative;
   overflow: hidden;
 }
+.result-grade { position: absolute; top: 24rpx; right: 28rpx; z-index: 3; background: #26a69a; }
 
 /* 装饰 */
 .balloon {

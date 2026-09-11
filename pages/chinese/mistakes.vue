@@ -84,6 +84,10 @@ import { onShow } from '@dcloudio/uni-app'
 import PageHeader from '../../components/PageHeader.vue'
 import { getAllWrongList, getWrongStats } from '../../utils/chinese/mistakes.js'
 import { getRecentLogs } from '../../utils/chinese/practiceLog.js'
+import { awaitLearningSession } from '../../utils/common/learningSession.js'
+import { openCourseGradeSession } from '../../utils/common/gradeContext.js'
+
+let sessionGrade
 import TrendChart from '../../components/chinese/TrendChart.vue'
 
 const stats = ref({
@@ -113,15 +117,17 @@ const filteredList = computed(() => {
 })
 
 function loadData() {
-  stats.value = getWrongStats()
-  wrongList.value = getAllWrongList()
-  trendData.value = getRecentLogs(7).map(d => ({
+  stats.value = getWrongStats(sessionGrade)
+  wrongList.value = getAllWrongList(sessionGrade)
+  trendData.value = getRecentLogs(sessionGrade, 7).map(d => ({
     label: d.label,
     rate: d.accuracy != null ? d.accuracy : null,
   }))
 }
 
-onShow(() => {
+onShow(async () => {
+  await awaitLearningSession()
+  if (!sessionGrade) sessionGrade = openCourseGradeSession()
   loadData()
 })
 

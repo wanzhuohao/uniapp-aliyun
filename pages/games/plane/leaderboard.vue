@@ -53,6 +53,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { getLeaderboard } from './api.js';
+import { awaitLearningSession } from '../../../utils/common/learningSession.js';
 
 const list = ref([]);
 const loading = ref(true);
@@ -66,6 +67,7 @@ function formatTime(sec) {
 async function loadData() {
   loading.value = true;
   try {
+    await awaitLearningSession();
     list.value = await getLeaderboard(50);
   } catch (e) {
     uni.showToast({ title: e.message || '加载失败', icon: 'none' });

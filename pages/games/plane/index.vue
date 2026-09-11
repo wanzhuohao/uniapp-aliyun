@@ -238,6 +238,7 @@
 import { ref, shallowRef, reactive, onMounted, onBeforeUnmount, computed, nextTick, watch } from 'vue';
 import { createEngine } from './engine.js';
 import { submitScore } from './api.js';
+import { awaitLearningSession } from '../../../utils/common/learningSession.js';
 
 const stats = reactive({ hp: 3, maxHp: 3, shield: 0, xp: 0, xpNeed: 6, level: 1, kills: 0, time: 0 });
 const upgradeChoices = ref([]);
@@ -319,6 +320,8 @@ function startEngine() {
 
 onMounted(async () => {
   mounted = true;
+  await awaitLearningSession();
+  if (!mounted) return;
   await nextTick();
   setTimeout(startEngine, 50);
 

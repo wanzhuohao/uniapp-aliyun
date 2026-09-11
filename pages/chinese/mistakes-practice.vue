@@ -6,10 +6,11 @@
       :total="totalCount"
       @cancel="exitMode"
     />
+    <GradeBadge v-if="mode && !finishedMode" class="grade-float" :label="gradeLabel" />
     <view v-else class="top-bar">
       <view class="back-btn" @click="goBack">←</view>
       <text class="page-title">错题重练</text>
-      <text class="placeholder"></text>
+      <GradeBadge :label="gradeLabel" />
     </view>
 
     <view v-if="!mode" class="filter-area">
@@ -55,7 +56,7 @@
 
     <view v-if="mode === 'pinyin' && !finishedMode && currentPinyinQ" class="quiz-wrap">
       <QuestionCard
-        :key="'p-' + currentIndex"
+        :key="'p-' + currentIndex + '-' + answerAttemptKey"
         :question="currentPinyinQ.question"
         :questionType="currentPinyinQ.questionType"
         :options="currentPinyinQ.options"
@@ -65,6 +66,7 @@
 
     <HanziQuestion
       v-if="mode === 'hanzi' && !finishedMode && currentHanziQ"
+      :key="'h-' + currentIndex + '-' + answerAttemptKey"
       :question="currentHanziQ"
       @answer="handleHanziAnswer"
     />
@@ -90,6 +92,9 @@ import HanziQuestion from '../../components/chinese/HanziQuestion.vue'
 import { getDueList, getAllWrongList, recordCorrect, recordWrongAgain } from '../../utils/chinese/mistakes.js'
 import { getQuestions } from '../../utils/chinese/questionLoader.js'
 import { shuffle, sampleWithout, ALL_STRUCTURES, buildRadicalOptions, buildStructureOptions, buildStrokeCountOptions } from '../../utils/chinese/questionHelper.js'
+import { awaitLearningSession } from '../../utils/common/learningSession.js'
+import { getLearningGradeLabel, openCourseGradeSession } from '../../utils/common/gradeContext.js'
+import GradeBadge from '../../components/learning/GradeBadge.vue'
 
 const practiceAll = ref(false)
 const mode = ref('')
@@ -108,6 +113,17 @@ const totalUnmastered = computed(() => counts.value.pinyin + counts.value.hanzi)
 const currentIndex = ref(0)
 const correctCount = ref(0)
 const masteredThisRound = ref(0)
+const answerAttemptKey = ref(0)
+const gradeLabel = ref('')
+let sessionGrade
+
+function showStorageFailure() {
+  uni.showModal({
+    title: '学习记录未保存',
+    content: '本机存储空间不足或不可用。请清理空间后重试当前题。',
+    showCancel: false,
+  })
+}
 
 const pinyinQueue = ref([])
 const currentPinyinQ = computed(() => pinyinQueue.value[currentIndex.value] || null)
@@ -122,7 +138,7 @@ const totalCount = computed(() => {
 })
 
 function loadAllWrong() {
-  const list = practiceAll.value ? getAllWrongList() : getDueList()
+  const list = practiceAll.value ? getAllWrongList(sessionGrade) : getDueList(sessionGrade)
   const groups = { pinyin: [], hanzi: [] }
   for (const w of list) {
     if (w.type === 'pinyin') groups.pinyin.push(w)
@@ -136,8 +152,8 @@ function loadUnitData(units) {
     if (unitPoolMap.value[unit]) continue
     // pinyin 和 stroke 两种 type 都要读，合并
     const combined = []
-    const p = getQuestions('pinyin', unit)
-    const s = getQuestions('stroke', unit)
+    const p = getQuestions(sessionGrade, 'pinyin', unit)
+    const s = getQuestions(sessionGrade, 'stroke', unit)
     if (p) combined.push(...p)
     if (s) combined.push(...s)
     if (combined.length > 0) {
@@ -155,6 +171,7 @@ function enterMode(type) {
   currentIndex.value = 0
   correctCount.value = 0
   masteredThisRound.value = 0
+  answerAttemptKey.value = 0
 
   if (type === 'pinyin') preparePinyinMode()
   else if (type === 'hanzi') prepareHanziMode()
@@ -251,11 +268,21 @@ function handlePinyinAnswer({ isCorrect }) {
   if (!q) return
   const w = q._wrong
   if (isCorrect) {
+    const r = recordCorrect(sessionGrade, w._id, w.box, w.correctCount || 0)
+    if (!r?.saved) {
+      answerAttemptKey.value++
+      showStorageFailure()
+      return
+    }
     correctCount.value++
-    const r = recordCorrect(w._id, w.box, w.correctCount || 0)
     if (r.mastered) masteredThisRound.value++
   } else {
-    recordWrongAgain(w._id, w.box, w.wrongCount || 0)
+    const saved = recordWrongAgain(sessionGrade, w._id, w.box, w.wrongCount || 0)
+    if (!saved) {
+      answerAttemptKey.value++
+      showStorageFailure()
+      return
+    }
   }
   if (currentIndex.value < pinyinQueue.value.length - 1) {
     currentIndex.value++
@@ -269,11 +296,21 @@ function handleHanziAnswer({ isCorrect }) {
   if (!q) return
   const w = q._wrong
   if (isCorrect) {
+    const r = recordCorrect(sessionGrade, w._id, w.box, w.correctCount || 0)
+    if (!r?.saved) {
+      answerAttemptKey.value++
+      showStorageFailure()
+      return
+    }
     correctCount.value++
-    const r = recordCorrect(w._id, w.box, w.correctCount || 0)
     if (r.mastered) masteredThisRound.value++
   } else {
-    recordWrongAgain(w._id, w.box, w.wrongCount || 0)
+    const saved = recordWrongAgain(sessionGrade, w._id, w.box, w.wrongCount || 0)
+    if (!saved) {
+      answerAttemptKey.value++
+      showStorageFailure()
+      return
+    }
   }
   advanceHanzi()
 }
@@ -296,6 +333,7 @@ function exitMode() {
   currentIndex.value = 0
   correctCount.value = 0
   masteredThisRound.value = 0
+  answerAttemptKey.value = 0
   pinyinQueue.value = []
   hanziQueue.value = []
   loadAllWrong()
@@ -314,12 +352,16 @@ function switchToDue() {
   loadAllWrong()
 }
 
-onMounted(() => {
+onMounted(async () => {
+  await awaitLearningSession()
+  sessionGrade = openCourseGradeSession()
+  gradeLabel.value = getLearningGradeLabel(sessionGrade)
   loadAllWrong()
 })
 </script>
 
 <style scoped>
+.grade-float { position: fixed; top: 20rpx; right: 24rpx; z-index: 20; background: #a62d33; }
 .wbp-page {
   min-height: 100vh;
   background: #FAF6EE;

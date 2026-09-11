@@ -1,4 +1,9 @@
 // 练习日志：每次练习记一条（type/totalCount/correctCount），按 storageKey 划分学科。
+import { safeSetStorage } from './safeStorage.js'
+import { isLearningStorageGateError, learningStorageApi } from './learningSession.js'
+import { assertAvailableLearningGrade, assertCurrentLearningGrade } from './gradeContext.js'
+import { mergeLearningGradeRecords, projectLearningValue, selectLearningGrade } from './gradeMigration.js'
+
 const MAX_LOGS = 1000
 
 function todayStr() {
@@ -7,35 +12,46 @@ function todayStr() {
 }
 
 export function createPracticeLog({ storageKey }) {
-  function loadAll() {
+  function loadProjected() {
     try {
-      const raw = uni.getStorageSync(storageKey)
-      if (Array.isArray(raw)) return raw
+      const raw = learningStorageApi.getStorageSync(storageKey)
+      const projected = projectLearningValue(storageKey, Array.isArray(raw) ? raw : [])
+      if (Array.isArray(projected)) return projected
       return []
     } catch (e) {
+      if (isLearningStorageGateError(e)) throw e
       return []
     }
   }
 
-  function saveAll(list) {
-    if (list.length > MAX_LOGS) list = list.slice(-MAX_LOGS)
-    uni.setStorageSync(storageKey, list)
+  function loadAll(grade) {
+    assertAvailableLearningGrade(grade)
+    return selectLearningGrade(storageKey, loadProjected(), grade)
   }
 
-  function recordPractice({ type, totalCount, correctCount }) {
-    const all = loadAll()
-    all.push({
+  function saveAll(grade, current, full) {
+    const target = mergeLearningGradeRecords(storageKey, full, grade, current, { limit: MAX_LOGS })
+    assertCurrentLearningGrade(grade)
+    return safeSetStorage(storageKey, target)
+  }
+
+  function recordPractice({ grade, type, totalCount, correctCount }) {
+    assertAvailableLearningGrade(grade)
+    const full = loadProjected()
+    const current = selectLearningGrade(storageKey, full, grade)
+    current.push({
+      grade,
       type,
       date: todayStr(),
       totalCount,
       correctCount,
       createdAt: Date.now(),
     })
-    saveAll(all)
+    return saveAll(grade, current, full)
   }
 
-  function getRecentLogs(days = 7) {
-    const all = loadAll()
+  function getRecentLogs(grade, days = 7) {
+    const all = loadAll(grade)
     const now = new Date()
     const startTs = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime() - (days - 1) * 24 * 60 * 60 * 1000
 
@@ -62,5 +78,5 @@ export function createPracticeLog({ storageKey }) {
     return result
   }
 
-  return { recordPractice, getRecentLogs }
+  return { loadAll, recordPractice, getRecentLogs }
 }

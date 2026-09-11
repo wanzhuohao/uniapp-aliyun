@@ -3,7 +3,7 @@
     <view v-if="!started || finished" class="top-bar">
       <view class="back-btn" @click="goBack">←</view>
       <text class="page-title">错题重练</text>
-      <text class="placeholder"></text>
+      <GradeBadge :label="gradeLabel" />
     </view>
     <view v-else class="practice-bar">
       <view class="back-btn" @click="exitPractice">←</view>
@@ -16,6 +16,7 @@
         />
       </view>
       <text class="progress-text">{{ currentIndex + 1 }}/{{ queue.length }}</text>
+      <GradeBadge :label="gradeLabel" />
     </view>
 
     <view v-if="!started" class="filter-area">
@@ -58,7 +59,7 @@
 
     <WordQuestion
       v-if="started && !finished && currentQ"
-      :key="currentIndex"
+      :key="currentIndex + '-' + answerAttemptKey"
       :question="currentQ.source"
       :options="currentQ.options"
       :qType="currentQ.qType"
@@ -84,6 +85,9 @@ import WordQuestion from '../../components/english/WordQuestion.vue'
 import { getAllWrongList, getDueList, recordCorrect, recordWrongAgain } from '../../utils/english/mistakes.js'
 import { getAllWords } from '../../utils/english/questionLoader.js'
 import { shuffle, sampleWithout } from '../../utils/english/questionHelper.js'
+import { awaitLearningSession } from '../../utils/common/learningSession.js'
+import { getLearningGradeLabel, openCourseGradeSession } from '../../utils/common/gradeContext.js'
+import GradeBadge from '../../components/learning/GradeBadge.vue'
 
 const practiceAll = ref(false)
 const started = ref(false)
@@ -100,12 +104,23 @@ const queue = ref([])
 const currentIndex = ref(0)
 const correctCount = ref(0)
 const masteredThisRound = ref(0)
+const answerAttemptKey = ref(0)
+const gradeLabel = ref('')
+let sessionGrade
+
+function showStorageFailure() {
+  uni.showModal({
+    title: '学习记录未保存',
+    content: '本机存储空间不足或不可用。请清理空间后重试当前题。',
+    showCancel: false,
+  })
+}
 
 const currentQ = computed(() => queue.value[currentIndex.value] || null)
 
 function loadRecords() {
-  dueRecords.value = getDueList()
-  allRecords.value = getAllWrongList()
+  dueRecords.value = getDueList(sessionGrade)
+  allRecords.value = getAllWrongList(sessionGrade)
 }
 
 function togglePracticeAll() {
@@ -113,7 +128,7 @@ function togglePracticeAll() {
 }
 
 function buildQuiz(records) {
-  const allWords = getAllWords()
+  const allWords = getAllWords(sessionGrade)
   const byId = {}
   for (const w of allWords) byId[w._id] = w
   const out = []
@@ -140,6 +155,7 @@ function startPractice() {
   currentIndex.value = 0
   correctCount.value = 0
   masteredThisRound.value = 0
+  answerAttemptKey.value = 0
   finished.value = false
   started.value = queue.value.length > 0
   if (!started.value) finished.value = true
@@ -150,11 +166,21 @@ function handleAnswer({ isCorrect }) {
   if (!q) return
   const w = q._wrong
   if (isCorrect) {
+    const r = recordCorrect(sessionGrade, w._id, w.box, w.correctCount || 0)
+    if (!r?.saved) {
+      answerAttemptKey.value++
+      showStorageFailure()
+      return
+    }
     correctCount.value++
-    const r = recordCorrect(w._id, w.box, w.correctCount || 0)
     if (r.mastered) masteredThisRound.value++
   } else {
-    recordWrongAgain(w._id, w.box, w.wrongCount || 0)
+    const saved = recordWrongAgain(sessionGrade, w._id, w.box, w.wrongCount || 0)
+    if (!saved) {
+      answerAttemptKey.value++
+      showStorageFailure()
+      return
+    }
   }
   if (currentIndex.value < queue.value.length - 1) {
     currentIndex.value++
@@ -170,6 +196,7 @@ function exitPractice() {
     success(res) {
       if (res.confirm) {
         started.value = false
+        answerAttemptKey.value = 0
         loadRecords()
       }
     },
@@ -180,13 +207,19 @@ function reset() {
   loadRecords()
   started.value = false
   finished.value = false
+  answerAttemptKey.value = 0
 }
 
 function goBack() {
   uni.navigateBack()
 }
 
-onMounted(() => { loadRecords() })
+onMounted(async () => {
+  await awaitLearningSession()
+  sessionGrade = openCourseGradeSession()
+  gradeLabel.value = getLearningGradeLabel(sessionGrade)
+  loadRecords()
+})
 </script>
 
 <style scoped>

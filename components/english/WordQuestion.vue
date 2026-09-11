@@ -49,7 +49,7 @@
 
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
-import { speakEn } from '../../utils/common/speech.js'
+import { speakEn, stopEnSpeech } from '../../utils/common/speech.js'
 
 const props = defineProps({
   question: { type: Object, required: true },
@@ -64,10 +64,13 @@ const selectedIdx = ref(-1)
 const answered = computed(() => !!choiceState.value)
 let pendingTimer = null
 let bootTimer = null
+let answerGeneration = 0
 
 const qTypeLabel = computed(() => props.qType === 'img2word' ? '看图选词' : '听词选图')
 
 function resetState() {
+  answerGeneration++
+  stopEnSpeech()
   choiceState.value = ''
   selectedIdx.value = -1
   if (pendingTimer) {
@@ -82,6 +85,7 @@ function pickOption(i) {
   const opt = props.options[i]
   if (!opt) return
   const isCorrect = !!opt.isCorrect
+  const generation = ++answerGeneration
   choiceState.value = isCorrect ? 'correct' : 'wrong'
   // 答题后朗读正确单词，等播完 + 最少展示时长都满足再切下一题
   const minDelay = isCorrect ? 600 : 1200
@@ -91,7 +95,7 @@ function pickOption(i) {
   const delayPromise = new Promise((r) => { pendingTimer = setTimeout(r, minDelay) })
   Promise.all([speakPromise, delayPromise]).then(() => {
     pendingTimer = null
-    if (choiceState.value) emit('answer', { isCorrect, optionIndex: i })
+    if (generation === answerGeneration && choiceState.value) emit('answer', { isCorrect, optionIndex: i })
   })
 }
 
@@ -119,8 +123,10 @@ watch(() => props.question?.word, (nw) => {
 })
 
 onUnmounted(() => {
+  answerGeneration++
   if (bootTimer) clearTimeout(bootTimer)
   if (pendingTimer) clearTimeout(pendingTimer)
+  stopEnSpeech()
 })
 </script>
 
