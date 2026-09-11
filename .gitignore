@@ -6,3 +6,6 @@ uniCloud-aliyun/
 uni_modules/
 tools/.idiom-raw.json
 ngrok.zip
+
+# 临时文件
+COMMIT_MSG.txt
