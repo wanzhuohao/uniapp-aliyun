@@ -12,6 +12,14 @@
 - P1 语音真机兼容：Chrome/Android/iOS/微信浏览器实测音频可听、自动播放限制、连续点击抢占、离页停止
 - P1 发布记录：每次发行 H5 同步登记公网地址/发布时间/源码基线/HBuilderX版本/主资源名/托管环境
 
+## 2026-09-12 P1 代码修复（语音离页停止 + 备份恢复成功提示 + 发布记录文件）
+
+- speech.js：新增 stopAllSpeech、visibilitychange/pagehide 全局监听（页面切后台自动停止所有语音）、zhVoiceAvailable 无中文语音包时静默跳过，避免部分系统用英文语音读中文
+- data-center.vue：confirmRestore/retryRecovery/confirmSafeClear 成功后显示 toast + location.reload()，之前成功路径无反馈
+- 新增 docs/release-notes.md：发布元信息模板 + 首次公网冒烟测试记录
+- 飞书文档更新备份/语音两个 P1 章节的代码实现状态
+- 验证：12/12 测试套件全通过
+
 ## 2026-09-11 P1 验收状态同步（公网冒烟测试与剩余验收项）
 
 - 飞书文档 rev 21 更新三个 P1 章节：备份/恢复/下载、语音与真机兼容、发布记录

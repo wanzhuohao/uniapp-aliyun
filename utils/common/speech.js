@@ -3,6 +3,7 @@ let cachedVoices = []
 let primed = false
 let enAudio = null
 let enFinish = null
+let zhVoiceAvailable = null // null=未知, true=有中文语音, false=无中文语音
 
 function cleanupEnAudio(audio) {
   if (!audio) return
@@ -23,15 +24,37 @@ export function stopEnSpeech() {
   }
 }
 
+// 停止所有语音（中文 TTS + 英文 Audio），页面切到后台或卸载时调用
+export function stopAllSpeech() {
+  stopEnSpeech()
+  if (typeof window !== 'undefined' && window.speechSynthesis) {
+    try { window.speechSynthesis.cancel() } catch (e) {}
+  }
+}
+
 function loadVoices() {
   if (typeof window === 'undefined' || !window.speechSynthesis) return
   const vs = window.speechSynthesis.getVoices()
-  if (vs && vs.length) cachedVoices = vs
+  if (vs && vs.length) {
+    cachedVoices = vs
+    zhVoiceAvailable = vs.some(x => (x.lang || '').toLowerCase().startsWith('zh'))
+  }
 }
 
 if (typeof window !== 'undefined' && window.speechSynthesis) {
   loadVoices()
   window.speechSynthesis.onvoiceschanged = loadVoices
+}
+
+// 页面切到后台时停止所有语音，避免回到前台时残留播放
+if (typeof document !== 'undefined') {
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') {
+      stopAllSpeech()
+    }
+  })
+  // pagehide 兼容旧浏览器和移动端
+  window.addEventListener('pagehide', stopAllSpeech)
 }
 
 // 在用户手势里同步调用一次，解锁 iOS/Safari 的 TTS 和 Audio
@@ -58,11 +81,13 @@ function speakWith(text, { lang, rate, pitch, voiceLangPrefix }) {
   if (!text) return
   try { window.speechSynthesis.resume() } catch (e) {}
   window.speechSynthesis.cancel()
+  if (!cachedVoices.length) loadVoices()
+  // 无中文语音包时静默跳过，避免部分系统用英文语音读中文
+  if (voiceLangPrefix === 'zh' && zhVoiceAvailable === false) return
   const utterance = new SpeechSynthesisUtterance(text)
   utterance.lang = lang
   utterance.rate = rate
   utterance.pitch = pitch
-  if (!cachedVoices.length) loadVoices()
   const v = cachedVoices.find(x => (x.lang || '').toLowerCase().startsWith(voiceLangPrefix))
   if (v) utterance.voice = v
   window.speechSynthesis.speak(utterance)
