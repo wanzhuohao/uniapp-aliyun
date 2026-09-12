@@ -1,5 +1,5 @@
 // 单元-课程配置
-export const UNIT_CONFIG = {
+const UNIT_CONFIG = {
   '2-1': {
     label: '第一单元',
     lessons: [
@@ -78,8 +78,41 @@ export const UNIT_CONFIG = {
   },
 }
 
+// 二年级上（grade2-term1）预留单元骨架：单元名先占位，课程只放一个「待补充」项，
+// 进单元出题为空即提示“该学期语文题库待补充”。等数据到位后再填充真实课程。
+const UNIT_ORDINALS = ['一', '二', '三', '四', '五', '六', '七', '八']
+const GRADE2_UNIT_CONFIG = Object.fromEntries(
+  UNIT_ORDINALS.map((ord, idx) => {
+    const unitKey = `3-${idx + 1}`
+    return [unitKey, {
+      label: `第${ord}单元`,
+      lessons: [{ key: `${unitKey}-0`, label: '待补充' }],
+    }]
+  })
+)
+
+// 学期 → 单元配置映射。value 用 gradeContext 的学期标识（grade1-term2 / grade2-term1）。
+// 一年级下（grade1-term2）沿用原有 UNIT_CONFIG（前缀 2），二年级上（grade2-term1）用占位骨架（前缀 3）。
+export const SEMESTER_UNIT_CONFIGS = {
+  'grade1-term2': UNIT_CONFIG,
+  'grade2-term1': GRADE2_UNIT_CONFIG,
+}
+
 export const UNIT_KEYS = Object.keys(UNIT_CONFIG)
 
 export function getLessonKeys(unitKey) {
   return (UNIT_CONFIG[unitKey]?.lessons || []).map(l => l.key)
+}
+
+// 按学期取单元配置文件：未知学期回退到一年级下，保证历史调用兼容。
+export function getSemesterUnitConfig(grade) {
+  return SEMESTER_UNIT_CONFIGS[grade] || UNIT_CONFIG
+}
+
+export function getSemesterUnitKeys(grade) {
+  return Object.keys(getSemesterUnitConfig(grade))
+}
+
+export function getSemesterLessonKeys(grade, unit) {
+  return (getSemesterUnitConfig(grade)[unit]?.lessons || []).map(l => l.key)
 }

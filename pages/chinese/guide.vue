@@ -38,7 +38,7 @@
       <view class="section">
         <text class="section-title">数据说明</text>
         <view class="item">
-          <text class="item-desc">所有数据（错题本、练习日志）都保存在本地浏览器，清除浏览器数据会丢失。当前题库覆盖一年级下第 1~8 全部单元。</text>
+          <text class="item-desc">所有数据（错题本、练习日志）都保存在本地浏览器，清除浏览器数据会丢失。当前可用学期为一年级下、二年级上。一年级下题库覆盖第 1~8 全部单元；二年级上已开放单元结构、题库待后续补充。</text>
         </view>
       </view>
 

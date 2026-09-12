@@ -70,8 +70,14 @@ function isIsoString(value) {
   return !Number.isNaN(date.getTime()) && date.toISOString() === value
 }
 
+const KNOWN_GRADE_VALUES = Object.freeze([
+  'grade1-term2', 'grade2-term1', 'grade2-term2',
+  'grade3-term1', 'grade3-term2', 'grade4-term1', 'grade4-term2',
+  'grade5-term1', 'grade5-term2', 'grade6-term1', 'grade6-term2',
+])
+
 function isKnownGrade(value) {
-  return ['grade1-term2', 'grade2', 'grade3', 'grade4', 'grade5', 'grade6'].includes(value)
+  return KNOWN_GRADE_VALUES.includes(value)
 }
 
 function isJsonObject(value) {
@@ -89,7 +95,7 @@ function validateBadgeMap(value) {
 
 function validateSpecialObject(key, value, schemaVersion = 'runtime') {
   if (key === STORAGE_KEYS.learningGrade) {
-    return hasExactKeys(value, ['schemaVersion', 'grade']) && value.schemaVersion === 1 && value.grade === 'grade1-term2'
+    return hasExactKeys(value, ['schemaVersion', 'grade']) && value.schemaVersion === 1 && isKnownGrade(value.grade)
   }
   if (key === STORAGE_KEYS.learningGoal) {
     const validV1 = hasExactKeys(value, ['schemaVersion', 'dailyTarget', 'updatedAt']) && value.schemaVersion === 1 &&

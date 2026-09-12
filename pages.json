@@ -1,6 +1,7 @@
 {
   "pages": [
     { "path": "pages/index/index", "style": { "navigationStyle": "custom", "navigationBarTitleText": "学习小天地" } },
+    { "path": "pages/setting/index", "style": { "navigationStyle": "custom", "navigationBarTitleText": "设置" } },
     { "path": "pages/learning/dashboard", "style": { "navigationStyle": "custom", "navigationBarTitleText": "学习看板" } },
     { "path": "pages/learning/data-center", "style": { "navigationStyle": "custom", "navigationBarTitleText": "数据中心" } },
     { "path": "pages/learning/paper", "style": { "navigationStyle": "custom", "navigationBarTitleText": "综合练习卷" } },

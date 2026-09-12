@@ -34,7 +34,7 @@
     </view>
 
     <view v-if="started && totalQuestions === 0" class="empty-hint">
-      <text>本单元暂无拼音题目</text>
+      <text>该学期语文题库待补充，数据更新后即可练习</text>
       <view class="back-btn" @click="onCancel">返回</view>
     </view>
 
@@ -62,16 +62,16 @@ import { getQuestions } from '../../utils/chinese/questionLoader.js'
 import { recordWrong } from '../../utils/chinese/mistakes.js'
 import { recordPractice } from '../../utils/chinese/practiceLog.js'
 import { getCurrentUnit, setCurrentUnit, getChinesePrefs, setChinesePrefs } from '../../utils/chinese/stateStore.js'
-import { UNIT_CONFIG, UNIT_KEYS, getLessonKeys } from '../../utils/chinese/unitConfig.js'
+import { getSemesterUnitConfig, getSemesterUnitKeys, getSemesterLessonKeys } from '../../utils/chinese/unitConfig.js'
 import { awaitLearningSession } from '../../utils/common/learningSession.js'
 import { openCourseGradeSession } from '../../utils/common/gradeContext.js'
 
 const PAGE_KEY = 'pinyin'
-const unitConfig = UNIT_CONFIG
-const unitKeys = UNIT_KEYS
+const unitConfig = computed(() => getSemesterUnitConfig(sessionGrade))
+const unitKeys = computed(() => getSemesterUnitKeys(sessionGrade))
 
-const currentUnit = ref(UNIT_KEYS[0])
-const selectedLessons = ref(getLessonKeys(currentUnit.value))
+const currentUnit = ref(getSemesterUnitKeys(null)[0])
+const selectedLessons = ref(getSemesterLessonKeys(null, currentUnit.value))
 const filterType = ref('')
 let preferencesHydrated = false
 let sessionGrade
@@ -79,7 +79,7 @@ let sessionGrade
 function hydratePreferences() {
   currentUnit.value = getCurrentUnit(sessionGrade)
   const savedPrefs = getChinesePrefs(sessionGrade, PAGE_KEY)
-  const all = getLessonKeys(currentUnit.value)
+  const all = getSemesterLessonKeys(sessionGrade, currentUnit.value)
   if (Array.isArray(savedPrefs?.selectedLessons)) {
     const filtered = savedPrefs.selectedLessons.filter(k => all.includes(k))
     selectedLessons.value = filtered.length ? filtered : all
@@ -89,7 +89,7 @@ function hydratePreferences() {
   filterType.value = typeof savedPrefs?.filterType === 'string' ? savedPrefs.filterType : ''
   preferencesHydrated = true
 }
-const currentLessons = computed(() => UNIT_CONFIG[currentUnit.value]?.lessons || [])
+const currentLessons = computed(() => unitConfig.value[currentUnit.value]?.lessons || [])
 const isAllLessonsSelected = computed(() =>
   currentLessons.value.length > 0 &&
   selectedLessons.value.length === currentLessons.value.length
@@ -120,7 +120,7 @@ function persistPrefs() {
 function switchUnit(uk) {
   currentUnit.value = uk
   setCurrentUnit(sessionGrade, uk)
-  selectedLessons.value = getLessonKeys(uk)
+  selectedLessons.value = getSemesterLessonKeys(sessionGrade, uk)
   persistPrefs()
 }
 function toggleLesson(key) {
@@ -130,7 +130,7 @@ function toggleLesson(key) {
   persistPrefs()
 }
 function toggleAllLessons() {
-  const all = getLessonKeys(currentUnit.value)
+  const all = getSemesterLessonKeys(sessionGrade, currentUnit.value)
   selectedLessons.value = isAllLessonsSelected.value ? [] : [...all]
   persistPrefs()
 }

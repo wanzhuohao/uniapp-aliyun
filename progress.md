@@ -7,6 +7,25 @@
 
 ## 待办
 
+- 二年级上语文题库数据待用户补充（当前仅单元骨架，出题提示「该学期语文题库待补充」）
+
+## 2026-09-12 语文按学期分开：二年级上开放单元骨架（方案 A）
+
+- `unitConfig.js`：新增 `SEMESTER_UNIT_CONFIGS` 学期→单元映射（grade1-term2 沿用 `2-x` 8 单元；grade2-term1 新建 `3-x` 8 单元占位骨架，每单元一个「待补充」课）
+- 新增 `getSemesterUnitConfig / getSemesterUnitKeys / getSemesterLessonKeys` 按学期取配置
+- `learn / pinyin / hanzi` 三练习页改用学期单元配置，选二年级上显示单元骨架、进单元出题为空提示「该学期语文题库待补充」
+- `stateStore.getCurrentUnit` 默认取当前学期第一单元，跨学期不取到不存在单元
+- `guide.vue` 数据说明更新为二年级上题库待后续补充
+
+## 2026-09-12 年级改为设置选学期：开放一年级下 + 二年级上
+
+- 新增首页右上角设置入口 + 设置页 `pages/setting/index.vue` 选择学期
+- 首页移除「当前年级」面板；学期选择从设置页完成
+- `gradeContext`：开放可用学期集 `AVAILABLE_LEARNING_GRADES = [grade1-term2, grade2-term1]`，新增 `saveLearningGrade`；其余学期置灰「待更新」
+- `storageRegistry`：`isKnownGrade` / learningGrade 校验改为接受学期白名单
+- 两学期暂共用同一套题库（语文/数学/英语题源与年级无关），后续按数据区分
+- 语文 guide 数据说明改为中性与年级无关的表述
+
 ## 2026-09-12 收工：数学历史页区分专注/在线/打印类型（P1 修复）
 
 - history.vue：新增专注 tab、badge-focus、isJudged 判定（focus 有 isCorrect 对错）；历史类型独立处理 online/focus/print，打印保持无对错
