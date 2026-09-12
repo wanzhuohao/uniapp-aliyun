@@ -29,8 +29,8 @@
           <view class="card-header-left">
             <!-- Type Badge -->
             <text
-              :class="['type-badge', record.type === 'online' ? 'badge-online' : 'badge-print']"
-            >{{ record.type === 'online' ? '在线' : '打印' }}</text>
+              :class="['type-badge', record.type === 'online' ? 'badge-online' : record.type === 'focus' ? 'badge-focus' : 'badge-print']"
+            >{{ record.type === 'online' ? '在线' : record.type === 'focus' ? '专注' : '打印' }}</text>
 
             <!-- Difficulty -->
             <text class="difficulty-name">{{ getLevelName(record.level) }}</text>
@@ -45,6 +45,10 @@
               <view v-if="record.type === 'online'" class="meta-row">
                 <text class="accuracy-text">{{ getAccuracy(record) }}%</text>
                 <text class="time-text">{{ formatTime(record.elapsed) }}</text>
+              </view>
+              <!-- Focus: accuracy only -->
+              <view v-else-if="record.type === 'focus'" class="meta-row">
+                <text class="accuracy-text">{{ getAccuracy(record) }}%</text>
               </view>
               <!-- Print: label -->
               <view v-else class="meta-row">
@@ -63,7 +67,7 @@
               v-for="(q, qi) in record.questions"
               :key="qi"
               :class="['grid-item',
-                record.type === 'online' && q.isCorrect === false && 'grid-item-wrong',
+                isJudged(record.type) && q.isCorrect === false && 'grid-item-wrong',
                 (q.type === 'hundredChart' || q.type === 'triangle' || q.type === 'triangle-free' || q.type === 'square') && 'grid-item-chart']"
             >
               <!-- 百数表：mini 网格 -->
@@ -79,8 +83,8 @@
                       </template>
                     </template>
                   </view>
-                  <text v-if="record.type === 'online' && q.isCorrect !== false" class="grid-correct"> ✓</text>
-                  <text v-if="record.type === 'online' && q.isCorrect === false" class="grid-answer"> ✗</text>
+                  <text v-if="isJudged(record.type) && q.isCorrect !== false" class="grid-correct"> ✓</text>
+                  <text v-if="isJudged(record.type) && q.isCorrect === false" class="grid-answer"> ✗</text>
                 </view>
               </template>
               <!-- 三角形填数（含自由填） -->
@@ -100,8 +104,8 @@
                       <text :class="['mt-c', parseShape(q.expr).shown.includes('C') ? 'mc-center' : 'mc-ans']">{{ parseShape(q.expr).vals.C }}</text>
                     </view>
                   </view>
-                  <text v-if="record.type === 'online' && q.isCorrect !== false" class="grid-correct"> ✓</text>
-                  <text v-if="record.type === 'online' && q.isCorrect === false" class="grid-answer"> ✗</text>
+                  <text v-if="isJudged(record.type) && q.isCorrect !== false" class="grid-correct"> ✓</text>
+                  <text v-if="isJudged(record.type) && q.isCorrect === false" class="grid-answer"> ✗</text>
                 </view>
               </template>
               <!-- 方形填数 -->
@@ -124,17 +128,17 @@
                       <text :class="['mt-c', parseShape(q.expr).shown.includes('C') ? 'mc-center' : 'mc-ans']">{{ parseShape(q.expr).vals.C }}</text>
                     </view>
                   </view>
-                  <text v-if="record.type === 'online' && q.isCorrect !== false" class="grid-correct"> ✓</text>
-                  <text v-if="record.type === 'online' && q.isCorrect === false" class="grid-answer"> ✗</text>
+                  <text v-if="isJudged(record.type) && q.isCorrect !== false" class="grid-correct"> ✓</text>
+                  <text v-if="isJudged(record.type) && q.isCorrect === false" class="grid-answer"> ✗</text>
                 </view>
               </template>
               <!-- 填运算符(单边+双边) -->
               <template v-else-if="q.type === 'fillOp' || q.type === 'fillOp2'">
-                <template v-if="record.type === 'online' && q.isCorrect !== false">
+                <template v-if="isJudged(record.type) && q.isCorrect !== false">
                   <text class="grid-expr">{{ formatOpExpr(q) }}</text>
                   <text class="grid-correct"> ✓</text>
                 </template>
-                <template v-else-if="record.type === 'online'">
+                <template v-else-if="isJudged(record.type)">
                   <text class="grid-expr">{{ formatOpExpr(q) }}</text>
                   <text class="grid-answer"> ✗</text>
                 </template>
@@ -144,8 +148,8 @@
               </template>
               <!-- 普通题 -->
               <template v-else>
-                <!-- 打印记录 -->
-                <template v-if="record.type !== 'online'">
+                <!-- 打印记录（无对错信息） -->
+                <template v-if="!isJudged(record.type)">
                   <text class="grid-expr">{{ exprParts(q.expr).before }}</text>
                   <text class="grid-answer">{{ q.answer }}</text>
                   <text class="grid-expr">{{ exprParts(q.expr).after }}</text>
@@ -187,6 +191,7 @@ let sessionGrade
 const tabs = [
   { label: '全部', value: 'all' },
   { label: '在线', value: 'online' },
+  { label: '专注', value: 'focus' },
   { label: '打印', value: 'print' },
 ]
 
@@ -222,6 +227,11 @@ function getAccuracy(record) {
   if (record.correct != null) return Math.round((record.correct / total) * 100)
   const correct = record.questions.filter(q => q.isCorrect !== false).length
   return Math.round((correct / total) * 100)
+}
+
+// online 和 focus 都有 isCorrect 对错信息，print 没有
+function isJudged(type) {
+  return type === 'online' || type === 'focus'
 }
 
 // 百数表 JSON 解析
@@ -413,6 +423,10 @@ onShow(async () => {
 
 .badge-print {
   background: #8EA8BF;
+}
+
+.badge-focus {
+  background: #6A1B9A;
 }
 
 /* Difficulty + Count */
