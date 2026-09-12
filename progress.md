@@ -2,10 +2,16 @@
 
 > 项目路径: `C:\claude code\uniapp-aliyun`
 > 技术栈: UniApp Vue3 + Composition API + uniCloud-aliyun
-> 最后更新: 2026-09-11
+> 最后更新: 2026-09-12
 > 状态: **开发中**
 
 ## 待办
+
+## 2026-09-12 收工：数学历史页区分专注/在线/打印类型（P1 修复）
+
+- history.vue：新增专注 tab、badge-focus、isJudged 判定（focus 有 isCorrect 对错）；历史类型独立处理 online/focus/print，打印保持无对错
+- 对应飞书文档 P1「专注记录被错误显示为打印练习」
+- 验证：direct-capabilities / global-grade 16/16 / storage / speech 等测试全通过
 
 - HBuilderX 编译验证（附件接入后未编译过）
 - P1 备份恢复：浏览器级下载事件确认 + 隔离配置导出-校验-导入-回滚-比对全链路验收
