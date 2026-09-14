@@ -1,6 +1,6 @@
 import { ACTIVE_LEARNING_GRADE, assertAvailableLearningGrade, isKnownLearningGrade } from './gradeContext.js'
 import { BACKUP_STORAGE_KEYS, LEGACY_BACKUP_STORAGE_KEYS, STORAGE_KEYS } from './storageRegistry.js'
-import { UNIT_CONFIG } from '../chinese/unitConfig.js'
+import { getSemesterUnitConfig } from '../chinese/unitConfig.js'
 
 const ARRAY_KEYS = new Set([
   STORAGE_KEYS.mathHistory,
@@ -217,7 +217,7 @@ function validLegacyScopedValue(key, value) {
   if (!isObject(value) || !isJsonSerializable(value)) return false
   if ([STORAGE_KEYS.mathOnlinePrefs, STORAGE_KEYS.chineseState, STORAGE_KEYS.englishState].includes(key)) {
     if (hasOwn(value, 'schemaVersion') || hasOwn(value, 'byGrade')) return false
-    if (key === STORAGE_KEYS.chineseState && hasOwn(value, 'currentUnit') && !hasOwn(UNIT_CONFIG, value.currentUnit)) return false
+    if (key === STORAGE_KEYS.chineseState && hasOwn(value, 'currentUnit') && !hasOwn(getSemesterUnitConfig(ACTIVE_LEARNING_GRADE), value.currentUnit)) return false
     if (hasOwn(value, 'prefs') && (!isObject(value.prefs) || Object.entries(value.prefs).some(([page, prefs]) => !isNonEmptyString(page) || !isObject(prefs)))) return false
     return true
   }
