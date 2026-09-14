@@ -9,6 +9,14 @@
 
 - 二年级上语文题库数据待用户补充（当前仅单元骨架，出题提示「该学期语文题库待补充」）
 
+## 2026-09-14 收工：修复 3 处过期回归断言（对齐学期模型）
+
+- 09-12「年级改为设置选学期、简写枚举改学期枚举」改了生产代码，但 3 处测试断言未同步更新导致回归变红（非生产 bug，是测试覆盖盲区）
+- `test-global-grade.mjs` G03：首页断言 → 设置页断言，年级简写枚举 → 学期枚举
+- `test-global-grade.mjs` G04：`isKnownLearningGrade('grade2')` / `('grade2-term1')` 翻转对齐学期语义
+- `test-direct-capabilities.mjs` P10：首页 `LEARNING_GRADE_OPTIONS` 断言 → 设置页
+- 验证：test-global-grade 14/16 → 16/16 全过；test-direct-capabilities 恢复全绿；其余测试脚本无失败
+
 ## 2026-09-12 语文按学期分开：二年级上开放单元骨架（方案 A）
 
 - `unitConfig.js`：新增 `SEMESTER_UNIT_CONFIGS` 学期→单元映射（grade1-term2 沿用 `2-x` 8 单元；grade2-term1 新建 `3-x` 8 单元占位骨架，每单元一个「待补充」课）

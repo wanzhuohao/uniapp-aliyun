@@ -163,12 +163,16 @@ test('G02 非法年级 fail-closed，修复只覆盖年级 key', () => {
   assert.equal(nullAdapter.calls.some(item => item.op === 'set'), false)
 })
 
-test('G03 首页是唯一年级选择入口，所有学习页展示冻结年级且综合卷无局部选择器', () => {
+test('G03 设置页展示学期选项，所有学习页展示冻结年级且综合卷无局部选择器', () => {
   assert.deepEqual(LEARNING_GRADE_OPTIONS.map(item => [item.value, item.disabled]), [
-    ['grade1-term2', false], ['grade2', true], ['grade3', true], ['grade4', true], ['grade5', true], ['grade6', true],
+    ['grade1-term2', false], ['grade2-term1', false], ['grade2-term2', true], ['grade3-term1', true],
+    ['grade3-term2', true], ['grade4-term1', true], ['grade4-term2', true], ['grade5-term1', true],
+    ['grade5-term2', true], ['grade6-term1', true], ['grade6-term2', true],
   ])
   const home = readFileSync(resolve(root, 'pages/index/index.vue'), 'utf8')
-  assert.match(home, /LEARNING_GRADE_OPTIONS/)
+  const setting = readFileSync(resolve(root, 'pages/setting/index.vue'), 'utf8')
+  assert.match(setting, /LEARNING_GRADE_OPTIONS/)
+  assert.doesNotMatch(home, /LEARNING_GRADE_OPTIONS/)
   const paper = readFileSync(resolve(root, 'pages/learning/paper.vue'), 'utf8')
   assert.match(paper, /openCourseGradeSession\(\)/)
   assert.doesNotMatch(paper, /LEARNING_GRADE_OPTIONS|gradeOptions|v-for="grade/)
@@ -206,8 +210,8 @@ test('G04 缺失、非法和未开放年级在业务存储前失败', () => {
   platform.calls.length = 0
   for (const run of cases) assert.throws(run, error => error?.code === 'LEARNING_GRADE_UNAVAILABLE')
   assert.deepEqual(platform.calls, [])
-  assert.equal(isKnownLearningGrade('grade2'), true)
-  assert.equal(isKnownLearningGrade('grade2-term1'), false)
+  assert.equal(isKnownLearningGrade('grade2'), false)
+  assert.equal(isKnownLearningGrade('grade2-term1'), true)
 })
 
 test('G05 旧日志只投影到一年级并保持顺序、原值与幂等性', () => {
