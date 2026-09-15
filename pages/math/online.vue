@@ -646,7 +646,13 @@ function toggleType(val) {
 // 按当前年级过滤可见题型，避免低年级出现高年级题型
 const visibleTypeOptions = computed(() => typeOptions.filter(t => gradeSupportsType(currentGrade.value, t.value)))
 
-const isAllTypesSelected = computed(() => visibleTypeOptions.value.length > 0 && selectedTypes.value.size === visibleTypeOptions.value.length)
+// 只统计/参与出的"当前年级可见"的已选类型：过滤掉跨年级或失效遗留在 Set 里的类型，
+// 否则 isAllTypesSelected（全选）和 selectedType 的计数会错位
+const effectiveTypes = computed(() =>
+  [...selectedTypes.value].filter(t => gradeSupportsType(currentGrade.value, t))
+)
+
+const isAllTypesSelected = computed(() => visibleTypeOptions.value.length > 0 && effectiveTypes.value.length === visibleTypeOptions.value.length)
 
 function toggleAllTypes() {
   selectedSpecial.value = ''
@@ -659,20 +665,23 @@ function toggleAllTypes() {
 
 function selectSpecial(val) {
   if (selectedSpecial.value === val) {
-    // 再次点击取消，回退到默认普通题型
+    // 再次点击取消，回退到默认普通题型（用当前年级第一个可见类型兜底）
     selectedSpecial.value = ''
-    if (selectedTypes.value.size === 0) selectedTypes.value = new Set(['add'])
+    if (effectiveTypes.value.length === 0) {
+      const first = visibleTypeOptions.value[0]
+      selectedTypes.value = new Set(first ? [first.value] : ['add'])
+    }
   } else {
     selectedSpecial.value = val
     selectedTypes.value = new Set()
   }
 }
 
-const canStart = computed(() => selectedTypes.value.size > 0 || !!selectedSpecial.value)
+const canStart = computed(() => effectiveTypes.value.length > 0 || !!selectedSpecial.value)
 
 const selectedType = computed(() => {
   if (selectedSpecial.value) return selectedSpecial.value
-  const arr = [...selectedTypes.value]
+  const arr = [...effectiveTypes.value]
   const allVisible = visibleTypeOptions.value.map(t => t.value)
   // 选中的恰好覆盖当前年级全部可见题型 → 用混合出题
   return allVisible.length > 0 && arr.length >= allVisible.length ? 'mix' : arr.length === 1 ? arr[0] : arr
@@ -696,7 +705,7 @@ let _persistTimer = null
 function flushPrefs() {
   savePrefs({
     level: selectedLevel.value,
-    types: [...selectedTypes.value],
+    types: [...effectiveTypes.value],
     special: selectedSpecial.value,
     count: selectedCount.value,
     customCountActive: customCountActive.value,
