@@ -8,7 +8,7 @@
           <text class="hero-title">学习小天地</text>
           <text class="hero-sub">每天一点点，慢慢就会了</text>
         </view>
-        <view class="setting-btn" @click="goTo('/pages/setting/index')">⚙</view>
+        <view class="grade-btn" @click="goTo('/pages/setting/index')">{{ gradeLabel || '切换年级' }}</view>
       </view>
     </view>
 
@@ -79,6 +79,19 @@
 </template>
 
 <script setup>
+import { onMounted, ref } from 'vue'
+import { getLearningGradeLabel, openCourseGradeSession } from '../../utils/common/gradeContext.js'
+
+const gradeLabel = ref('')
+
+onMounted(() => {
+  try {
+    gradeLabel.value = getLearningGradeLabel(openCourseGradeSession())
+  } catch {
+    gradeLabel.value = ''
+  }
+})
+
 function goTo(url) {
   uni.navigateTo({ url })
 }
@@ -125,21 +138,20 @@ function goTo(url) {
   letter-spacing: 2rpx;
   margin-top: 8rpx;
 }
-.setting-btn {
-  width: 60rpx;
-  height: 60rpx;
-  border-radius: 50%;
+.grade-btn {
+  padding: 12rpx 24rpx;
+  border-radius: 999rpx;
   background: #fff;
   box-shadow: 0 4rpx 14rpx rgba(31, 31, 31, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 34rpx;
-  color: #2a2520;
+  font-size: 24rpx;
+  color: #8B7D65;
   flex-shrink: 0;
   transition: transform 0.2s;
 }
-.setting-btn:active { transform: scale(0.9); }
+.grade-btn:active { transform: scale(0.92); }
 /* 卡片通用 */
 .card {
   position: relative;

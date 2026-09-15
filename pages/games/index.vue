@@ -9,22 +9,6 @@
         <text class="hero-sub">边玩边学，词字句话样样有</text>
       </view>
 
-      <!-- 飞机大战 -->
-      <view class="card card-plane" @click="goGame('plane')">
-        <view class="card-deco deco-plane">
-          <view class="plane-icon">
-            <view class="plane-body"></view>
-            <view class="plane-wing"></view>
-          </view>
-        </view>
-        <view class="card-main">
-          <text class="card-tag">PLANE WAR</text>
-          <text class="card-title">飞机大战</text>
-          <text class="card-desc">升级强化,击败敌机</text>
-        </view>
-        <text class="card-arrow">›</text>
-      </view>
-
       <view class="card card-idiom" @click="goTo('/pages/games/idiom-chain')">
         <view class="card-deco">
           <text class="deco-char c1">成</text>
@@ -99,6 +83,54 @@
         <text class="card-arrow">›</text>
       </view>
 
+      <!-- 记忆翻牌 -->
+      <view class="card card-memory" @click="goGame('memoryMatch')">
+        <view class="card-deco deco-memory">
+          <view class="mem-card m1">🍎</view>
+          <view class="mem-card m2">?</view>
+          <view class="mem-card m3">🐱</view>
+          <view class="mem-card m4">?</view>
+        </view>
+        <view class="card-main">
+          <text class="card-tag">MEMORY MATCH</text>
+          <text class="card-title">记忆翻牌</text>
+          <text class="card-desc">翻牌配对,锻炼记忆力</text>
+        </view>
+        <text class="card-arrow">›</text>
+      </view>
+
+      <!-- 飞机大战 -->
+      <view class="card card-plane" @click="goGame('plane')">
+        <view class="card-deco deco-plane">
+          <view class="plane-icon">
+            <view class="plane-body"></view>
+            <view class="plane-wing"></view>
+          </view>
+        </view>
+        <view class="card-main">
+          <text class="card-tag">PLANE WAR</text>
+          <text class="card-title">飞机大战</text>
+          <text class="card-desc">升级强化,击败敌机</text>
+        </view>
+        <text class="card-arrow">›</text>
+      </view>
+
+      <!-- 塔防肉鸽 -->
+      <view class="card card-tower" @click="goGame('towerDefense')">
+        <view class="card-deco deco-tower">
+          <view class="tower-turret">
+            <view class="tower-barrel"></view>
+          </view>
+          <view class="tower-base"></view>
+        </view>
+        <view class="card-main">
+          <text class="card-tag">TOWER DEFENSE</text>
+          <text class="card-title">塔防肉鸽</text>
+          <text class="card-desc">布防抵御,肉鸽养成</text>
+        </view>
+        <text class="card-arrow">›</text>
+      </view>
+
     </view>
   </view>
 </template>
@@ -112,6 +144,8 @@ const ROUTES = {
   slidingPuzzle: '/pages/games/sliding-puzzle',
   sudoku: '/pages/games/sudoku',
   plane: '/pages/games/plane/index',
+  memoryMatch: '/pages/games/memory-match',
+  towerDefense: '/pages/games/tower-defense',
 }
 
 function goTo(url) {
@@ -319,6 +353,32 @@ function goGame(key) {
 }
 .card-sudoku .card-tag { color: #C2185B; }
 
+/* ===== 记忆翻牌装饰 ===== */
+.deco-memory {
+  background: linear-gradient(135deg, #FFF3E0 0%, #FFB74D 100%);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  padding: 14rpx;
+  gap: 8rpx;
+}
+.deco-memory .mem-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border-radius: 10rpx;
+  font-size: 34rpx;
+  box-shadow: 0 2rpx 4rpx rgba(0,0,0,0.1);
+}
+.deco-memory .m2, .deco-memory .m4 {
+  background: linear-gradient(135deg, #FF8A65, #FF5722);
+  color: #fff;
+  font-size: 28rpx;
+  font-weight: bold;
+}
+.card-memory .card-tag { color: #E65100; }
+
 /* ===== 飞机大战装饰 ===== */
 .deco-plane {
   background: linear-gradient(135deg, #1A0E3D 0%, #0B1840 100%);
@@ -368,4 +428,53 @@ function goGame(key) {
   clip-path: polygon(0% 50%, 30% 0%, 70% 0%, 100% 50%, 70% 80%, 30% 80%);
 }
 .card-plane .card-tag { color: #7C4DFF; }
+
+/* ===== 塔防肉鸽装饰 ===== */
+.deco-tower {
+  background: linear-gradient(135deg, #2E2E38 0%, #44404E 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  position: relative;
+  padding-bottom: 16rpx;
+}
+.tower-turret {
+  position: relative;
+  width: 52rpx;
+  height: 44rpx;
+  background: linear-gradient(135deg, #7D6BFF 0%, #5B4BE0 100%);
+  border-radius: 14rpx 14rpx 6rpx 6rpx;
+}
+.tower-barrel {
+  position: absolute;
+  left: 50%;
+  top: -14rpx;
+  width: 10rpx;
+  height: 22rpx;
+  margin-left: -5rpx;
+  background: #3D3566;
+  border-radius: 4rpx 4rpx 0 0;
+  transform: rotate(-18deg);
+  transform-origin: bottom center;
+}
+.tower-base {
+  width: 64rpx;
+  height: 46rpx;
+  margin-top: -6rpx;
+  background: linear-gradient(180deg, #5B4BE0 0%, #3D3566 100%);
+  border-radius: 4rpx 4rpx 10rpx 10rpx;
+}
+.tower-base::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 26rpx;
+  width: 70rpx;
+  height: 6rpx;
+  margin-left: -35rpx;
+  background: rgba(255,255,255,0.3);
+  border-radius: 4rpx;
+}
+.card-tower .card-tag { color: #5B4BE0; }
 </style>

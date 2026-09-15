@@ -15,8 +15,27 @@
     </view>
 
     <view v-if="!started" class="filter-area">
-      <text class="filter-title">选择主题</text>
-      <view class="unit-tags">
+      <text class="filter-title">{{ isTextbookMode ? '选择单元' : '选择主题' }}</text>
+
+      <!-- 课文模式：按单元选（3 年级及以后） -->
+      <view v-if="isTextbookMode" class="unit-tags">
+        <view v-if="unitKeys.length === 0" class="empty-unit-hint">
+          <text>该学期课文内容待补充</text>
+        </view>
+        <template v-else>
+          <view
+            :class="['unit-tag', 'unit-tag-toggle', isAllUnitsSelected && 'active']"
+            @click="toggleAllUnits"
+          >{{ isAllUnitsSelected ? '全不选' : '全选' }}</view>
+          <view v-for="uk in unitKeys" :key="uk"
+            :class="['unit-tag', selectedUnits.includes(uk) && 'active']"
+            @click="toggleUnit(uk)"
+          >{{ unitConfig[uk].label }}</view>
+        </template>
+      </view>
+
+      <!-- 启蒙模式：按主题选（1-2 年级） -->
+      <view v-else class="unit-tags">
         <view
           :class="['unit-tag', 'unit-tag-toggle', isAllThemesSelected && 'active']"
           @click="toggleAllThemes"
@@ -37,7 +56,7 @@
     </view>
 
     <view v-if="started && totalQuestions === 0" class="empty-hint">
-      <text>请至少选择一个主题</text>
+      <text>{{ isTextbookMode ? '该学期课文内容待补充' : '请至少选择一个主题' }}</text>
       <view class="back-btn-lg" @click="started = false">返回</view>
     </view>
 
@@ -58,6 +77,7 @@ import { onShow } from '@dcloudio/uni-app'
 import PageHeader from '../../components/PageHeader.vue'
 import WordQuestion from '../../components/english/WordQuestion.vue'
 import { getWordsByTheme, getAllWords } from '../../utils/english/questionLoader.js'
+import { getEnglishUnitConfig, getEnglishUnitKeys } from '../../utils/english/unitConfig.js'
 import { recordWrong } from '../../utils/english/mistakes.js'
 import { recordPractice } from '../../utils/english/practiceLog.js'
 import { THEME_CONFIG, THEME_KEYS } from '../../utils/english/themeConfig.js'
@@ -76,6 +96,17 @@ const filterType = ref('')
 let preferencesHydrated = false
 let sessionGrade
 
+// 课文模式：3 年级及以后按单元选，1-2 年级维持启蒙（主题）
+const isTextbookMode = ref(false)
+const unitConfig = ref({})
+const unitKeys = ref([])
+const selectedUnits = ref([])
+const isAllUnitsSelected = computed(() => unitKeys.value.length > 0 && selectedUnits.value.length === unitKeys.value.length)
+
+function isTextbookGrade(grade) {
+  return /^grade([3-6])-/.test(grade || '')
+}
+
 function hydratePreferences() {
   const prefs = getEnglishPrefs(sessionGrade, PAGE_KEY)
   if (Array.isArray(prefs?.selectedThemes)) {
@@ -88,7 +119,7 @@ function hydratePreferences() {
   preferencesHydrated = true
 }
 const isAllThemesSelected = computed(() => selectedThemes.value.length === themeKeys.length)
-const canStart = computed(() => selectedThemes.value.length > 0)
+const canStart = computed(() => isTextbookMode.value ? selectedUnits.value.length > 0 : selectedThemes.value.length > 0)
 const started = ref(false)
 const currentIndex = ref(0)
 const correctCount = ref(0)
@@ -125,6 +156,14 @@ function toggleAllThemes() {
   selectedThemes.value = isAllThemesSelected.value ? [] : [...THEME_KEYS]
   persistPrefs()
 }
+function toggleUnit(uk) {
+  const idx = selectedUnits.value.indexOf(uk)
+  if (idx >= 0) selectedUnits.value.splice(idx, 1)
+  else selectedUnits.value.push(uk)
+}
+function toggleAllUnits() {
+  selectedUnits.value = isAllUnitsSelected.value ? [] : [...unitKeys.value]
+}
 function setFilterType(v) {
   filterType.value = v
   persistPrefs()
@@ -144,6 +183,11 @@ function buildQuestion(item, qType, allWords) {
 function startRound() {
   if (!canStart.value) return
   primeSpeech()
+  if (isTextbookMode.value) {
+    // 课文模式：单元内容待补充，暂无单词
+    uni.showToast({ title: '该学期课文内容待补充', icon: 'none', duration: 2000 })
+    return
+  }
   const words = sampleWithout(getWordsByTheme(sessionGrade, selectedThemes.value), 10)
   const allWords = getAllWords(sessionGrade)
   const types = filterType.value ? [filterType.value] : ['img2word', 'word2img']
@@ -209,6 +253,10 @@ function goBack() {
 onShow(async () => {
   await awaitLearningSession()
   if (!sessionGrade) sessionGrade = openCourseGradeSession()
+  isTextbookMode.value = isTextbookGrade(sessionGrade)
+  unitConfig.value = getEnglishUnitConfig(sessionGrade) || {}
+  unitKeys.value = getEnglishUnitKeys(sessionGrade)
+  if (selectedUnits.value.length === 0) selectedUnits.value = [...unitKeys.value]
   if (!preferencesHydrated) hydratePreferences()
   if (roundFinished.value) {
     started.value = false
@@ -304,6 +352,12 @@ onShow(async () => {
   min-width: 134rpx;
   text-align: center;
   box-sizing: border-box;
+}
+.empty-unit-hint {
+  padding: 40rpx 0;
+  color: #8EA5A5;
+  font-size: 26rpx;
+  letter-spacing: 2rpx;
 }
 .filter-tags {
   display: flex;

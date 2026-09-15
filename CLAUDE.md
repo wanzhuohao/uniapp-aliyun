@@ -37,6 +37,8 @@ pages/games/                — 小游戏模块
   sliding-puzzle / sliding-puzzle-guide  — 数字华容道
   sudoku / sudoku-guide  — 迷你数独
   plane/ (index.vue, engine.js, skills.js, leaderboard.vue) — 飞机肉鸽（从 uniapp 迁移）
+  memory-match / memory-match.js / memoryMatchStorage.js — 记忆翻牌（配对）
+  tower-defense / towerDefense.js / towerDefenseStorage.js — 塔防肉鸽（Canvas）
 
 utils/math/                 — 数学工具
   questionEngine.js / mathStorage.js
@@ -54,6 +56,7 @@ utils/english/              — 英语工具（全纯前端 localStorage）
   practiceLog.js            — 练习日志，key: english_practice_logs
   stateStore.js             — 偏好存储，key: english_state
   themeConfig.js / questionHelper.js
+  unitConfig.js             — 英语单元/课文配置（3 年级起按单元选，当前空白骨架待补充）
 
 utils/games/                — 小游戏工具
   idiomChain.js             — 成语接龙核心：dynamic import 加载词库 + 索引 + 判分 + AI 选词 + 提示

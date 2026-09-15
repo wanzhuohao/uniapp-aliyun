@@ -18,6 +18,8 @@ export const STORAGE_REGISTRY = Object.freeze({
   idiomChainBest: entry('idiom_chain_best', 'finite-number', 'games'),
   idiomChainLast: entry('idiom_chain_last', 'object', 'games'),
   planeLeaderboardScores: entry('plane_leaderboard_scores', 'array', 'games'),
+  memoryMatchStats: entry('memory_match_stats', 'object', 'games'),
+  towerDefenseStats: entry('tower_defense_stats', 'object', 'games'),
   learningGoal: entry('learning_goal_v1', 'object', 'dashboard'),
   learningChallenge: entry('learning_challenge_v1', 'object', 'dashboard'),
   diagnosticErrors: entry('learning_diagnostic_errors_v1', 'array', 'diagnostic'),
