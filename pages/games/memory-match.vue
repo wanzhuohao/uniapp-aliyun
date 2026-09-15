@@ -20,7 +20,11 @@
       </view>
 
       <!-- 卡牌网格 -->
-      <view class="grid" :style="{ gridTemplateColumns: `repeat(${cols}, 1fr)` }">
+      <view class="grid" :style="{
+        gridTemplateColumns: `repeat(${cols}, 1fr)`,
+        gridTemplateRows: `repeat(${gridRows}, 1fr)`,
+        aspectRatio: `${cols}/${gridRows}`
+      }">
         <view v-for="card in deck" :key="card.id"
           class="card"
           :class="{
@@ -75,6 +79,8 @@ const moves = ref(0)
 const matchedCount = computed(() => matched.value.size / 2)
 const totalPairs = computed(() => getDifficulty(difficulty.value).pairs)
 const cols = computed(() => getDifficulty(difficulty.value).cols)
+// 行数 = 总卡数 / 列数，配合容器 aspect-ratio 让每格保持正方形（数独同款做法）
+const gridRows = computed(() => Math.ceil(deck.value.length / cols.value))
 const winning = ref(false)
 const newBest = ref(false)
 const lockActive = ref(false)
@@ -212,7 +218,6 @@ onUnmounted(stopTimer)
   margin: 0 auto 28rpx;
 }
 .card {
-  aspect-ratio: 1;
   perspective: 800rpx;
   cursor: pointer;
 }

@@ -115,22 +115,6 @@
         <text class="card-arrow">›</text>
       </view>
 
-      <!-- 塔防肉鸽 -->
-      <view class="card card-tower" @click="goGame('towerDefense')">
-        <view class="card-deco deco-tower">
-          <view class="tower-turret">
-            <view class="tower-barrel"></view>
-          </view>
-          <view class="tower-base"></view>
-        </view>
-        <view class="card-main">
-          <text class="card-tag">TOWER DEFENSE</text>
-          <text class="card-title">塔防肉鸽</text>
-          <text class="card-desc">布防抵御,肉鸽养成</text>
-        </view>
-        <text class="card-arrow">›</text>
-      </view>
-
     </view>
   </view>
 </template>
@@ -145,7 +129,6 @@ const ROUTES = {
   sudoku: '/pages/games/sudoku',
   plane: '/pages/games/plane/index',
   memoryMatch: '/pages/games/memory-match',
-  towerDefense: '/pages/games/tower-defense',
 }
 
 function goTo(url) {
@@ -429,52 +412,4 @@ function goGame(key) {
 }
 .card-plane .card-tag { color: #7C4DFF; }
 
-/* ===== 塔防肉鸽装饰 ===== */
-.deco-tower {
-  background: linear-gradient(135deg, #2E2E38 0%, #44404E 100%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-end;
-  position: relative;
-  padding-bottom: 16rpx;
-}
-.tower-turret {
-  position: relative;
-  width: 52rpx;
-  height: 44rpx;
-  background: linear-gradient(135deg, #7D6BFF 0%, #5B4BE0 100%);
-  border-radius: 14rpx 14rpx 6rpx 6rpx;
-}
-.tower-barrel {
-  position: absolute;
-  left: 50%;
-  top: -14rpx;
-  width: 10rpx;
-  height: 22rpx;
-  margin-left: -5rpx;
-  background: #3D3566;
-  border-radius: 4rpx 4rpx 0 0;
-  transform: rotate(-18deg);
-  transform-origin: bottom center;
-}
-.tower-base {
-  width: 64rpx;
-  height: 46rpx;
-  margin-top: -6rpx;
-  background: linear-gradient(180deg, #5B4BE0 0%, #3D3566 100%);
-  border-radius: 4rpx 4rpx 10rpx 10rpx;
-}
-.tower-base::before {
-  content: '';
-  position: absolute;
-  left: 50%;
-  bottom: 26rpx;
-  width: 70rpx;
-  height: 6rpx;
-  margin-left: -35rpx;
-  background: rgba(255,255,255,0.3);
-  border-radius: 4rpx;
-}
-.card-tower .card-tag { color: #5B4BE0; }
 </style>

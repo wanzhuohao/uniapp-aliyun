@@ -28,7 +28,7 @@
               @click="toggleAllTypes"
             >{{ isAllTypesSelected ? '全不选' : '全选' }}</view>
             <view
-              v-for="item in typeOptions"
+              v-for="item in visibleTypeOptions"
               :key="item.value"
               :class="['setting-tag', selectedTypes.has(item.value) && 'active']"
               @click="toggleType(item.value)"
@@ -42,7 +42,7 @@
           <text class="setting-sublabel">选中后与上面题型互斥</text>
           <view class="special-cards">
             <view
-              v-for="item in specialOptions"
+              v-for="item in visibleSpecialOptions"
               :key="item.value"
               :class="['special-card', selectedSpecial === item.value && 'active']"
               @click="selectSpecial(item.value)"
@@ -369,6 +369,21 @@
             </view>
           </template>
 
+          <!-- 乘法填空：a × __ = c，expr 已含 =，直接展示题干 -->
+          <template v-else-if="q.type === 'multFill'">
+            <text class="q-expr">{{ q.expr }}</text>
+            <input
+              class="q-input"
+              type="number"
+              :value="q.userAnswer"
+              :disabled="submissionFrozen"
+              :focus="i === currentFocus"
+              placeholder="?"
+              @input="onInput(i, $event)"
+              @confirm="onConfirm(i)"
+            />
+          </template>
+
           <!-- 普通加减/连加减: 算式 = 输入框 -->
           <template v-else>
             <text class="q-expr">{{ q.expr }} =</text>
@@ -528,7 +543,7 @@
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import PageHeader from '../../components/PageHeader.vue'
-import { generateQuestions, LEVEL_CONFIG, checkAnswer } from '../../utils/math/questionEngine.js'
+import { generateQuestions, LEVEL_CONFIG, checkAnswer, gradeSupportsType } from '../../utils/math/questionEngine.js'
 import { buildOnlineSubmissionTarget, createOnlineSubmissionIntent } from '../../utils/math/mathStorage.js'
 import { toast } from '../../utils/common/toast.js'
 import { safeSetStorage } from '../../utils/common/safeStorage.js'
@@ -552,9 +567,16 @@ const typeOptions = [
   { value: 'fill',         label: '填空' },
   { value: 'chain',        label: '连加连减' },
   { value: 'fillOp',       label: '填运算符' },
+  { value: 'mulT',         label: '表内乘法' },
+  { value: 'multFill',     label: '乘法填空' },
+  { value: 'sameAdd',      label: '同数连加' },
+  { value: 'parenMix',     label: '括号混合' },
+  { value: 'pattern',      label: '找规律' },
   { value: 'hundredChart', label: '百数表' },
   { value: 'shapeFill',   label: '图形填数' },
 ]
+// 特殊题型也按年级过滤
+const visibleSpecialOptions = computed(() => specialOptions.filter(t => gradeSupportsType(currentGrade.value, t.value)))
 const specialOptions = [
   {
     value: 'triangleFree',
@@ -589,6 +611,30 @@ const selectedLevel = ref(typeof _prefs.level === 'number' ? _prefs.level : 1)
 const selectedTypes  = ref(new Set(Array.isArray(_prefs.types) ? _prefs.types : ['add']))
 const selectedSpecial = ref(typeof _prefs.special === 'string' ? _prefs.special : '')
 
+// 二年级上新增题型
+const NEW_MATH_TYPES = ['mulT', 'multFill', 'sameAdd', 'parenMix', 'pattern']
+// 响应式当前年级（sessionGrade 是非响应式 let，用它驱动题型列表过滤的计算属性）
+const currentGrade = ref('')
+// 二年级（上/下）默认带上二上新增题型，便于直接看到效果；其他年级维持默认只加法
+function defaultTypes() {
+  return /^grade2-/.test(sessionGrade || '')
+    ? ['add', 'sub', 'compare', 'fill', 'chain', 'fillOp', ...NEW_MATH_TYPES]
+    : ['add']
+}
+// 默认难度按年级：二年级起混合练习默认 100 以内（配合表内乘法等），低年级（一年级）默认 20 以内
+function defaultLevel() {
+  const m = /^grade(\d)/.exec(sessionGrade || '')
+  return m && Number(m[1]) >= 2 ? 3 : 1
+}
+// 二年级始终并入新题型（保留原有已选），其他年级用保存的选择
+function resolveTypes(savedTypes) {
+  const types = Array.isArray(savedTypes) ? savedTypes : defaultTypes()
+  if (/^grade2-/.test(sessionGrade || '')) {
+    return [...new Set([...types, ...NEW_MATH_TYPES])]
+  }
+  return types
+}
+
 function toggleType(val) {
   selectedSpecial.value = ''
   const s = selectedTypes.value
@@ -597,14 +643,17 @@ function toggleType(val) {
   selectedTypes.value = new Set(s)
 }
 
-const isAllTypesSelected = computed(() => selectedTypes.value.size === typeOptions.length)
+// 按当前年级过滤可见题型，避免低年级出现高年级题型
+const visibleTypeOptions = computed(() => typeOptions.filter(t => gradeSupportsType(currentGrade.value, t.value)))
+
+const isAllTypesSelected = computed(() => visibleTypeOptions.value.length > 0 && selectedTypes.value.size === visibleTypeOptions.value.length)
 
 function toggleAllTypes() {
   selectedSpecial.value = ''
   if (isAllTypesSelected.value) {
     selectedTypes.value = new Set()
   } else {
-    selectedTypes.value = new Set(typeOptions.map(t => t.value))
+    selectedTypes.value = new Set(visibleTypeOptions.value.map(t => t.value))
   }
 }
 
@@ -624,7 +673,9 @@ const canStart = computed(() => selectedTypes.value.size > 0 || !!selectedSpecia
 const selectedType = computed(() => {
   if (selectedSpecial.value) return selectedSpecial.value
   const arr = [...selectedTypes.value]
-  return arr.length === typeOptions.length ? 'mix' : arr.length === 1 ? arr[0] : arr
+  const allVisible = visibleTypeOptions.value.map(t => t.value)
+  // 选中的恰好覆盖当前年级全部可见题型 → 用混合出题
+  return allVisible.length > 0 && arr.length >= allVisible.length ? 'mix' : arr.length === 1 ? arr[0] : arr
 })
 const selectedCount = ref(typeof _prefs.count === 'number' ? _prefs.count : 100)
 const customCountActive = ref(_prefs.customCountActive === true)
@@ -664,10 +715,11 @@ watch([selectedLevel, selectedTypes, selectedSpecial, selectedCount, customCount
 onMounted(async () => {
   await awaitLearningSession()
   sessionGrade = openCourseGradeSession()
+  currentGrade.value = sessionGrade
   session = getLearningSession()
   const prefs = loadPrefs() || {}
-  selectedLevel.value = typeof prefs.level === 'number' ? prefs.level : selectedLevel.value
-  selectedTypes.value = new Set(Array.isArray(prefs.types) ? prefs.types : [...selectedTypes.value])
+  selectedLevel.value = typeof prefs.level === 'number' ? prefs.level : defaultLevel()
+  selectedTypes.value = new Set(resolveTypes(prefs.types))
   selectedSpecial.value = typeof prefs.special === 'string' ? prefs.special : selectedSpecial.value
   selectedCount.value = typeof prefs.count === 'number' ? prefs.count : selectedCount.value
   customCountActive.value = prefs.customCountActive === true

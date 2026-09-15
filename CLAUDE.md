@@ -38,7 +38,6 @@ pages/games/                — 小游戏模块
   sudoku / sudoku-guide  — 迷你数独
   plane/ (index.vue, engine.js, skills.js, leaderboard.vue) — 飞机肉鸽（从 uniapp 迁移）
   memory-match / memory-match.js / memoryMatchStorage.js — 记忆翻牌（配对）
-  tower-defense / towerDefense.js / towerDefenseStorage.js — 塔防肉鸽（Canvas）
 
 utils/math/                 — 数学工具
   questionEngine.js / mathStorage.js

@@ -6,6 +6,23 @@ const LEVEL_CONFIG = {
   3: { name: '100以内', max: 100 },
 }
 
+// 每个题型最低适用的年级（alias 年级名）。未列出的题型默认全年级可用。
+// 这样题型列表/混合出题可按当前年级过滤，避免低年级出现高年级题型。
+export const TYPE_MIN_GRADE = {
+  add: 'grade1', sub: 'grade1', compare: 'grade1', fill: 'grade1', chain: 'grade1', fillOp: 'grade1',
+  hundredChart: 'grade1', shapeFill: 'grade1',
+  triangleFree: 'grade2', mulT: 'grade2', multFill: 'grade2', sameAdd: 'grade2', parenMix: 'grade2', pattern: 'grade2',
+}
+
+// 判断某题型是否适用于该学习年级（grade 形如 grade1-term2 / grade2-term1）
+export function gradeSupportsType(grade, type) {
+  const min = TYPE_MIN_GRADE[type]
+  if (!min) return true
+  const m = /^grade(\d)/.exec(grade || '')
+  if (!m) return true // 未知年级不拦截（保持兼容）
+  return Number(m[1]) >= Number(min.replace('grade', ''))
+}
+
 let randomSource = Math.random
 
 function rand(min, max) {
@@ -382,6 +399,84 @@ function genShapeFill(level) {
   return randomSource() > 0.5 ? genTriangle(level) : genSquare(level)
 }
 
+// ===== 二年级上·新题型 =====
+
+// 表内乘法口算：9 以内 × 9 以内。答案填数字
+function genMulT(level) {
+  const a = rand(2, 9)
+  const b = rand(2, 9)
+  return { expr: `${a} × ${b}`, answer: String(a * b), type: 'mulT' }
+}
+
+// 乘法填空（求因数）：a × __ = c 或 __ × b = c，填缺失的因数
+function genMultFill(level) {
+  const a = rand(2, 9)
+  const b = rand(2, 9)
+  const c = a * b
+  if (randomSource() > 0.5) {
+    return { expr: `${a} × __ = ${c}`, answer: String(b), type: 'multFill' }
+  }
+  return { expr: `__ × ${b} = ${c}`, answer: String(a), type: 'multFill' }
+}
+
+// 同数连加（几个相同数相加，乘法预备）：a + a + … + a
+function genSameAdd(level) {
+  for (let attempt = 0; attempt < 20; attempt++) {
+    const n = rand(2, 5)
+    const a = rand(2, 9)
+    if (a * n <= 50) {
+      const parts = []
+      for (let i = 0; i < n; i++) parts.push(String(a))
+      return { expr: parts.join(' + '), answer: String(a * n), type: 'sameAdd' }
+    }
+  }
+  const a = rand(2, 5), n = rand(2, 4)
+  const parts = []
+  for (let i = 0; i < n; i++) parts.push(String(a))
+  return { expr: parts.join(' + '), answer: String(a * n), type: 'sameAdd' }
+}
+
+// 带括号加减混合：四种形式，中间/最终结果均 >=0 且 <=100
+function genParenMix(level) {
+  for (let attempt = 0; attempt < 40; attempt++) {
+    const kind = rand(1, 4)
+    if (kind === 1) { // a - (b + c)
+      const b = rand(5, 40), c = rand(1, 20), s = b + c
+      const a = rand(s + 1, Math.min(100, s + 30))
+      return { expr: `${a} - (${b} + ${c})`, answer: String(a - s), type: 'parenMix' }
+    }
+    if (kind === 2) { // a + (b - c)
+      const b = rand(10, 60), c = rand(1, b - 1), d = b - c
+      const a = rand(1, Math.min(40, 100 - d))
+      return { expr: `${a} + (${b} - ${c})`, answer: String(a + d), type: 'parenMix' }
+    }
+    if (kind === 3) { // (a + b) - c
+      const a = rand(5, 40), b = rand(5, 40), s = a + b
+      const c = rand(1, s - 1)
+      return { expr: `(${a} + ${b}) - ${c}`, answer: String(s - c), type: 'parenMix' }
+    }
+    // a - (b - c)
+    const b = rand(20, 60), c = rand(1, b - 1), d = b - c
+    const a = rand(d + 1, Math.min(100, d + 40))
+    return { expr: `${a} - (${b} - ${c})`, answer: String(a - d), type: 'parenMix' }
+  }
+  const b = rand(5, 20), c = rand(1, 20), a = rand(b + c + 1, b + c + 30)
+  return { expr: `${a} - (${b} + ${c})`, answer: String(a - b - c), type: 'parenMix' }
+}
+
+// 找规律：等差数列，隐藏中间一项
+function genPattern(level) {
+  const steps = [2, 3, 5, 10]
+  const step = steps[rand(0, steps.length - 1)]
+  const len = rand(4, 6)
+  const start = rand(1, 20)
+  const seq = []
+  for (let i = 0; i < len; i++) seq.push(start + i * step)
+  const hide = rand(1, len - 1)
+  const expr = seq.map((v, i) => (i === hide ? '__' : String(v))).join(' , ')
+  return { expr, answer: String(seq[hide]), type: 'pattern' }
+}
+
 // 判题：triangle-free 动态校验，其他题型字符串比对
 export function checkAnswer(q) {
   assertAvailableLearningGrade(q?.grade)
@@ -417,8 +512,10 @@ const TYPE_GENERATORS = {
   fillOp: genFillOp, fillOpSingle: genFillOpSingle, fillOpDouble: genFillOpDouble,
   hundredChart: genHundredChart, shapeFill: genShapeFill,
   triangle: genTriangle, square: genSquare, triangleFree: genTriangleFree,
+  mulT: genMulT, multFill: genMultFill, sameAdd: genSameAdd,
+  parenMix: genParenMix, pattern: genPattern,
 }
-const MIX_TYPES = ['add', 'add', 'sub', 'sub', 'compare', 'fill', 'chain', 'fillOp', 'hundredChart', 'shapeFill']
+const MIX_TYPES = ['add', 'add', 'sub', 'sub', 'compare', 'fill', 'chain', 'fillOp', 'hundredChart', 'shapeFill', 'mulT', 'sameAdd', 'parenMix', 'pattern', 'multFill']
 const PRINT_TYPES = ['add', 'add', 'sub', 'sub', 'chain']
 const PRINT_NO_CHAIN_TYPES = ['add', 'sub']
 
@@ -443,7 +540,7 @@ export function generateQuestions({ grade, level, count, questionType = 'mix', r
   // 支持数组形式的 questionType
   let typePool
   if (Array.isArray(questionType)) typePool = questionType
-  else if (questionType === 'mix') typePool = MIX_TYPES
+  else if (questionType === 'mix') typePool = MIX_TYPES.filter(t => gradeSupportsType(grade, t))
   else if (questionType === 'print') typePool = PRINT_TYPES
   else if (questionType === 'print-no-chain') typePool = PRINT_NO_CHAIN_TYPES
   else typePool = [questionType]

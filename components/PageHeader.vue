@@ -8,7 +8,8 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
 import GradeBadge from './learning/GradeBadge.vue'
 import { awaitLearningSession } from '../utils/common/learningSession.js'
 import { getLearningGradeLabel, openCourseGradeSession } from '../utils/common/gradeContext.js'
@@ -31,7 +32,7 @@ const props = defineProps({
   },
 })
 
-onMounted(async () => {
+onShow(async () => {
   if (!props.showGrade || props.theme === 'game') return
   try {
     await awaitLearningSession()

@@ -20,7 +20,7 @@
           <text v-if="!item.disabled && selected === item.value" class="semester-check">✓</text>
         </view>
       </view>
-      <view class="hint">题目类型当前两个学期完全一致，后期按数据逐步区分。</view>
+      <view class="hint">题目类型各学期目前基本一致，后期按数据逐步区分。</view>
     </view>
 
     <!-- 异常提示 -->
@@ -72,6 +72,7 @@ function choose(item) {
     selected.value = saveLearningGrade(item.value)
     errorText.value = ''
     uni.showToast({ title: `已切换至${item.label}`, icon: 'success' })
+    uni.navigateBack()
   } catch {
     uni.showToast({ title: '保存失败，请刷新后重试', icon: 'none' })
   }

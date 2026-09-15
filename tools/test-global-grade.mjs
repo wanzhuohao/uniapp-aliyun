@@ -140,8 +140,8 @@ test('G01 首次进入只初始化唯一全局年级，备份 key 为 19/18', ()
   assert.equal(initializeLearningGrade(adapter), ACTIVE_LEARNING_GRADE)
   assert.deepEqual(adapter.map.get(STORAGE_KEYS.learningGrade), activeGradeValue)
   assert.deepEqual([...new Set(adapter.calls.map(item => item.key))], [STORAGE_KEYS.learningGrade])
-  assert.equal(BACKUP_STORAGE_KEYS.length, 19)
-  assert.equal(LEGACY_BACKUP_STORAGE_KEYS.length, 18)
+  assert.equal(BACKUP_STORAGE_KEYS.length, 20)
+  assert.equal(LEGACY_BACKUP_STORAGE_KEYS.length, 19)
   assert.equal(BACKUP_STORAGE_KEYS.filter(key => key === STORAGE_KEYS.learningGrade).length, 1)
 })
 
@@ -165,9 +165,9 @@ test('G02 非法年级 fail-closed，修复只覆盖年级 key', () => {
 
 test('G03 设置页展示学期选项，所有学习页展示冻结年级且综合卷无局部选择器', () => {
   assert.deepEqual(LEARNING_GRADE_OPTIONS.map(item => [item.value, item.disabled]), [
-    ['grade1-term2', false], ['grade2-term1', false], ['grade2-term2', true], ['grade3-term1', true],
-    ['grade3-term2', true], ['grade4-term1', true], ['grade4-term2', true], ['grade5-term1', true],
-    ['grade5-term2', true], ['grade6-term1', true], ['grade6-term2', true],
+    ['grade1-term1', false], ['grade1-term2', false], ['grade2-term1', false], ['grade2-term2', false],
+    ['grade3-term1', false], ['grade3-term2', false], ['grade4-term1', false], ['grade4-term2', false],
+    ['grade5-term1', false], ['grade5-term2', false], ['grade6-term1', false], ['grade6-term2', false],
   ])
   const home = readFileSync(resolve(root, 'pages/index/index.vue'), 'utf8')
   const setting = readFileSync(resolve(root, 'pages/setting/index.vue'), 'utf8')
@@ -373,7 +373,7 @@ test('G11 v1 备份确定性升级到 v2，v2 年级与非法记录边界可验�
   const legacyEntries = LEGACY_BACKUP_STORAGE_KEYS.map(key => ({ key, ...legacyObject[key] }))
   const upgraded = await validateLearningBackup(signedBackup(1, legacyEntries))
   assert.equal(upgraded.schemaVersion, 2)
-  assert.equal(upgraded.snapshot.length, 19)
+  assert.equal(upgraded.snapshot.length, 20)
 
   const badLegacy = clone(legacyObject)
   badLegacy[STORAGE_KEYS.chineseMistakes] = { present: true, value: [validChineseWrong({ _id: 'a', question_id: 'b' })] }

@@ -4,22 +4,27 @@ import { STORAGE_KEYS } from './storageRegistry.js'
 // 默认（推荐）学期：一年级下册。历史存量数据沿用该值，切换学期后新数据写入所选学期。
 export const ACTIVE_LEARNING_GRADE = 'grade1-term2'
 
-// 当前已开放的可用学期集。
-export const AVAILABLE_LEARNING_GRADES = Object.freeze(['grade1-term2', 'grade2-term1'])
+// 当前已开放的可用学期集：六个年级十二学期全部可选。
+export const AVAILABLE_LEARNING_GRADES = Object.freeze([
+  'grade1-term1', 'grade1-term2', 'grade2-term1', 'grade2-term2',
+  'grade3-term1', 'grade3-term2', 'grade4-term1', 'grade4-term2',
+  'grade5-term1', 'grade5-term2', 'grade6-term1', 'grade6-term2',
+])
 
-// 全部可展示的学期选项（含待更新置灰项）。
+// 全部可展示的学期选项。
 export const LEARNING_GRADE_OPTIONS = Object.freeze([
+  Object.freeze({ value: 'grade1-term1', label: '一年级上', disabled: false, note: '' }),
   Object.freeze({ value: 'grade1-term2', label: '一年级下', disabled: false, note: '' }),
   Object.freeze({ value: 'grade2-term1', label: '二年级上', disabled: false, note: '' }),
-  Object.freeze({ value: 'grade2-term2', label: '二年级下', disabled: true, note: '待更新' }),
-  Object.freeze({ value: 'grade3-term1', label: '三年级上', disabled: true, note: '待更新' }),
-  Object.freeze({ value: 'grade3-term2', label: '三年级下', disabled: true, note: '待更新' }),
-  Object.freeze({ value: 'grade4-term1', label: '四年级上', disabled: true, note: '待更新' }),
-  Object.freeze({ value: 'grade4-term2', label: '四年级下', disabled: true, note: '待更新' }),
-  Object.freeze({ value: 'grade5-term1', label: '五年级上', disabled: true, note: '待更新' }),
-  Object.freeze({ value: 'grade5-term2', label: '五年级下', disabled: true, note: '待更新' }),
-  Object.freeze({ value: 'grade6-term1', label: '六年级上', disabled: true, note: '待更新' }),
-  Object.freeze({ value: 'grade6-term2', label: '六年级下', disabled: true, note: '待更新' }),
+  Object.freeze({ value: 'grade2-term2', label: '二年级下', disabled: false, note: '' }),
+  Object.freeze({ value: 'grade3-term1', label: '三年级上', disabled: false, note: '' }),
+  Object.freeze({ value: 'grade3-term2', label: '三年级下', disabled: false, note: '' }),
+  Object.freeze({ value: 'grade4-term1', label: '四年级上', disabled: false, note: '' }),
+  Object.freeze({ value: 'grade4-term2', label: '四年级下', disabled: false, note: '' }),
+  Object.freeze({ value: 'grade5-term1', label: '五年级上', disabled: false, note: '' }),
+  Object.freeze({ value: 'grade5-term2', label: '五年级下', disabled: false, note: '' }),
+  Object.freeze({ value: 'grade6-term1', label: '六年级上', disabled: false, note: '' }),
+  Object.freeze({ value: 'grade6-term2', label: '六年级下', disabled: false, note: '' }),
 ])
 
 const KNOWN_GRADES = new Set(LEARNING_GRADE_OPTIONS.map(item => item.value))

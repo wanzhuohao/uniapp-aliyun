@@ -79,13 +79,16 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
+import { awaitLearningSession } from '../../utils/common/learningSession.js'
 import { getLearningGradeLabel, openCourseGradeSession } from '../../utils/common/gradeContext.js'
 
 const gradeLabel = ref('')
 
-onMounted(() => {
+onShow(async () => {
   try {
+    await awaitLearningSession()
     gradeLabel.value = getLearningGradeLabel(openCourseGradeSession())
   } catch {
     gradeLabel.value = ''
