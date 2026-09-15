@@ -75,6 +75,25 @@
       </view>
       <text class="card-arrow">›</text>
     </view>
+
+    <!-- 首次选年级弹窗：没选年级时弹出，选完才可继续使用 -->
+    <view v-if="showGradePicker" class="grademask" @click.stop>
+      <view class="gradepicker">
+        <text class="gp-title">欢迎使用学习小天地</text>
+        <text class="gp-sub">请先选择孩子的学期</text>
+        <scroll-view scroll-y class="gp-scroll">
+          <view
+            v-for="g in gradeOptions"
+            :key="g.value"
+            :class="['gp-item', g.disabled && 'gp-disabled']"
+            @click="pickGrade(g)"
+          >
+            <text class="gp-label">{{ g.label }}</text>
+          </view>
+        </scroll-view>
+        <text class="gp-tip">随时可在设置页切换学期</text>
+      </view>
+    </view>
   </view>
 </template>
 
@@ -82,18 +101,39 @@
 import { ref } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import { awaitLearningSession } from '../../utils/common/learningSession.js'
-import { getLearningGradeLabel, openCourseGradeSession } from '../../utils/common/gradeContext.js'
+import {
+  LEARNING_GRADE_OPTIONS, saveLearningGrade,
+  getLearningGradeLabel, openCourseGradeSession,
+} from '../../utils/common/gradeContext.js'
 
 const gradeLabel = ref('')
+const showGradePicker = ref(false)
+const gradeOptions = LEARNING_GRADE_OPTIONS
 
 onShow(async () => {
   try {
     await awaitLearningSession()
     gradeLabel.value = getLearningGradeLabel(openCourseGradeSession())
   } catch {
+    // 尚未选年级 / 年级数据无效：弹出选择
     gradeLabel.value = ''
+    showGradePicker.value = true
   }
 })
+
+function pickGrade(g) {
+  if (g.disabled) {
+    uni.showToast({ title: '该学期资料待更新', icon: 'none' })
+    return
+  }
+  try {
+    saveLearningGrade(g.value)
+    gradeLabel.value = g.label
+    showGradePicker.value = false
+  } catch {
+    uni.showToast({ title: '保存失败，请重试', icon: 'none' })
+  }
+}
 
 function goTo(url) {
   uni.navigateTo({ url })
@@ -321,4 +361,44 @@ function goTo(url) {
 .quick-card:last-child { grid-column:1 / -1; }
 .quick-title { font-size:28rpx; font-weight:bold; color:#2a2520; }
 .quick-desc { font-size:22rpx; color:#8b7d65; }
+
+/* 首次选年级弹窗 */
+.grademask {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483000;
+  background: rgba(33, 35, 40, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40rpx;
+}
+.gradepicker {
+  width: 100%;
+  max-width: 560rpx;
+  background: #fff;
+  border-radius: 28rpx;
+  padding: 44rpx 32rpx 28rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10rpx;
+  box-shadow: 0 12rpx 40rpx rgba(0,0,0,0.25);
+}
+.gp-title { font-size: 36rpx; font-weight: 700; color: #2a2520; }
+.gp-sub { font-size: 24rpx; color: #8b7d65; margin-bottom: 16rpx; }
+.gp-scroll { width: 100%; max-height: 52vh; }
+.gp-item {
+  padding: 24rpx;
+  border-radius: 14rpx;
+  background: #f2f1ee;
+  margin-bottom: 14rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.gp-item:active { background: #e3f2fd; }
+.gp-item.gp-disabled { opacity: 0.45; }
+.gp-label { font-size: 30rpx; font-weight: 600; color: #2a2520; }
+.gp-tip { margin-top: 12rpx; font-size: 22rpx; color: #a89c88; }
 </style>

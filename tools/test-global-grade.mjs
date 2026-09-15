@@ -172,7 +172,8 @@ test('G03 设置页展示学期选项，所有学习页展示冻结年级且综�
   const home = readFileSync(resolve(root, 'pages/index/index.vue'), 'utf8')
   const setting = readFileSync(resolve(root, 'pages/setting/index.vue'), 'utf8')
   assert.match(setting, /LEARNING_GRADE_OPTIONS/)
-  assert.doesNotMatch(home, /LEARNING_GRADE_OPTIONS/)
+  // 首页首次进入无年级时弹出选择，复用同一份学期选项（单源），不从别处复制
+  assert.match(home, /LEARNING_GRADE_OPTIONS/)
   const paper = readFileSync(resolve(root, 'pages/learning/paper.vue'), 'utf8')
   assert.match(paper, /openCourseGradeSession\(\)/)
   assert.doesNotMatch(paper, /LEARNING_GRADE_OPTIONS|gradeOptions|v-for="grade/)
