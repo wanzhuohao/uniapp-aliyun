@@ -16,6 +16,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
 import PageHeader from '../../components/PageHeader.vue'
 import { awaitLearningSession, learningStorageApi } from '../../utils/common/learningSession.js'
 import { STORAGE_KEYS } from '../../utils/common/storageRegistry.js'
@@ -35,6 +36,7 @@ function refresh(){const input=readInput();const result=buildLearningDashboard(i
 function rateText(value){return value==null?'暂无':`${Math.round(value*100)}%`}
 function changeGoal(){uni.showModal({title:'每日题量目标（10～200）',editable:true,placeholderText:String(dashboard.value.goal.dailyTarget),success(res){if(!res.confirm)return;const value=Number(res.content);if(!Number.isInteger(value)||value<10||value>200){uni.showToast({title:'请输入 10～200 的整数',icon:'none'});return}try{const raw=learningStorageApi.getStorageSync(STORAGE_KEYS.learningGoal);const target=updateLearningGradeBucket(STORAGE_KEYS.learningGoal,raw===''?undefined:raw,sessionGrade,()=>({dailyTarget:value,updatedAt:new Date().toISOString()}));assertCurrentLearningGrade(sessionGrade);learningStorageApi.setStorageSync(STORAGE_KEYS.learningGoal,target);refresh()}catch{uni.showToast({title:'年级已变化，请重新进入',icon:'none'})}}})}
 onMounted(async()=>{try{await awaitLearningSession();sessionGrade=openCourseGradeSession();refresh()}catch{uni.showModal({title:'年级不可用',content:'请返回学习首页修复当前年级',showCancel:false})}finally{loading.value=false}})
+onShow(async()=>{if(sessionGrade===undefined)return;try{await awaitLearningSession();const cur=openCourseGradeSession();if(cur===sessionGrade)return;sessionGrade=cur;refresh()}catch{uni.showToast({title:'年级不可用，请返回修复',icon:'none'})}})
 </script>
 
 <style scoped>

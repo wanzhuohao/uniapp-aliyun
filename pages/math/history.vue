@@ -292,7 +292,8 @@ function formatDate(isoString) {
 
 onShow(async () => {
   await awaitLearningSession()
-  if (!sessionGrade) sessionGrade = openCourseGradeSession()
+  const cur = openCourseGradeSession()
+  if (cur !== sessionGrade) sessionGrade = cur
   records.value = getHistory(sessionGrade)
 })
 </script>

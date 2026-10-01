@@ -38,7 +38,10 @@ onShow(async () => {
     await awaitLearningSession()
     gradeLabel.value = getLearningGradeLabel(openCourseGradeSession())
   } catch {
-    gradeLabel.value = ''
+    // 学期读取失败/加载未完成时，不能渲染 GradeBadge 的全屏遮罩把整页锁死
+    // （此前置空 gradeLabel 会触发 position:fixed 的 course-gate-overlay，
+    //   页面所有按钮点不了且无恢复入口）。给一个可点击的兜底徽标，仍可进设置页重新选择学期。
+    gradeLabel.value = '选择学期'
   }
 })
 

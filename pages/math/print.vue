@@ -97,6 +97,7 @@
 
 <script setup>
 import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
 import PageHeader from '../../components/PageHeader.vue'
 import { generateQuestions, LEVEL_CONFIG } from '../../utils/math/questionEngine.js'
 import { saveRecord } from '../../utils/math/mathStorage.js'
@@ -153,6 +154,16 @@ onMounted(async () => {
   sessionGrade = openCourseGradeSession()
   updateSheetScale()
   window.addEventListener('resize', updateSheetScale)
+})
+
+// 从设置页切换年级返回时刷新年级，并清空旧年级已生成的纸张（首屏由 onMounted 初始化）
+onShow(async () => {
+  if (sessionGrade === undefined) return
+  await awaitLearningSession()
+  const cur = openCourseGradeSession()
+  if (cur === sessionGrade) return
+  sessionGrade = cur
+  questions.value = []
 })
 
 onUnmounted(() => {

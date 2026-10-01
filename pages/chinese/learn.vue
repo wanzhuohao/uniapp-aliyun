@@ -102,12 +102,16 @@ import { getQuestions } from '../../utils/chinese/questionLoader.js'
 import { getCurrentUnit, setCurrentUnit, getChinesePrefs, setChinesePrefs } from '../../utils/chinese/stateStore.js'
 import { getSemesterUnitConfig, getSemesterUnitKeys, getSemesterLessonKeys } from '../../utils/chinese/unitConfig.js'
 import { awaitLearningSession } from '../../utils/common/learningSession.js'
-import { openCourseGradeSession } from '../../utils/common/gradeContext.js'
+import { openCourseGradeSession, ACTIVE_LEARNING_GRADE, repairLearningGrade } from '../../utils/common/gradeContext.js'
 import PageHeader from '../../components/PageHeader.vue'
 
 const PAGE_KEY = 'learn'
-const unitConfig = computed(() => getSemesterUnitConfig(sessionGrade))
-const unitKeys = computed(() => getSemesterUnitKeys(sessionGrade))
+// 学期在 onShow 才异步读出；用 ref 保持响应式，让依赖它的单元/课程 computed
+// 在学期变化时能重算（此前直接依赖普通 let sessionGrade，computed 缓存后不更新，
+// 导致页面始终按首次求值(undefined→一年级下)的单元/课程显示——二年级上因此错乱）。
+const semesterRef = ref('')
+const unitConfig = computed(() => getSemesterUnitConfig(semesterRef.value))
+const unitKeys = computed(() => getSemesterUnitKeys(semesterRef.value))
 
 const currentUnit = ref(getSemesterUnitKeys(null)[0])
 const selectedLessons = ref(getSemesterLessonKeys(null, currentUnit.value))
@@ -300,8 +304,27 @@ function speakChar() {
 }
 
 onShow(async () => {
-  await awaitLearningSession()
-  if (!sessionGrade) sessionGrade = openCourseGradeSession()
+  let cur
+  try {
+    await awaitLearningSession()
+    cur = openCourseGradeSession()
+  } catch {
+    // 学期数据缺失/损坏时，回退到有效默认学期并顺带修复存储。仅回退 sessionGrade 不够：
+    // 持久化（persistPrefs/setCurrentUnit）会经 prefsStore.save → assertCurrentLearningGrade
+    // 再读存储中的学期，若存储仍损坏就会抛「学习期间年级已变化」把切单元/全选截断。
+    // 顶部 PageHeader 会显示“选择学期”徽标，用户仍可去设置页正式重选学期。
+    cur = ACTIVE_LEARNING_GRADE
+    try { repairLearningGrade() } catch {}
+  }
+  if (cur !== sessionGrade) {
+    sessionGrade = cur
+    semesterRef.value = cur
+    preferencesHydrated = false
+    started.value = false
+    roundFinished.value = false
+    showAnswer.value = false
+    showIframe.value = false
+  }
   if (!preferencesHydrated) hydratePreferences()
   if (roundFinished.value) {
     started.value = false

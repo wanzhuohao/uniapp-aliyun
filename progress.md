@@ -2,13 +2,60 @@
 
 > 项目路径: `C:\claude code\uniapp-aliyun`
 > 技术栈: UniApp Vue3 + Composition API + uniCloud-aliyun
-> 最后更新: 2026-09-15
+> 最后更新: 2026-09-16
 > 状态: **开发中**
 
 ## 待办
 
 - 二年级上语文题库数据待用户补充（当前仅单元骨架，出题提示「该学期语文题库待补充」）
 - 英语 3 年级及以后课文/单词数据待补充（当前单元为空白骨架，选单元提示「该学期课文内容待补充」）
+
+## 2026-09-21 移除「飞机大战」小游戏
+
+- `pages.json`：删除 `pages/games/plane/index`、`pages/games/plane/leaderboard` 两条路由
+- `pages/games/index.vue`：移除飞机卡片、`ROUTES.plane` 映射及 `deco-plane`/`plane-*` 装饰样式
+- `utils/common/storageRegistry.js`：删除 `planeLeaderboardScores` 存储键
+- 删除 `pages/games/plane/` 目录（api/engine/index/leaderboard/skills）
+- 本地自测：小游戏页已无飞机入口，剩余 成语接龙/24点/数字华容道/迷你数独/记忆翻牌 5 个；plane 路由失效
+
+## 2026-09-16 数学新增「竖式」题型（二年级上）
+
+- `utils/math/questionEngine.js`：新增 `genVertical`（两位数 100 以内加减法竖式，a/b 恒两位数，减法不退成负；evpt 结果自然带进位/退位），注册进 `TYPE_GENERATORS`、`MIX_TYPES`，`TYPE_MIN_GRADE[TYPE].vertical='grade2'`
+- `pages/math/online.vue`：题型列表加「竖式」；二年级默认并入（`NEW_MATH_TYPES`）；新增竖式模板分支（列式 a/b + 运算符 + 横线 + 结果输入框）与样式、`vertDigits` 辅助
+- 本地只选竖式验证：二年级上正确生成并渲染（如 15 + 38 → 53、84 - 13 竖式），作答沿用通用 onInput + checkAnswer
+
+## 2026-09-16 根治语文练习页「二年级上错乱 / 全选反选」（computed 缓存非响应式学期）
+
+- 现象：语文 learn 页在「二年级上」显示一年级下课程、全选按钮显示与行为错位；「一年级下」正常
+- 根因：learn/hanzi/pinyin 的 `unitConfig`/`unitKeys`/`currentLessons` 是 computed，直接读**非响应式普通变量** `sessionGrade`。computed 只在首次求值（`sessionGrade=undefined` → 回退 `UNIT_CONFIG` 一年级下）后缓存，`onShow` 更新 `sessionGrade` 后不重算，页面始终按一年级下的单元/课程跑，仅顶栏徽标每次即时读存储，徽标与单元表单据割裂
+- 修复：三者新增响应式 `semesterRef`，`unitConfig`/`unitKeys` 改依赖 `semesterRef.value`，`onShow` 设置 `sessionGrade` 时同步 `semesterRef.value = cur`，computed 随学期重算（本地对二上验证：第一单元小蝌蚪找妈妈/我是什么/植物妈妈有办法/语文园地一，第二单元识字场景歌等，全选往返正常）
+
+## 2026-09-16 修复语文等页面「灰色按钮点不了」（GradeBadge 全屏遮罩锁死）
+
+- 现象：带 PageHeader 的页面（语文生字学习等）按钮呈灰色、点了没反应、无恢复入口。本地复现：页面被 `.course-gate-overlay`（position:fixed; inset:0; z-index:2147483646，背景 #f7f5f0）拦截全部点击，Playwright 报 intercepts pointer events
+- 根因：`PageHeader.onShow` 读取年级失败（`awaitLearningSession()` reject，或 `openCourseGradeSession()` 抛「当前学期信息损坏」）时把 `gradeLabel` 置空；`GradeBadge` 对空 label 渲染全屏灰遮罩，整页被锁死
+- 修复：`components/PageHeader.vue` 的 catch 分支不再置空 label，改为兜底「选择学期」，渲染为可点击徽标（仍可进设置页重选学期），页面不再被遮罩锁死
+- 补充：`pages/chinese/learn.vue` 在 `onShow` 读取学期失败时回退到有效默认学期 `ACTIVE_LEARNING_GRADE`，并调用 `repairLearningGrade()` 顺带修复损坏的学期存储。仅回退 `sessionGrade` 不够——持久化会经 `prefsStore.save → assertCurrentLearningGrade` 重读存储、若存储仍损坏会抛「学习期间年级已变化」而截断切单元/全选。配合 PageHeader「选择学期」兜底，页面不再被遮罩锁死、可正常全选，并可在设置页正式重选学期
+- 发布：HBuilderX CLI `publish web --webHosting true` 部署到 uniCloud 前端网页托管，公网地址 https://static-mp-e72765cf-7698-494a-88b2-1a531e6efc9f.next.bspapp.com/（命令见 docs/tooling-hbuilderx-cli.md）
+
+## 2026-09-16 修复数学在线练习切换年级后题型不立即刷新
+
+- 原因：`online.vue` 只在 `onMounted` 读一次年级，设置页切年级 `navigateBack` 返回时页面实例是还原不重挂载，`onMounted` 不重跑，`currentGrade`/题型列表停留旧年级
+- 修复：抽 `hydrateSettings()` 复用装载逻辑，新增 `onShow` 重新读取当前年级，变化即重载该年级的题型与偏好（首载走 `onMounted`，`prefsHydrated` 未置位时 `onShow` 早退避免双载）
+
+## 2026-09-16 语文同步修复：切年级返回不刷新单元/课时/错题
+
+- 语文练习页 `pinyin`/`hanzi`/`learn` 的 `sessionGrade` 原本在 `onShow` 用 `if (!sessionGrade)` 守卫只读一次，切年级返回后停留在旧年级的单元/题型
+- 修复：三个练习页 `onShow` 均改为重读当前年级，变化则 `preferencesHydrated=false` 重载该年级单元/课时/题型，并重置进行中的一轮（learn 额外重置 showAnswer/showIframe）
+- 错题页同步：`mistakes-practice` 补 `onShow`，切年级返回时清空队列缓存并回到错题选择界面重载新年级错题；`mistakes` 列表页 `onShow` 改为切年级时更新 `sessionGrade` 并重载数据
+
+## 2026-09-16 统一根治"切年级返回后内容不刷新"（英语/数学/学习看板全模块）
+
+- 根因统一：各练习页 `sessionGrade` 只在挂载（onMounted/onLoad）或 `if (!sessionGrade)` 时读一次，设置页切年级 `navigateBack` 返回时实例被还原不重挂载，年级相关状态停留在旧值
+- 英语：`words`（改 onShow 重读年级→重算课文模式/单元/主题并重载偏好）、`letters`（加 onShow 切年级重载字母表）、`mistakes`（onShow 更新年级后刷新）、`mistakes-practice`（加 onShow 切年级回到选择界面重载错题）；`phonics` 内容与年级无关不改
+- 数学：`history`/`mistakes`（onShow 更新年级后刷新）、`mistakes-practice`（加 onShow 切年级重载错题重置本轮）、`focus`（加 onShow 切年级重新出 15 题）、`print`（加 onShow 切年级更新年级并清空已生成纸张）
+- 学习模块：`dashboard`（加 onShow 切年级重算看板）、`paper` 综合卷（加 onShow 切年级退回组卷设置避免旧年级试卷错位）
+- 不做改动的边界：`phonics`（数据与年级无关）、`result`/`data-center`（navigateTo 每次新挂载、仅展示诊断标签，非内容刷新）
 
 ## 2026-09-15 数学新增「二年级上」题型（以 9 月作业为依据）
 

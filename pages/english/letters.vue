@@ -39,6 +39,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
 import PageHeader from '../../components/PageHeader.vue'
 import { getLetters } from '../../utils/english/questionLoader.js'
 import { speakEn, primeSpeech, stopEnSpeech } from '../../utils/common/speech.js'
@@ -48,6 +49,13 @@ import { openCourseGradeSession } from '../../utils/common/gradeContext.js'
 const letters = ref([])
 const activeIdx = ref(0)
 const current = computed(() => letters.value[activeIdx.value] || null)
+let lettersGrade
+
+function loadLetters() {
+  lettersGrade = openCourseGradeSession()
+  letters.value = getLetters(lettersGrade)
+  activeIdx.value = 0
+}
 
 function selectLetter(i) {
   primeSpeech()
@@ -76,8 +84,14 @@ function next() {
 
 onMounted(async () => {
   await awaitLearningSession()
-  letters.value = getLetters(openCourseGradeSession())
+  loadLetters()
   // 首次挂载不自动朗读，避免 iOS 拦截
+})
+
+onShow(async () => {
+  await awaitLearningSession()
+  const cur = openCourseGradeSession()
+  if (cur !== lettersGrade) loadLetters()
 })
 
 onUnmounted(stopEnSpeech)

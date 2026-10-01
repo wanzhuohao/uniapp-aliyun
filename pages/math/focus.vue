@@ -4,6 +4,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
 import PageHeader from '../../components/PageHeader.vue'
 import { generateQuestions, checkAnswer } from '../../utils/math/questionEngine.js'
 import { buildFocusSubmissionTarget, createFocusSubmissionIntent } from '../../utils/math/mathStorage.js'
@@ -14,6 +15,7 @@ import { openCourseGradeSession } from '../../utils/common/gradeContext.js'
 const questions=ref([]),index=ref(0),submitted=ref(false),busy=ref(false),question=computed(()=>questions.value[index.value])
 let session,sessionGrade,focusInstanceId,frozenIntent
 onMounted(async()=>{try{await awaitLearningSession();sessionGrade=openCourseGradeSession();session=getLearningSession();focusInstanceId=createPaperInstanceId();questions.value=generateQuestions({grade:sessionGrade,level:2,count:15,questionType:['add','sub','compare','fill']}).map(q=>({...q,userAnswer:''}))}catch{uni.showModal({title:'年级不可用',content:'请返回学习首页修复当前年级',showCancel:false})}})
+onShow(async()=>{if(sessionGrade===undefined)return;try{await awaitLearningSession();const cur=openCourseGradeSession();if(cur===sessionGrade)return;sessionGrade=cur;session=getLearningSession();focusInstanceId=createPaperInstanceId();frozenIntent=null;submitted.value=false;index.value=0;questions.value=generateQuestions({grade:sessionGrade,level:2,count:15,questionType:['add','sub','compare','fill']}).map(q=>({...q,userAnswer:''}))}catch{uni.showModal({title:'年级不可用',content:'请返回学习首页修复当前年级',showCancel:false})}})
 async function submit(){if(submitted.value||busy.value)return;busy.value=true;try{if(!frozenIntent)frozenIntent=await createFocusSubmissionIntent({grade:sessionGrade,focusInstanceId,answers:questions.value.map(item=>({expr:item.expr,answer:item.answer,type:item.type,userAnswer:item.userAnswer,correct:checkAnswer(item)}))});const result=await session.runPaperMutation(context=>applyRegisteredSnapshotTransaction(context,original=>buildFocusSubmissionTarget(original,frozenIntent),'paper',{sessionGrade}));if(!result?.ok)throw new Error(result?.code||'PAPER_SUBMISSION_INCONSISTENT');const correct=frozenIntent.answers.filter(item=>item.correct).length;submitted.value=true;uni.showModal({title:'专注完成',content:`答对 ${correct}/${questions.value.length} 题`,showCancel:false,success:()=>uni.navigateBack()})}catch(error){const committed=error?.committed===true;uni.showModal({title:committed?'专注记录已保存':'专注记录未保存',content:committed?'记录已保存，但存储状态需要恢复。请按页面提示完成恢复，恢复前不要重复交卷。':`${error.message||'本机存储不可用'}。请勿刷新，可关闭其他学习标签页或清理空间后重试同一次交卷。`,showCancel:false})}finally{busy.value=false}}
 function exit(){if(submitted.value){uni.navigateBack();return}uni.showModal({title:'退出专注',content:'当前进度不会保存，确定退出？',success:r=>{if(r.confirm)uni.navigateBack()}})}
 </script>

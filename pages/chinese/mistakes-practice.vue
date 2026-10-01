@@ -86,6 +86,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
 import PracticeBar from '../../components/chinese/PracticeBar.vue'
 import QuestionCard from '../../components/chinese/QuestionCard.vue'
 import HanziQuestion from '../../components/chinese/HanziQuestion.vue'
@@ -356,6 +357,27 @@ onMounted(async () => {
   await awaitLearningSession()
   sessionGrade = openCourseGradeSession()
   gradeLabel.value = getLearningGradeLabel(sessionGrade)
+  loadAllWrong()
+})
+
+// 从设置页切换年级返回时，重载新年级的错题并回到选择界面（首屏由 onMounted 初始化）
+onShow(async () => {
+  if (!sessionGrade) return
+  await awaitLearningSession()
+  const cur = openCourseGradeSession()
+  if (cur === sessionGrade) return
+  sessionGrade = cur
+  gradeLabel.value = getLearningGradeLabel(sessionGrade)
+  mode.value = ''
+  finishedMode.value = false
+  practiceAll.value = false
+  currentIndex.value = 0
+  correctCount.value = 0
+  masteredThisRound.value = 0
+  pinyinQueue.value = []
+  hanziQueue.value = []
+  questionDataMap.value = {}
+  unitPoolMap.value = {}
   loadAllWrong()
 })
 </script>

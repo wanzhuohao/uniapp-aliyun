@@ -31,6 +31,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
 import PageHeader from '../../components/PageHeader.vue'
 import PaperQuestion from '../../components/learning/PaperQuestion.vue'
 import { awaitLearningSession, getLearningSession, learningStorageApi } from '../../utils/common/learningSession.js'
@@ -172,6 +173,20 @@ onMounted(async () => {
     exclusiveSupported.value = session.exclusiveDataOpsSupported
   } catch {
     uni.showModal({ title: '年级不可用', content: '请返回学习首页修复当前年级', showCancel: false })
+  }
+})
+
+// 从设置页切换年级返回时，更新年级并退回组卷设置（避免旧年级试卷提交错位）
+onShow(async () => {
+  if (sessionGrade === undefined) return
+  try {
+    await awaitLearningSession()
+    const cur = openCourseGradeSession()
+    if (cur === sessionGrade) return
+    sessionGrade = cur
+    reset()
+  } catch {
+    // 年级不可用时静默，组卷时会再次提示
   }
 })
 </script>

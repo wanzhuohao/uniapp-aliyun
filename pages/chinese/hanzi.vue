@@ -65,8 +65,11 @@ import PracticeBar from '../../components/chinese/PracticeBar.vue'
 import HanziQuestion from '../../components/chinese/HanziQuestion.vue'
 
 const PAGE_KEY = 'hanzi'
-const unitConfig = computed(() => getSemesterUnitConfig(sessionGrade))
-const unitKeys = computed(() => getSemesterUnitKeys(sessionGrade))
+// 学期在 onShow 才异步读出；用 ref 保持响应式，让单元/课程 computed 在学期变化时能重算
+//（此前直接依赖普通 let sessionGrade，computed 缓存后不更新，非默认学期(如二年级上)显示错乱）。
+const semesterRef = ref('')
+const unitConfig = computed(() => getSemesterUnitConfig(semesterRef.value))
+const unitKeys = computed(() => getSemesterUnitKeys(semesterRef.value))
 
 const currentUnit = ref(getSemesterUnitKeys(null)[0])
 const selectedLessons = ref(getSemesterLessonKeys(null, currentUnit.value))
@@ -242,7 +245,14 @@ function advanceQuestion(resultCorrectCount) {
 
 onShow(async () => {
   await awaitLearningSession()
-  if (!sessionGrade) sessionGrade = openCourseGradeSession()
+  const cur = openCourseGradeSession()
+  if (cur !== sessionGrade) {
+    sessionGrade = cur
+    semesterRef.value = cur
+    preferencesHydrated = false
+    started.value = false
+    roundFinished.value = false
+  }
   if (!preferencesHydrated) hydratePreferences()
   if (roundFinished.value) {
     started.value = false

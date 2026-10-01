@@ -12,6 +12,7 @@ export const TYPE_MIN_GRADE = {
   add: 'grade1', sub: 'grade1', compare: 'grade1', fill: 'grade1', chain: 'grade1', fillOp: 'grade1',
   hundredChart: 'grade1', shapeFill: 'grade1',
   triangleFree: 'grade2', mulT: 'grade2', multFill: 'grade2', sameAdd: 'grade2', parenMix: 'grade2', pattern: 'grade2',
+  vertical: 'grade2',
 }
 
 // 判断某题型是否适用于该学习年级（grade 形如 grade1-term2 / grade2-term1）
@@ -477,6 +478,27 @@ function genPattern(level) {
   return { expr, answer: String(seq[hide]), type: 'pattern' }
 }
 
+// 竖式计算：两位数加减法（100 以内），展示成列竖式，用户填结果。
+// a、b 均取两位数，减法保证不退成负数；结果让部分题自然带进位/退位。
+function genVertical(level) {
+  for (let attempt = 0; attempt < 30; attempt++) {
+    const isAdd = randomSource() > 0.5
+    let a, b, ans
+    if (isAdd) {
+      a = rand(10, 89)
+      b = rand(10, 90 - a) // 结果 ≤ 100，两位数+
+      ans = a + b
+    } else {
+      a = rand(21, 99)
+      b = rand(10, a - 1)  // 结果 ≥ 11，可能退位
+      ans = a - b
+    }
+    return { op: isAdd ? '+' : '-', a, b, expr: `${a} ${isAdd ? '+' : '-'} ${b}`, answer: String(ans), type: 'vertical' }
+  }
+  // fallback
+  return { op: '+', a: 36, b: 47, expr: '36 + 47', answer: '83', type: 'vertical' }
+}
+
 // 判题：triangle-free 动态校验，其他题型字符串比对
 export function checkAnswer(q) {
   assertAvailableLearningGrade(q?.grade)
@@ -513,9 +535,9 @@ const TYPE_GENERATORS = {
   hundredChart: genHundredChart, shapeFill: genShapeFill,
   triangle: genTriangle, square: genSquare, triangleFree: genTriangleFree,
   mulT: genMulT, multFill: genMultFill, sameAdd: genSameAdd,
-  parenMix: genParenMix, pattern: genPattern,
+  parenMix: genParenMix, pattern: genPattern, vertical: genVertical,
 }
-const MIX_TYPES = ['add', 'add', 'sub', 'sub', 'compare', 'fill', 'chain', 'fillOp', 'hundredChart', 'shapeFill', 'mulT', 'sameAdd', 'parenMix', 'pattern', 'multFill']
+const MIX_TYPES = ['add', 'add', 'sub', 'sub', 'compare', 'fill', 'chain', 'fillOp', 'hundredChart', 'shapeFill', 'mulT', 'sameAdd', 'parenMix', 'pattern', 'multFill', 'vertical']
 const PRINT_TYPES = ['add', 'add', 'sub', 'sub', 'chain']
 const PRINT_NO_CHAIN_TYPES = ['add', 'sub']
 

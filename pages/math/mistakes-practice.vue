@@ -185,7 +185,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { onLoad } from '@dcloudio/uni-app'
+import { onLoad, onShow } from '@dcloudio/uni-app'
 import { getDueList, getAllWrong, recordCorrect, recordWrongAgain } from '../../utils/math/mathStorage.js'
 import { awaitLearningSession } from '../../utils/common/learningSession.js'
 import { getLearningGradeLabel, openCourseGradeSession } from '../../utils/common/gradeContext.js'
@@ -227,6 +227,21 @@ onLoad(async (options) => {
   sessionGrade = openCourseGradeSession()
   gradeLabel.value = getLearningGradeLabel(sessionGrade)
   loadByMode(options.mode || 'due')
+})
+
+// 从设置页切换年级返回时，按新年级重载错题并重置本轮（首屏由 onLoad 初始化）
+onShow(async () => {
+  if (!sessionGrade) return
+  await awaitLearningSession()
+  const cur = openCourseGradeSession()
+  if (cur === sessionGrade) return
+  sessionGrade = cur
+  gradeLabel.value = getLearningGradeLabel(sessionGrade)
+  submitted.value = false
+  finished.value = false
+  correctCount.value = 0
+  masteredCount.value = 0
+  loadByMode(currentMode.value)
 })
 
 // ---- 拆分辅助 ----

@@ -252,7 +252,15 @@ function goBack() {
 
 onShow(async () => {
   await awaitLearningSession()
-  if (!sessionGrade) sessionGrade = openCourseGradeSession()
+  const cur = openCourseGradeSession()
+  if (cur !== sessionGrade) {
+    sessionGrade = cur
+    preferencesHydrated = false
+    started.value = false
+    roundFinished.value = false
+    roundKey.value++
+    selectedUnits.value = []
+  }
   isTextbookMode.value = isTextbookGrade(sessionGrade)
   unitConfig.value = getEnglishUnitConfig(sessionGrade) || {}
   unitKeys.value = getEnglishUnitKeys(sessionGrade)

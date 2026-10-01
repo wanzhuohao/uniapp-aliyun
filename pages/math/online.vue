@@ -384,6 +384,35 @@
             />
           </template>
 
+          <!-- 竖式：两位数加减（100以内），列竖式，填结果 -->
+          <template v-else-if="q.type === 'vertical'">
+            <view class="vertical">
+              <view class="vert-row">
+                <text class="vert-cell vert-spacer" />
+                <text class="vert-cell" v-for="(d, ci) in vertDigits(q.a)" :key="'a' + ci">{{ d }}</text>
+              </view>
+              <view class="vert-row">
+                <text class="vert-cell vert-op">{{ q.op }}</text>
+                <text class="vert-cell" v-for="(d, ci) in vertDigits(q.b)" :key="'b' + ci">{{ d }}</text>
+              </view>
+              <view class="vert-line" />
+              <view class="vert-row">
+                <text class="vert-cell vert-spacer" />
+                <text class="vert-cell vert-spacer" />
+                <input
+                  class="vert-input"
+                  type="number"
+                  :value="q.userAnswer"
+                  :disabled="submissionFrozen"
+                  :focus="i === currentFocus"
+                  placeholder="?"
+                  @input="onInput(i, $event)"
+                  @confirm="onConfirm(i)"
+                />
+              </view>
+            </view>
+          </template>
+
           <!-- 普通加减/连加减: 算式 = 输入框 -->
           <template v-else>
             <text class="q-expr">{{ q.expr }} =</text>
@@ -542,6 +571,7 @@
 
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
 import PageHeader from '../../components/PageHeader.vue'
 import { generateQuestions, LEVEL_CONFIG, checkAnswer, gradeSupportsType } from '../../utils/math/questionEngine.js'
 import { buildOnlineSubmissionTarget, createOnlineSubmissionIntent } from '../../utils/math/mathStorage.js'
@@ -563,6 +593,7 @@ const levelOptions = [
 const typeOptions = [
   { value: 'add',          label: '加法' },
   { value: 'sub',          label: '减法' },
+  { value: 'vertical',     label: '竖式' },
   { value: 'compare',      label: '比大小' },
   { value: 'fill',         label: '填空' },
   { value: 'chain',        label: '连加连减' },
@@ -612,7 +643,7 @@ const selectedTypes  = ref(new Set(Array.isArray(_prefs.types) ? _prefs.types : 
 const selectedSpecial = ref(typeof _prefs.special === 'string' ? _prefs.special : '')
 
 // 二年级上新增题型
-const NEW_MATH_TYPES = ['mulT', 'multFill', 'sameAdd', 'parenMix', 'pattern']
+const NEW_MATH_TYPES = ['mulT', 'multFill', 'sameAdd', 'parenMix', 'pattern', 'vertical']
 // 响应式当前年级（sessionGrade 是非响应式 let，用它驱动题型列表过滤的计算属性）
 const currentGrade = ref('')
 // 二年级（上/下）默认带上二上新增题型，便于直接看到效果；其他年级维持默认只加法
@@ -721,11 +752,9 @@ watch([selectedLevel, selectedTypes, selectedSpecial, selectedCount, customCount
   _persistTimer = setTimeout(flushPrefs, 200)
 })
 
-onMounted(async () => {
-  await awaitLearningSession()
-  sessionGrade = openCourseGradeSession()
+// 按当前年级重新装载本地设置（首载与切年级返回时复用）
+function hydrateSettings() {
   currentGrade.value = sessionGrade
-  session = getLearningSession()
   const prefs = loadPrefs() || {}
   selectedLevel.value = typeof prefs.level === 'number' ? prefs.level : defaultLevel()
   selectedTypes.value = new Set(resolveTypes(prefs.types))
@@ -735,7 +764,30 @@ onMounted(async () => {
   customCountVal.value = typeof prefs.customCountVal === 'string' ? prefs.customCountVal : customCountVal.value
   timerEnabled.value = typeof prefs.timerEnabled === 'boolean' ? prefs.timerEnabled : timerEnabled.value
   timerMinutes.value = typeof prefs.timerMinutes === 'number' ? prefs.timerMinutes : timerMinutes.value
+}
+
+onMounted(async () => {
+  await awaitLearningSession()
+  sessionGrade = openCourseGradeSession()
+  session = getLearningSession()
+  hydrateSettings()
   prefsHydrated = true
+})
+
+// 从设置页切换年级返回时，页面实例是还原而非重挂载，onMounted 不会重跑。
+// 这里在 onShow 里重新读取当前年级，若已变化则重载该年级的偏好与题型，保证"立马更新"。
+onShow(async () => {
+  if (!prefsHydrated) return
+  try {
+    await awaitLearningSession()
+  } catch {
+    return
+  }
+  const cur = openCourseGradeSession()
+  if (cur === sessionGrade) return
+  sessionGrade = cur
+  session = getLearningSession()
+  hydrateSettings()
 })
 
 // ---- 答题状态 ----
@@ -979,6 +1031,11 @@ function onConfirm(index) {
     currentFocus.value = index + 1
     scrollTarget.value = 'q-' + (index + 1)
   }
+}
+
+// 竖式辅助：把两位数拆成个位、十位两个字符（a/b 恒为两位数）
+function vertDigits(n) {
+  return String(n).split('')
 }
 
 function selectCompare(index, symbol) {
@@ -1454,6 +1511,51 @@ onUnmounted(() => {
   color: #0F2B48;
   font-family: 'Courier New', 'Consolas', monospace;
   letter-spacing: 1rpx;
+}
+.vertical {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8rpx;
+  padding: 8rpx 0;
+}
+.vert-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 192rpx;
+}
+.vert-cell {
+  width: 64rpx;
+  height: 56rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 38rpx;
+  font-weight: 900;
+  color: #0F2B48;
+  font-family: 'Courier New', 'Consolas', monospace;
+}
+.vert-spacer { color: transparent; }
+.vert-op {
+  font-size: 32rpx;
+  color: #1E5A8E;
+}
+.vert-line {
+  width: 192rpx;
+  border-top: 4rpx solid #0F2B48;
+  margin: 4rpx 0;
+}
+.vert-input {
+  width: 120rpx;
+  height: 60rpx;
+  border: 3rpx solid #D8E4F0;
+  border-radius: 12rpx;
+  text-align: center;
+  font-size: 36rpx;
+  font-weight: 900;
+  background: #fff;
+  color: #1E5A8E;
 }
 .q-input {
   width: 110rpx;
